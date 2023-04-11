@@ -1,0 +1,63 @@
+version: '3.8'
+
+volumes:
+  data:
+  uploads:
+
+networks:
+  backend:
+
+services:
+# FRONTEND
+  front:
+    image: node:lts-alpine
+    container_name: frontend
+    working_dir: /app
+    command: sh -c "npm install 
+                    && npm run build
+                    && npm install -g serve 
+                    && serve -s build -l 3000"
+    environment:
+      - PUBLIC_URL=${FRONT_URL}
+      - REACT_APP_BACKEND_URL=${BACK_URL}
+      - REACT_APP_BACKEND_SOCKET=${SOCKET_URL}
+    volumes:
+      - ./front:/app
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - back
+  test-db:
+    image: postgres:13
+    container_name: postgres
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: nest
+    networks:
+      - backend
+  back:
+    image: node:lts-alpine
+    container_name: backend
+    working_dir: /app
+    command: sh -c "npm install
+                    && npx prisma migrate deploy
+                    && npm run start"
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=nest
+    volumes:
+      - ./back:/app
+      - uploads:/app/image_dir
+    ports:
+      - "4000:4000"
+      - "5555:5555"
+    restart: unless-stopped
+    networks:
+      - backend
+    depends_on:
+      - test-db
