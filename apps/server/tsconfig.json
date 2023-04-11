@@ -10,6 +10,9 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "paths": {
+      "@nestjs/*": ["node_modules/@nestjs/*"]
+    },  
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
