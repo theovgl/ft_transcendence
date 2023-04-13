@@ -14,11 +14,9 @@ services:
     container_name: frontend
     working_dir: /app
     command: sh -c "npm install 
-                    && npm run dev"
-    environment:
-      - PUBLIC_URL=${FRONT_URL}
-      - REACT_APP_BACKEND_URL=${BACK_URL}
-      - REACT_APP_BACKEND_SOCKET=${SOCKET_URL}
+                    && npm run build
+                    && npm install -g serve 
+                    && serve -s build -l 3000"
     volumes:
       - ./apps/website:/app
     ports:
@@ -43,14 +41,13 @@ services:
     working_dir: /app
     command: sh -c "npm install
                     && npx prisma migrate deploy
-                    && npm run start:dev"
+                    && npm run start"
     environment:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=postgres
       - POSTGRES_DB=nest
     volumes:
       - ./apps/server:/app
-      - uploads:/app/image_dir
     ports:
       - "4000:4000"
       - "5555:5555"
