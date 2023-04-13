@@ -35,13 +35,13 @@ services:
       POSTGRES_DB: nest
     networks:
       - backend
-  back:
-    image: node:lts-alpine
+
+  backend:
+    build:
+      context: ./apps/server/
+      target: dev
     container_name: backend
-    working_dir: /app
-    command: sh -c "npm install
-                    && npx prisma migrate deploy
-                    && npm run start"
+    command: npm run start:dev
     environment:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=postgres
