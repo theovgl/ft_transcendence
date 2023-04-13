@@ -57,3 +57,4 @@ services:
       - backend
     depends_on:
       - test-db
+
