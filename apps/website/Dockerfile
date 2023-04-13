@@ -1,7 +1,6 @@
 # Stage n.1 : Install deps
 FROM node:lts-alpine AS deps
 RUN apk add --no-cache libc6-compat
-#USER node
 WORKDIR /app
 
 COPY package*.json ./
@@ -19,11 +18,8 @@ ENV NEXT_TELEMETRY_DISABLE 1
 
 RUN npm run build
 
-#USER node
-
 # Stage n.3 : Run
 FROM node:lts-alpine AS runner
-#USER node
 WORKDIR /app
 
 ENV NODE_ENV production
