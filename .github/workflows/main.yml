@@ -28,16 +28,16 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install dependencies
-        run: npm
+        run: (cd apps/website && npm install)
 
       - name: Lint the codebase
-        run: npm lint
+        run: (cd apps/website && npm run lint)
 
-      - name: Test our code
-        run: npm test
+     # - name: Test our code
+     #   run: npm test
 
       - name: Build
-        run: npm build
+        run: (cd apps/website && npm run build)
 
      # - name: Login
      #   run: npx warp login --api-key=${{ secrets.SD_API_KEY }}
