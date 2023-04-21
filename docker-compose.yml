@@ -15,6 +15,7 @@ services:
       context: ./apps/website/
       target: runner
     command: npm run dev
+    entrypoint: ./docker-entrypoint.sh
     environment:
       NODE_ENV: development
     volumes:
@@ -43,6 +44,7 @@ services:
       target: dev
     container_name: backend
     command: npm run start:dev
+    entrypoint: ./docker-entrypoint.sh
     environment:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=postgres
