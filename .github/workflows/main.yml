@@ -1,0 +1,44 @@
+name: Deploy
+
+# Controls when the workflow will run
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+  push:
+    branches:
+      - 'dev'
+      - 'main'
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    env:
+      # replace with your project/env name
+      ORG_PROJECT: ft_transcendence
+      DEPLOY_ENV: dev
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: (cd apps/website && npm install)
+
+      - name: Lint the codebase
+        run: (cd apps/website && npm run lint)
+
+     # - name: Test our code
+     #   run: npm test
+
+      - name: Build
+        run: (cd apps/website && npm run build)
+
+     # - name: Login
+     #   run: npx warp login --api-key=${{ secrets.SD_API_KEY }}
+
+     # - name: Deploy
+     #   run: npx warp deploy --project ${ORG_PROJECT} --env ${DEPLOY_ENV}
