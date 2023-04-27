@@ -1,5 +1,6 @@
 import Head from 'next/head';
-import Field from '../components/Field.tsx';
+import LoginForm from '@/components/Form.tsx';
+import formStyle from '@/styles/form.module.css';
 
 export default function Home() {
 	return (
@@ -10,10 +11,7 @@ export default function Home() {
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			<body>
-				<Field id="login" name="login" placeholder="Enter login" size="16"/>
-				<Field id="password" name="password" placeholder="password" size="16"/>
-			</body>
+			<LoginForm/>
 		</>
 	);
 }
