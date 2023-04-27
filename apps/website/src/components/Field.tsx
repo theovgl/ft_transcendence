@@ -1,9 +1,9 @@
 export interface IField
 {
-	id: string
-	name: string
-	placeholder: string
-	size: number
+	id?: string
+	name?: string
+	placeholder?: string
+	size?: number
 }
 
 export default function Field(option: IField)
@@ -16,5 +16,6 @@ export default function Field(option: IField)
 		required
 		minLength={4} 
 		size={option.size ? option.size : 12}	/>
+
 	);
 }
