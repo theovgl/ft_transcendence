@@ -10,12 +10,12 @@ export interface IForm
 export default function LoginForm(option: IForm)
 {
 	return (
-		<div>
-		<form action ={option.action ? option.action : "/api/cool"} method={option.method ? option.method : "post"}>
-			<Field id="login" name="login" placeholder="Enter login" size={16}/>
-			<Field id="password" name="password" placeholder="password" size={16}/>
-			<Button type="submit" label="Log in"/>
-		</form>
-		</div>
+			<div>
+				<form action ={option.action ? option.action : "/api/cool"} method={option.method ? option.method : "post"}>
+					<Field id="login" name="login" placeholder="Enter login" size={16}/>
+					<Field id="password" name="password" placeholder="password" size={16}/>
+					<Button type="submit" label="Log in"/>
+				</form>
+			</div>
 	);
 }
