@@ -1,3 +1,5 @@
+import formStyle from '@/styles/form.module.css';
+
 export interface IField
 {
 	id: string

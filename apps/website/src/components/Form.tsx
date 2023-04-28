@@ -1,5 +1,6 @@
 import Field from '../components/Field.tsx';
 import Button from '../components/Button.tsx';
+import formStyle from '@/styles/form.module.css';
 
 export default function LoginForm(option: IForm) {
 	return (
