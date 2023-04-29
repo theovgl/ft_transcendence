@@ -9,13 +9,14 @@ enum ButtonTypes
 
 export interface IButton
 {
-	label: string
-	type: string
+	label?: string;
+	type?: 'button' | 'submit' | 'reset';
+	style?: string;
 }
 
 export default function Button(option: IButton) {
 	return (
-		<button className={formStyle.row}
+		<button className={option.style}
 			type={option.type
 				? option.type
 				: ButtonTypes.button}
