@@ -1,4 +1,4 @@
-import homepageStyle from "@/styles/homepage.module.css"
+import headerStyle from "@/styles/header.module.css"
 import Button from "@/components/Button.tsx"
 
 export interface IHeader
@@ -10,16 +10,16 @@ export interface IHeader
 export default function Header(option: IHeader)
 {
 	return (
-		<div className={homepageStyle.header}>
-				<a className={homepageStyle.header_page}>
+		<div className={headerStyle.main}>
+				<a className={headerStyle.page_name}>
 						{option.current_page}
 				</a>
 				<div>
-					<a className={homepageStyle.a_button_head}>
-						<Button style={homepageStyle.button_head} type="button" label="Settings"/>
+					<a className={headerStyle.button_wrapper}>
+						<Button style={headerStyle.button} type="button" label="Settings"/>
 					</a>
-					<a className={homepageStyle.a_button_head}>
-						<Button style={homepageStyle.button_head} type="button" label="Disconnect"/>
+					<a className={headerStyle.button_wrapper}>
+						<Button style={headerStyle.button} type="button" label="Disconnect"/>
 					</a>
 				</div>
 		</div>
