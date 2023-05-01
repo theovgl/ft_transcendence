@@ -12,7 +12,9 @@ export default function Chat()
 					<Tab label="Contact 1" active={false}/>
 				</div>
 				<div className={chatStyle.contact_list}>
-				 contact list
+					<Contact name="M.Obama" picture="temp" content="in-game" context="presentation"/>
+					<Contact name="XxX_Obama_Gaming_XxX" picture="temp" content="online" context="presentation"/>
+					<Contact name="TheRealObama" picture="temp" content="offline" context="presentation"/>
 				</div>
 				<div className={chatStyle.main}>
 					<Contact name="M.Obama" picture="temp" content="salu" context="message"/>

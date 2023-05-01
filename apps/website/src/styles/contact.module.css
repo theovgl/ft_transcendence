@@ -1,7 +1,7 @@
 .grid
 {
 	display:grid;
-	grid-template-columns: [col1] 10% [col2] 90%;
+	grid-template-columns: [col1] 50px [col2] auto;
 	grid-template-rows: [row1] 10% [row2] 90%;
 	padding-top:5px;
 	margin:0;
@@ -23,6 +23,15 @@
 	grid-column: col2 / span 1;
 }
 
+.name_presentation
+{
+	grid-row: row1 / span 1;
+	grid-column: col2 / span 1;
+
+	display: flex;
+	justify-content: center;
+}
+
 .message
 {
 	grid-column: col2 / span 1;
@@ -31,5 +40,8 @@
 
 .presentation
 {
-
+	grid-column: col2 / span 1;
+	grid-row: row1/ span 2;
+	display: flex;
+	justify-content: center;
 }

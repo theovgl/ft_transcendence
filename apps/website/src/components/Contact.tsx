@@ -12,12 +12,21 @@ export interface IContact
 	context: "message" | "presentation";
 }
 
-function choose_context_style(context: string)
+function choose_content_style(context: string)
 {
 	if (context == "message")
 		return contactStyle.message;
 	else if (context == "presentation")
 		return contactStyle.presentation;
+	return undefined;
+}
+
+function choose_name_style(context: string)
+{
+	if (context == "message")
+		return contactStyle.name;
+	else if (context == "presentation")
+		return contactStyle.name_presentation;
 	return undefined;
 }
 
@@ -31,10 +40,10 @@ export default function Contact(option: IContact)
 			src={profilePic}
 			/>
 			</div>
-		<div className={contactStyle.name}>
+		<div className={choose_name_style(option.context)}>
 			{option.name}	
 		</div>
-			<p className={choose_context_style(option.context)}>
+			<p className={choose_content_style(option.context)}>
 				{option.content}
 			</p>
 		</div>
