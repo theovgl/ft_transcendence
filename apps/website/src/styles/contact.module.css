@@ -1,0 +1,35 @@
+.grid
+{
+	display:grid;
+	grid-template-columns: [col1] 10% [col2] 90%;
+	grid-template-rows: [row1] 10% [row2] 90%;
+	padding-top:5px;
+	margin:0;
+	width:100%;
+}
+
+.picture
+{
+	display: flex;
+	align-items: flex-start;
+	justify-content:center;
+	grid-column: col1 / span 1;
+	grid-row: row1/ span 2;
+}
+
+.name
+{
+	grid-row: row1 / span 1;
+	grid-column: col2 / span 1;
+}
+
+.message
+{
+	grid-column: col2 / span 1;
+	grid-row: row1/ span 2;
+}
+
+.presentation
+{
+
+}
