@@ -1,9 +1,34 @@
-import navbarStyle from "@/styles/navbar.module.css"
-import Button from "@/components/Button.tsx"
-
+import navbarStyle from "../styles/navbar.module.scss";
+import Button from "@/components/Button.tsx";
+import LoginButton from "./LoginButton";
+import { LoginContext } from "@/utils/contexts/LoginContext";
+import { useContext } from "react";
 
 export default function Navbar()
 {
+	const loggedIn = useContext(LoginContext);
+
+	if (!loggedIn) {
+		return (
+			<nav className={navbarStyle.nav_container}>
+				<h1 className={navbarStyle.title}>Transcendence</h1>
+				<div className={navbarStyle.links_container}>
+					<LoginButton theme='dark'>Signup</LoginButton>
+					<LoginButton theme='light'>Login</LoginButton>
+				</div>
+			</nav>
+		)
+	}
+	else {
+		return (
+			<nav className={navbarStyle.nav_container}>
+				<h1 className={navbarStyle.title}>Transcendence</h1>
+			</nav>
+		)
+	}
+}
+
+/*
 	return (
 		<>
 			<div className={navbarStyle.main}>
@@ -21,4 +46,4 @@ export default function Navbar()
 			</div>
 		</>
 	);
-}
+*/
