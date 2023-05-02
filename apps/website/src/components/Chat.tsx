@@ -23,9 +23,8 @@ export default function Chat()
 					<Contact name="M.Obama" picture="temp" content="spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam " context="message"/>
 					<Contact name="M.Obama" picture="temp" content="oups" context="message"/>
 				</div>
-				<div className={chatStyle.input}>
-				 message input
-				</div>
+				<input type="text" className={chatStyle.input}>
+				</input>
 		</div>
 	);
 }
