@@ -24,21 +24,38 @@ export default function Chat()
 
   const socketInitializer = async () => {
     // We just call it because we don't need anything else out of it
-    await fetch("/api/socket");
 
-    socket = io();
+    socket = io("http://localhost:4000", 
+		{
+			transports: ['websocket', 'polling'],
+			methods: ["GET", "POST"],
+			allowedHeaders:["Access-Control-Allow-Origin: http://www.localhost"]
+		});
 
-    socket.on("newIncomingMessage", (msg) => {
-      setMessages((currentMsg) => [
-        ...currentMsg,
-        { author: msg.author, message: msg.message },
-      ]);
-      console.log(messages);
-    });
+		socket.on("message", (msg: Message) => {
+  	    setMessages((currentMsg) => [
+  	      ...currentMsg,
+  	      { author: msg.author, message: msg.message },
+  	    ]);
+
+		});
+
+//    socket.on("newIncomingMessage", (msg) => {
+//			console.log("on newIncomingMessage");
+//      setMessages((currentMsg) => [
+//        ...currentMsg,
+//        { author: msg.author, message: msg.message },
+//      ]);
+//      console.log(messages);
+//    });
+		socket.on("connect_error", (error) => {
+			console.log(error);
+		});
   };
 
 	const sendMessage = async () => {
 		socket.emit("createdMessage", { author: chosenUsername, message });
+		console.log("emit createdMessage");
 		setMessages((currentMsg) => [
 			...currentMsg,
 			{ author: chosenUsername, message },
@@ -54,6 +71,7 @@ export default function Chat()
 			}
 		}
 	};
+
 
 	return (
 		<>
