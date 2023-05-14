@@ -13,7 +13,7 @@ import { AppGateway } from './chat/app.gateway';
     ConfigModule.forRoot({
       isGlobal: true
   }),],
-  controllers: [AppController],
-  providers: [AppService, AppGateway],
+	controllers: [AppController],
+	providers: [AppService, AppGateway],
 })
 export class AppModule {}
