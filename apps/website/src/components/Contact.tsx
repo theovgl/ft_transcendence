@@ -37,6 +37,7 @@ export default function Contact(option: IContact)
 		<div className={contactStyle.grid}>
 		<div className={contactStyle.picture}>
 			<Image 
+			alt="Obamna"
 			src={profilePic}
 			/>
 			</div>

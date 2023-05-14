@@ -1,10 +1,89 @@
-import chatStyle from "@/styles/chat.module.css"
-import Button from "@/components/Button.tsx"
-import Tab from "@/components/Tab.tsx"
-import Contact from "@/components/Contact.tsx"
+import chatStyle from "@/styles/chat.module.css";
+import Button from "@/components/Button.tsx";
+import Tab from "@/components/Tab.tsx";
+import Contact from "@/components/Contact.tsx";
+import { io, Socket } from "socket.io-client";
+import { useState, useEffect } from "react";
+
+
+type Message = {
+  author: string;
+  message: string;
+};
+
+interface ServerToClientEvents {
+  noArg: () => void;
+  basicEmit: (a: number, b: string, c: Buffer) => void;
+  withAck: (d: string, callback: (e: number) => void) => void;
+	msgToClient: (msg: Message) => void;
+}
+
+interface ClientToServerEvents {
+  hello: () => void;
+	msgToServer: (msg: Message) => void;
+}
+
+interface InterServerEvents {
+  ping: () => void;
+}
+
+interface SocketData {
+  name: string;
+  age: number;
+}
+
+let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 
 export default function Chat()
 {
+  const [username, setUsername] = useState("");
+  const [chosenUsername, setChosenUsername] = useState("");
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<Array<Message>>([]);
+
+	socket = io( "http://localhost:4000");
+
+	useEffect(() => {
+    socketInitializer();
+  }, []);
+
+
+	const socketInitializer = async () => {
+    // We just call it because we don't need anything else out of it
+
+
+
+    socket.on("msgToClient", (msg: Message) => {
+      setMessages((currentMsg) => [
+        ...currentMsg,
+        { author: msg.author, message: msg.message },
+      ]);
+      console.log(messages);
+    });
+
+};
+	const sendMessage = async () => {
+		socket.emit("msgToServer", { author: chosenUsername, message });
+		setMessages((currentMsg) => [
+			...currentMsg,
+			{ author: chosenUsername, message },
+		]);
+		setMessage("");
+	};	
+
+	const handleKeypress = (e:any) => {
+  //it triggers by pressing the enter key
+  if (e.keyCode === 13) {
+    if (message) {
+      sendMessage();
+    }
+  }
+//  socket.on('msgToClient', (message:string) => {
+//   this.receivedMessage(message)
+//  })
+	}
+
+
 	return (
 		<div className={chatStyle.grid}>
 				<div className={chatStyle.tab_list}>
@@ -23,7 +102,12 @@ export default function Chat()
 					<Contact name="M.Obama" picture="temp" content="spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam " context="message"/>
 					<Contact name="M.Obama" picture="temp" content="oups" context="message"/>
 				</div>
-				<input type="text" className={chatStyle.input}>
+				<input type="text" className={chatStyle.input}
+				                placeholder="New message..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyUp={handleKeypress}
+				>
 				</input>
 		</div>
 	);
