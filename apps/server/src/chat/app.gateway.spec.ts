@@ -6,10 +6,10 @@ describe('AppGateway', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AppGateway],
+      providers: [ChatGateway],
     }).compile();
 
-    gateway = module.get<AppGateway>(AppGateway);
+    gateway = module.get<AppGateway>(ChatGateway);
   });
 
   it('should be defined', () => {

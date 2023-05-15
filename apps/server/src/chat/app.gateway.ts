@@ -18,24 +18,20 @@ import {
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 
-@WebSocketGateway({
-  cors: {
-    origin: '*',
-  },
-})
-export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-
- @WebSocketServer() server: Server;
- private logger: Logger = new Logger('AppGateway');
+@WebSocketGateway({cors: {origin: ['https://hoppscotch.io', 'http://localhost:3000', 'http://localhost:4000']}})
+export class ChatGateway {//implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+// @WebSocketServer() server: Server;
+ private logger: Logger = new Logger('ChatGateway');
 
  @SubscribeMessage('msgToServer')
  handleMessage(client: Socket, payload: string): void {
-  this.server.emit('msgToClient', payload);
+	 console.log("cool");
+  //this.server.emit('msgToClient', payload);
  }
 
- afterInit(server: Server) {
-  this.logger.log('Init');
- }
+// afterInit(server: Server) {
+//  this.logger.log('Init');
+// }
 
  handleDisconnect(client: Socket) {
   this.logger.log(`Client disconnected: ${client.id}`);
