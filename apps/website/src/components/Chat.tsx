@@ -62,27 +62,24 @@ export default function Chat()
     });
 
 };
-	const sendMessage = async () => {
-		socket.emit("msgToServer", { author: chosenUsername, message });
-		setMessages((currentMsg) => [
-			...currentMsg,
-			{ author: chosenUsername, message },
-		]);
-		setMessage("");
-	};	
 
-	const handleKeypress = (e:any) => {
-  //it triggers by pressing the enter key
-  if (e.keyCode === 13) {
-    if (message) {
-      sendMessage();
-    }
-  }
-//  socket.on('msgToClient', (message:string) => {
-//   this.receivedMessage(message)
-//  })
+const sendMessage = async () => {
+	socket.emit("msgToServer", { author: chosenUsername, message });
+	setMessages((currentMsg) => [
+		...currentMsg,
+		{ author: chosenUsername, message },
+	]);
+	setMessage("");
+};	
+
+const handleKeypress = (e:any) => {
+//it triggers by pressing the enter key
+	if (e.keyCode === 13) {
+		if (message) {
+			sendMessage();
+		}
 	}
-
+}
 
 	return (
 		<div className={chatStyle.grid}>
@@ -96,14 +93,17 @@ export default function Chat()
 					<Contact name="TheRealObama" picture="temp" content="offline" context="presentation"/>
 				</div>
 				<div className={chatStyle.main}>
-					<Contact name="M.Obama" picture="temp" content="salu" context="message"/>
-					<Contact name="M.Obama" picture="temp" content="je suis barrack obama" context="message"/>
-					<Contact name="M.Obama" picture="temp" content="Je suis l'utilisateur par defaut du projet 42 transcendence" context="message"/>
-					<Contact name="M.Obama" picture="temp" content="spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam spam " context="message"/>
-					<Contact name="M.Obama" picture="temp" content="oups" context="message"/>
+				{
+					messages.map((msg, i) =>
+					{
+						return (
+							<Contact name="M.Obama" picture="temp" content={msg.message} context="message" key={i}/>
+						);
+					})
+				}
 				</div>
 				<input type="text" className={chatStyle.input}
-				                placeholder="New message..."
+				        placeholder="New message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyUp={handleKeypress}

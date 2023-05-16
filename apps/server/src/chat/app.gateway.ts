@@ -20,13 +20,12 @@ import { Socket, Server } from 'socket.io';
 
 @WebSocketGateway({cors: {origin: ['https://hoppscotch.io', 'http://localhost:3000', 'http://localhost:4000']}})
 export class ChatGateway {//implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
-// @WebSocketServer() server: Server;
+ @WebSocketServer() server: Server;
  private logger: Logger = new Logger('ChatGateway');
 
  @SubscribeMessage('msgToServer')
  handleMessage(client: Socket, payload: string): void {
-	 console.log("cool");
-  //this.server.emit('msgToClient', payload);
+  this.server.emit('msgToClient', payload);
  }
 
 // afterInit(server: Server) {
