@@ -1,3 +1,4 @@
+import chatStyle from "@/styles/chat.module.css";
 import contactStyle from "@/styles/contact.module.css"
 import Button from "@/components/Button.tsx"
 import Tab from "@/components/Tab.tsx"
@@ -42,7 +43,9 @@ export default function Contact(option: IContact)
 			/>
 			</div>
 		<div className={choose_name_style(option.context)}>
+		<button className={chatStyle.channelhook}>
 			{option.name}	
+		</button>
 		</div>
 			<p className={choose_content_style(option.context)}>
 				{option.content}

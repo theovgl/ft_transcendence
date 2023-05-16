@@ -9,7 +9,8 @@ import { useState, useEffect } from "react";
 type Message = {
   author: string;
   message: string;
-};
+	channel: string;
+}
 
 interface ServerToClientEvents {
   noArg: () => void;
@@ -32,6 +33,16 @@ interface SocketData {
   age: number;
 }
 
+//const tabs = Array.from(document.getElementsByClassName("ChannelTab"));
+//
+//tabs.forEach(tab => {
+//	tab.addEventListener('click', function SelectChannel()
+//	{
+//		console.log("test");
+//	});
+//});
+
+
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 
 export default function Chat()
@@ -40,6 +51,8 @@ export default function Chat()
   const [chosenUsername, setChosenUsername] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Array<Message>>([]);
+  const [rooms, setRooms] = useState<Array<String>>([]);
+  const [room, setRoom] = useState("");
 
 	socket = io( "http://localhost:4000");
 
@@ -49,10 +62,6 @@ export default function Chat()
 
 
 	const socketInitializer = async () => {
-    // We just call it because we don't need anything else out of it
-
-
-
     socket.on("msgToClient", (msg: Message) => {
       setMessages((currentMsg) => [
         ...currentMsg,
@@ -60,26 +69,27 @@ export default function Chat()
       ]);
       console.log(messages);
     });
+		socket.on("ChangeRoomFromClient", () => {
+			}
+	};
 
-};
+	const sendMessage = async () => {
+		socket.emit("msgToServer", { author: chosenUsername, message });
+		setMessages((currentMsg) => [
+			...currentMsg,
+			{ author: chosenUsername, message },
+		]);
+		setMessage("");
+	};	
 
-const sendMessage = async () => {
-	socket.emit("msgToServer", { author: chosenUsername, message });
-	setMessages((currentMsg) => [
-		...currentMsg,
-		{ author: chosenUsername, message },
-	]);
-	setMessage("");
-};	
-
-const handleKeypress = (e:any) => {
-//it triggers by pressing the enter key
-	if (e.keyCode === 13) {
-		if (message) {
-			sendMessage();
+	const handleKeypress = (e:any) => {
+	//it triggers by pressing the enter key
+		if (e.keyCode === 13) {
+			if (message) {
+				sendMessage();
+			}
 		}
 	}
-}
 
 	return (
 		<div className={chatStyle.grid}>
