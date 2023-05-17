@@ -43,6 +43,7 @@ interface SocketData {
 
 
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+socket = io( "http://localhost:4000" );
 
 export default function Chat()
 {
@@ -53,7 +54,6 @@ export default function Chat()
   const [rooms, setRooms] = useState<Array<String>>([]);
   const [room, setRoom] = useState("");
 
-	socket = io( "http://localhost:4000");
 
 	useEffect(() => {
     socketInitializer();
