@@ -32,6 +32,16 @@ interface SocketData {
   age: number;
 }
 
+//const tabs = Array.from(document.getElementsByClassName("ChannelTab"));
+//
+//tabs.forEach(tab => {
+//	tab.addEventListener('click', function SelectChannel()
+//	{
+//		console.log("test");
+//	});
+//});
+
+
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 
 export default function Chat()
