@@ -10,21 +10,23 @@ networks:
 services:
 # FRONTEND
   front:
-    image: node:lts-alpine
     container_name: frontend
-    working_dir: /app
-    command: sh -c "npm install 
-                    && npm run build
-                    && npm install -g serve 
-                    && serve -s build -l 3000"
+    build:
+      context: ./apps/website/
+      target: runner
+    command: npm run dev
+    entrypoint: ./docker-entrypoint.sh
+    environment:
+      NODE_ENV: development
     volumes:
       - ./apps/website:/app
     ports:
       - "3000:3000"
     restart: unless-stopped
     depends_on:
-      - back
-  test-db:
+      - backend
+
+  database:
     image: postgres:13
     container_name: postgres
     ports:
@@ -35,13 +37,14 @@ services:
       POSTGRES_DB: nest
     networks:
       - backend
-  back:
-    image: node:lts-alpine
+
+  backend:
+    build:
+      context: ./apps/server/
+      target: dev
     container_name: backend
-    working_dir: /app
-    command: sh -c "npm install
-                    && npx prisma migrate deploy
-                    && npm run start"
+    command: npm run start:dev
+    entrypoint: ./docker-entrypoint.sh
     environment:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=postgres
@@ -55,4 +58,5 @@ services:
     networks:
       - backend
     depends_on:
-      - test-db
+      - database
+
