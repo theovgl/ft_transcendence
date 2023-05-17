@@ -14,11 +14,9 @@ active = false;
 
 export default function Tab(option: ITab)
 {
-const ChangeTab = (e) => {
-	//it triggers by pressing the enter key
+const ChangeTab = () => {
 	if (active == false)
 		active = true;
-	e.preventDefault();
 	console.log("cool");
 }
 	return (
