@@ -54,11 +54,12 @@ export default function Chat()
   const [rooms, setRooms] = useState<Array<String>>([]);
   const [room, setRoom] = useState("");
 
-
 	useEffect(() => {
-    socketInitializer();
-  }, []);
-
+    	socketInitializer();
+		return () => {
+			socket.off('msgToClient');
+		  };
+  	}, []);
 
 	const socketInitializer = async () => {
     socket.on("msgToClient", (msg: Message) => {
@@ -74,7 +75,6 @@ export default function Chat()
 		socket.emit("msgToServer", { author: chosenUsername, message });
 		setMessages((currentMsg) => [
 			...currentMsg,
-			{ author: chosenUsername, message },
 		]);
 		setMessage("");
 	};	
