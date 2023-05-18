@@ -19,8 +19,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
  //Message Events
  @SubscribeMessage('msgToServer')
- handleMessage(client: Socket, payload: String): void {
-  console.log(payload);
+ handleMessage(client: Socket, payload: Message): void {
+  console.log(payload.message);
   this.server.emit('msgToClient', payload);
  }
 
