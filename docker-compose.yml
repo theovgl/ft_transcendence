@@ -26,7 +26,7 @@ services:
     depends_on:
       - backend
 
-  test-db:
+  database:
     image: postgres:13
     container_name: postgres
     ports:
@@ -58,5 +58,5 @@ services:
     networks:
       - backend
     depends_on:
-      - test-db
+      - database
 
