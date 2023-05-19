@@ -4,14 +4,15 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	width: 100%;
+	// width: 100%;
 	height: 70px;
 	background-color: $black-color;
 	color: $white-font-color;
-	margin: 15px;
 	padding: 15px 15px 15px 40px;
 	border-radius: 40px;
 	box-sizing: border-box;
+
+	box-shadow: 0 3px 10px rgba(0,0,0,0.1), 0 3px 10px rgba(0,0,0,0.20);
 }
 
 .title {
@@ -24,8 +25,16 @@
 	font-size: 20px;
 }
 
-.links_container {
+.button_container {
 	display: flex;
 	align-items: center;
 	gap: 10px;
+}
+
+.links_container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: 30px;
+	gap: 15px
 }
