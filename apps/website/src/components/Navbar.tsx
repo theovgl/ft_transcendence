@@ -1,49 +1,31 @@
-import navbarStyle from "../styles/navbar.module.scss";
-import Button from "@/components/Button.tsx";
-import LoginButton from "./LoginButton";
-import { LoginContext } from "@/utils/contexts/LoginContext";
-import { useContext } from "react";
+import navbarStyle from '../styles/navbar.module.scss';
+import LoginButton from './LoginButton';
+import { LoginContext } from '@/utils/contexts/LoginContext';
+import { useContext } from 'react';
+import NavbarLink from './NavbarLink';
 
-export default function Navbar()
-{
+export default function Navbar() {
 	const loggedIn = useContext(LoginContext);
 
 	if (!loggedIn) {
 		return (
 			<nav className={navbarStyle.nav_container}>
 				<h1 className={navbarStyle.title}>Transcendence</h1>
-				<div className={navbarStyle.links_container}>
-					<LoginButton theme='dark'>Signup</LoginButton>
-					<LoginButton theme='light'>Login</LoginButton>
+				<div className={navbarStyle.button_container}>
+					<LoginButton link="/signup" theme='dark'>Signup</LoginButton>
+					<LoginButton link="/login" theme='light'>Login</LoginButton>
 				</div>
 			</nav>
-		)
-	}
-	else {
+		);
+	} else {
 		return (
 			<nav className={navbarStyle.nav_container}>
 				<h1 className={navbarStyle.title}>Transcendence</h1>
+				<div className={navbarStyle.links_container}>
+					<NavbarLink href="/home">Home</NavbarLink>
+					<NavbarLink href="/chat">Chat</NavbarLink>
+				</div>
 			</nav>
-		)
+		);
 	}
 }
-
-/*
-	return (
-		<>
-			<div className={navbarStyle.main}>
-				<ul className={navbarStyle.button_list}>
-					<li className={navbarStyle.button_wrapper}><a>
-						<Button style={navbarStyle.button} label='play'/>
-					</a></li>
-					<li className={navbarStyle.button_wrapper}><a>
-						<Button style={navbarStyle.button} label='chat'/>
-					</a></li>
-					<li className={navbarStyle.button_wrapper}><a>
-						<Button style={navbarStyle.button} label='profile'/>
-					</a></li>
-				</ul>
-			</div>
-		</>
-	);
-*/
