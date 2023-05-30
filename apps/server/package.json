@@ -30,15 +30,11 @@
     "test:e2e": "dotenv -e .env.test -- jest --watch --no-cache --config ./test/jest-e2e.json"
   },
   "dependencies": {
-		"@nestjs/microservices": "",
-    "socket.io-client": "",
-    "socket.io": "",
-		"@nestjs/websockets":"",
-		"@nestjs/platform-socket.io":"",
     "@nestjs/common": "^9.3.12",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.3.12",
     "@nestjs/jwt": "^10.0.3",
+    "@nestjs/microservices": "",
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
     "@nestjs/platform-socket.io": "^9.4.0",
@@ -51,7 +47,9 @@
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "socket.io": "",
+    "socket.io-client": ""
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
