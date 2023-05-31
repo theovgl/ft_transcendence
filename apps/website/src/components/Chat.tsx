@@ -40,6 +40,14 @@ interface SocketData {
 //		console.log("test");
 //	});
 //});
+//
+
+type Tab = {}
+
+type GlobalProps = {
+	tab: Tab[]
+};
+
 
 
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
