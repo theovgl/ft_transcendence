@@ -1,0 +1,21 @@
+@import '../../styles/library';
+
+.stats_container {
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	padding: 30px 35px;
+	gap: 55px;
+	border: 5px solid $black-color;
+	box-shadow: 3px 4px 0px $black-color;
+	border-radius: 20px;
+}
+
+.stats_element {
+	font-family: $font-family;
+}
+
+.stats_element_title {
+	font-size: 20px;
+}

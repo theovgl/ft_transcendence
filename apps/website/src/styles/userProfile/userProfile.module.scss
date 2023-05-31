@@ -1,0 +1,60 @@
+@import '../library';
+
+.main {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 40px 20px 0px 20px;
+	gap: 10px;
+}
+
+.header {
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+	gap: 20px;
+}
+
+.header_buttons_container {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+	align-items: center;
+	padding: 0px 50px;
+	gap: 20px;
+}
+
+.user_id_container {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 0px;
+	gap: 20px;
+}
+
+.content_container {
+	display: flex;
+	// width: 100%;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 50px;
+}
+
+.content_section {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 10px;
+	gap: 10px;
+	width: 50%;
+}
+
+.title2 {
+	font-family: $font-family;
+	font-style: normal;
+	font-weight: 900;
+	font-size: 24px;
+}
