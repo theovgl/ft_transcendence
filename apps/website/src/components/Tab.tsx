@@ -1,5 +1,7 @@
 import tabStyle from "@/styles/tab.module.css"
 import Button from "@/components/Button.tsx"
+import {useState} from "react"
+
 
 export interface ITab
 {
@@ -7,24 +9,23 @@ export interface ITab
 	active: boolean;
 }
 
-let active: boolean;
-
-active = false;
-
-
 export default function Tab(option: ITab)
 {
-const ChangeTab = () => {
-	if (active == false)
-		active = true;
-	console.log("cool");
-}
+	const [buttonIsActive, changeButtonIsActive ] = useState(tabStyle.tab_single);
+
+	const ChangeTab = () => {
+		if (buttonIsActive == tabStyle.tab_single)
+			changeButtonIsActive(tabStyle.tab_single_active);
+		else
+			changeButtonIsActive(tabStyle.tab_single);
+		console.log("cool");
+	}
 	return (
 		<Button 
 			onClickFunction={ChangeTab}	
 			label={option.label} 
 			type="button" 
-			style={active? tabStyle.tab_single : tabStyle.tab_single_active}/>
+			style={buttonIsActive}/>
 
 
 	);
