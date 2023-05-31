@@ -11,22 +11,22 @@ export interface ITab
 
 export default function Tab(option: ITab)
 {
-	const [buttonIsActive, changeButtonIsActive ] = useState(tabStyle.tab_single);
+	const [buttonIsActive, changeButtonIsActive ] = useState(
+		option.active ? tabStyle.tab_single : tabStyle.tab_single_active
+	);
 
 	const ChangeTab = () => {
 		if (buttonIsActive == tabStyle.tab_single)
 			changeButtonIsActive(tabStyle.tab_single_active);
 		else
 			changeButtonIsActive(tabStyle.tab_single);
-		console.log("cool");
 	}
+	//implement signal create tab to server
 	return (
 		<Button 
 			onClickFunction={ChangeTab}	
 			label={option.label} 
 			type="button" 
 			style={buttonIsActive}/>
-
-
 	);
 }
