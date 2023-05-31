@@ -8,74 +8,33 @@ generator client {
 }
 
 model User {
-  id             Int          @id @default(autoincrement())
-  name           String				@unique
-  email          String				@unique
-  hashedPassword String?
+  id             Int     @id @default(autoincrement())
+  name           String  @unique
+  email          String  @unique
+  hashedPassword String
+  jwt            String?
   firstName      String?
   lastName       String?
-  picture        String?
-  level          Float        @default(0)
-  jwt            String?
-  role           Role         @default(USER)
-  rooms          Talk[]
-  messages       Message[]
-  matches        Play[]
-  friendProposal Friendship[] @relation("requester")
-  friendRequest  Friendship[] @relation("addressee")
-}
-
-model Room {
-  id       String    @id @default(uuid())
-  name     String
-  users    Talk[]
-  messages Message[]
-}
-
-model Message {
-  id        String   @id @default(uuid())
-  content   String
-  timestamp DateTime @default(now())
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-  room      Room     @relation(fields: [roomId], references: [id])
-  roomId    String
-}
-
-model Talk {
-  user   User   @relation(fields: [userId], references: [id])
-  userId Int
-  room   Room   @relation(fields: [roomId], references: [id])
-  roomId String
-
-  @@id([userId, roomId])
+  profilePicPath String?
+  level          Float   @default(0)
+  role           Role    @default(USER)
+  matches        Match[]
 }
 
 model Match {
   id        String    @id @default(uuid())
   createdAt DateTime  @default(now())
   endedAt   DateTime?
-  users     Play[]
+  users     User[]
+  score     Score?
 }
 
-model Play {
-  user    User   @relation(fields: [userId], references: [id])
-  userId  Int
+model Score {
+  id      String @id @default(uuid())
+  scoreUser1 Int
+  scoreUser2 Int
   match   Match  @relation(fields: [matchId], references: [id])
-  matchId String
-  score   Int    @default(0)
-
-  @@id([userId, matchId])
-}
-
-model Friendship {
-  requester   User             @relation("requester", fields: [requesterId], references: [id])
-  requesterId Int
-  addressee   User             @relation("addressee", fields: [addresseeId], references: [id])
-  addresseeId Int
-  status      FriendshipStatus @default(PENDING)
-
-  @@id([requesterId, addresseeId])
+  matchId String @unique
 }
 
 enum FriendshipStatus {
@@ -88,4 +47,3 @@ enum Role {
   USER
   ADMIN
 }
-
