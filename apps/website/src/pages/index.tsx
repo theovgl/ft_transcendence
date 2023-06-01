@@ -1,6 +1,5 @@
 import Head from 'next/head';
 import LoginForm from '@/components/Form.tsx';
-import formStyle from '@/styles/form.module.css';
 
 export default function Home() {
 	return (

@@ -1,0 +1,28 @@
+@import '../library';
+
+.button {
+	display: flex;
+	margin: 20px;
+	position: relative;
+	font-family: $font-family;
+	font-weight: 900;
+	font-size: 20px;
+	letter-spacing: 2px;
+	font-style: italic;
+	width: 150px;
+	height: 70px;
+	border-radius: 20px;
+	border: solid 4px $black-color;
+	border: solid 3px $off-white-color;
+	box-sizing: border-box;
+	align-items: center;
+	justify-content: center;
+	text-decoration: none;
+	background-color: $black-color;
+	color: $white-font-color;
+	z-index: 1;
+
+	&:hover {
+		//top: 0px
+	}
+}

@@ -1,12 +1,26 @@
-import Head from 'next/head'
-import LoginForm from '@/components/Form.tsx'
-import homepageStyle from "@/styles/homepage.module.css"
-import Navigation from "@/components/Navigation.tsx"
-import Leaderboard from "@/components/Leaderboard.tsx"
-import Button from "@/components/Button.tsx"
+import Head from 'next/head';
+import LoginForm from '@/components/Form.tsx';
+import 'normalize.css';
+import homepageStyle from "@/styles/homepage.module.scss";
+import Navigation from "@/components/Navigation.tsx";
+import Leaderboard from "@/components/Leaderboard/";
+import Button from "@/components/Button/Button";
+import Navbar from '@/components/Navbar';
+import PlayButton from '@/components/PlayButton';
+import { useEffect } from 'react';
 
 export default function Home() {
-return (
+
+	return (
+		<div className={homepageStyle.container}>
+			<Navbar />
+			<main className={homepageStyle.content}>
+				<PlayButton />
+				<Leaderboard />
+			</main>
+		</div>
+	);
+/* return (
 		<>
 				<Navigation current_page="HomePage"/>
 				<div className={homepageStyle.main}>
@@ -14,5 +28,5 @@ return (
 					<Leaderboard/>
 				</div>
 		</>
-)
+)*/
 }
