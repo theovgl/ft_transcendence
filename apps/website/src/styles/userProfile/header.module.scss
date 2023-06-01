@@ -1,0 +1,29 @@
+@import '../library';
+
+.id_container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+	padding: 0;
+	gap: 10px;
+
+	p {
+		margin: 0;
+	}
+}
+
+.fullname {
+	font-family: $font-family;
+	color: black;
+	font-weight: 700;
+	font-size: 24px;
+}
+
+.username {
+	font-family: $font-family;
+	font-weight: 500;
+	font-size: 20px;
+	color: #8D8D8D;
+}
+

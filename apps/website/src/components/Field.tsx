@@ -11,6 +11,7 @@ export interface IField
 export default function Field(option: IField) {
 	return (
 		<input type="text"
+			className={formStyle.row}
 			id={option.id
 				? option.id
 				: 'id_temp'} 
