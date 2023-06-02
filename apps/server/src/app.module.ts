@@ -3,12 +3,11 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
-import { UploadModule } from './upload/upload.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 
 @Module({
-	imports: [AuthModule, UploadModule, MulterModule.register({
+	imports: [AuthModule, MulterModule.register({
 		storage: memoryStorage()
 	}),
 	UserModule, PrismaModule,
