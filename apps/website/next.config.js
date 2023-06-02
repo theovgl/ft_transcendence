@@ -4,6 +4,11 @@ const nextConfig = {
 	eslint: {
 		ignoreDuringBuilds: true,
 	},
+	images: {
+		domains: ['backend'],
+		formats: ['image/webp'],
+    	loader: 'default',
+	  },
 };
 
 module.exports = nextConfig;
