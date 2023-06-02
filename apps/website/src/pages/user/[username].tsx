@@ -45,7 +45,7 @@ export default function Profile() {
 						<>
 							<div className={styles.header}>
 								<div className={styles.user_id_container}>
-									<ProfilePic />
+									<ProfilePic path={'http://backend:4000/users/profile-picture/' + userInfo.profilePicPath} />
 									<Name Username={userInfo.name} FirstName={userInfo.firstName} LastName={userInfo.lastName} />
 								</div>
 								<div className={styles.header_buttons_container}>
