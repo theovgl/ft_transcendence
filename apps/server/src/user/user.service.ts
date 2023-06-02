@@ -43,15 +43,19 @@ export class UserService {
 	async uploadProfilePicture(userId: number, image: Buffer): Promise<void> {
 		try {
 			// Convert whatever image in webp format
-			const convertedImage = await sharp(image, )
-				.resize(400, 400)
-				.toFormat('webp')
+			const convertedImage = await sharp(image)
+				.resize(400, 400, {
+					fit: 'cover'
+				})
+				.webp({
+					nearLossless: true
+				})
 				.toBuffer();
-	
+
 			// Assign this image a unique name
 			const uniqueFilename = uuidv4();
 			const convertedImageFilename = `${uniqueFilename}.webp`; 
-	
+
 			// Create the right directory if it doesn't exists
 			if (!fs.existsSync(`${process.env.UPLOADS_DESTINATION}/profile-pictures`)) {
 				fs.mkdirSync(`${process.env.UPLOADS_DESTINATION}/profile-pictures`, { recursive: true })
@@ -59,14 +63,14 @@ export class UserService {
 
 			// Save the file in that directory
 			fs.writeFileSync(`${process.env.UPLOADS_DESTINATION}/profile-pictures/${convertedImageFilename}`, convertedImage);
-			
+
 			// Update user table with the location of the image
 			await this.prisma.user.update({
 				where: {
 					id: userId
 				},
 				data: {
-					profilePicPath: `${process.env.UPLOADS_DESTINATION}/profile-pictures/${convertedImageFilename}`
+					profilePicPath: `${convertedImageFilename}`
 				}
 			});
 		} catch (error) {
