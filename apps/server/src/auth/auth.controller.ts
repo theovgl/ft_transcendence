@@ -1,9 +1,27 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto';
+import { ftAuthGuard } from './guard/ft.guards';
 
 @Controller('auth')
 export class AuthController {
+	@Get('42/login')
+	@UseGuards(ftAuthGuard)
+	handleLogin() {
+		return {msg: 'Login with 42'};
+	}
+
+	@Get('42/callback')
+	@UseGuards(ftAuthGuard)
+	handleLoginCallback() {
+		return {msg: 'Login with 42 callback'};
+	}
+	
+
+
+
+
+
 	constructor(private authService: AuthService) {}
   @Post('signup')
 	signup(@Body() dto: AuthDto) {
@@ -18,3 +36,4 @@ export class AuthController {
   	return this.authService.signin(dto);
   }
 }
+
