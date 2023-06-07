@@ -1,17 +1,30 @@
+import React from 'react';
 import FormLabel from './FormLabel';
 import styles from './LabeledInput.module.scss';
-import TextInput from './TextInput';
+import { Path, UseFormRegister } from 'react-hook-form';
 
-interface Props {
-	title: string;
-	inputPlaceholder: string;
+interface IFormValues {
+	'Email': string;
+	'First Name': string;
+	'Last Name': string;
 }
 
-export default function LabeledInput({title, inputPlaceholder}: Props) {
+type InputProps = {
+	label: Path<IFormValues>;
+	register: UseFormRegister<IFormValues>;
+	required: boolean;
+}
+
+export default function LabeledTextInput({label, register, required, }: InputProps) {
 	return (
 		<div className={styles.labeledInput_container}>
-			<FormLabel content={title}/>
-			<TextInput placeHolder={inputPlaceholder}/>
+			<FormLabel content={label}/>
+			<input
+				className={styles.input}
+				type='text'
+				placeholder={label}
+				{...register(label, { required })}
+			/>
 		</div>
 	);
 }
