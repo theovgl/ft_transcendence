@@ -1,32 +1,28 @@
-import { Children, PropsWithChildren } from 'react';
 import React from 'react';
 import styles from './Button.module.scss';
-import { IconType } from 'react-icons';
 
-interface Props {
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 	text: string,
 	icon?: React.ReactElement,
 	boxShadow?: boolean,
-	theme?: string
+	theme?: string,
 }
 
-export default function Button({
-	text = 'click',
-	boxShadow = true,
-	theme = 'light',
-	icon = undefined
-}: PropsWithChildren<Props>
-) {
+const Button: React.FC<ButtonProps> = ({text, icon, boxShadow, theme, ...props}) => {
 	return (
-		<button className={
-			`
-				${styles.btn}
-				${theme === 'light' ? styles.btn_light : styles.btn_dark}
-				${boxShadow ? styles.shadow : null}
-			`
-		}>
+		<button
+			className={
+				`
+					${styles.btn}
+					${theme === 'light' ? styles.btn_light : styles.btn_dark}
+					${boxShadow ? styles.shadow : null}
+				`
+			}
+			{...props}>
 			{text}
 			{icon ? icon : null}
 		</button>
 	);
-}
+};
+
+export default Button;
