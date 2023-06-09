@@ -17,7 +17,6 @@ export class UserService {
 				...dto,
 			},
 		});
-		delete user.hashedPassword;
 		return user;
 	}
 
@@ -36,7 +35,6 @@ export class UserService {
 
 		if(!user)
 			throw new NotFoundException('User: ' + username + ' does not exists');
-		delete user.hashedPassword;
 		return user;
 	}
 
@@ -57,9 +55,8 @@ export class UserService {
 			const convertedImageFilename = `${uniqueFilename}.webp`; 
 
 			// Create the right directory if it doesn't exists
-			if (!fs.existsSync(`${process.env.UPLOADS_DESTINATION}/profile-pictures`)) {
-				fs.mkdirSync(`${process.env.UPLOADS_DESTINATION}/profile-pictures`, { recursive: true })
-			}
+			if (!fs.existsSync(`${process.env.UPLOADS_DESTINATION}/profile-pictures`))
+				fs.mkdirSync(`${process.env.UPLOADS_DESTINATION}/profile-pictures`, { recursive: true });
 
 			// Save the file in that directory
 			fs.writeFileSync(`${process.env.UPLOADS_DESTINATION}/profile-pictures/${convertedImageFilename}`, convertedImage);

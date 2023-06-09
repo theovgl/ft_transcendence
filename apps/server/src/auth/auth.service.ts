@@ -80,7 +80,7 @@ export class AuthService {
 					name: user.username,
 					firstName: user.firstName,
 					lastName: user.lastName,
-					picture: user.picture,
+					profilePicPath: user.picture,
 				},
 			});
 			return newUser;
