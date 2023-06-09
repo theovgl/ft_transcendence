@@ -1,7 +1,4 @@
-export {};
-
-declare global {
-	interface IUserInfos {
+type UserInfos = {
 		id: number;
 		email: string;
 		name: string;
@@ -16,4 +13,3 @@ declare global {
 		wins: number;
 		looses: number;
 	}
-}
