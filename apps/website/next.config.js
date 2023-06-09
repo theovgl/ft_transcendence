@@ -7,8 +7,8 @@ const nextConfig = {
 	images: {
 		domains: ['backend'],
 		formats: ['image/webp'],
-    	loader: 'default',
-	  },
+		loader: 'default',
+	},
 };
 
 module.exports = nextConfig;
