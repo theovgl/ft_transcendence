@@ -11,7 +11,7 @@ import Match from '@/components/UserProfile/Match';
 
 export default function Profile() {
 	const router = useRouter();
-	const [userInfo, setUserInfo] = useState<IUserInfos | undefined>(undefined);
+	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
 
 	useEffect(() => {
 		if (!router.isReady) return;
@@ -45,11 +45,11 @@ export default function Profile() {
 						<>
 							<div className={styles.header}>
 								<div className={styles.user_id_container}>
-									<ProfilePic path={'http://backend:4000/users/profile-picture/' + userInfo.profilePicPath} />
+									<ProfilePic />
 									<Name Username={userInfo.name} FirstName={userInfo.firstName} LastName={userInfo.lastName} />
 								</div>
 								<div className={styles.header_buttons_container}>
-									<Button text='Message' icon={<BiMessageAltDetail />}/>
+									<Button text='Message' theme='light' boxShadow icon={<BiMessageAltDetail />}/>
 									<Button text='Friend' boxShadow={false} theme='dark' icon={<BiCheck />}/>
 								</div>
 							</div>
