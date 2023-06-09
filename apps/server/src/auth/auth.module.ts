@@ -18,7 +18,6 @@ import { ftStrategy } from './strategy/ftStrategy';
 			imports: [ConfigModule],
 			useFactory: async (configService: ConfigService) => ({
 				secret: configService.get('JWT_SECRET'),
-				// signOptions: { expiresIn: '1h' },
 			}),
 			inject: [ConfigService],
 		}),
