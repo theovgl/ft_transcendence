@@ -11,10 +11,12 @@ model User {
   id             Int          @id @default(autoincrement())
   name           String				@unique
   email          String				@unique
-  hashedPassword String
+  hashedPassword String?
   firstName      String?
   lastName       String?
+  picture        String?
   level          Float        @default(0)
+  jwt            String?
   role           Role         @default(USER)
   rooms          Talk[]
   messages       Message[]
