@@ -14,10 +14,9 @@ model User {
   hashedPassword String?
   firstName      String?
   lastName       String?
+  picture        String?
   level          Float        @default(0)
-  loggedIn       Boolean      @default(false)
-  accessToken    String?
-  refreshToken   String?
+  jwt            String?
   role           Role         @default(USER)
   rooms          Talk[]
   messages       Message[]
