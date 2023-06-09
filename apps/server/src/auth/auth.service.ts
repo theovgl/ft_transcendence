@@ -33,7 +33,7 @@ export class AuthService {
 
 		return newUser;
 	}
-	
+
 	async signToken(userId: number, email: string) {
 		const payload = {
 			sub: userId,
