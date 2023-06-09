@@ -5,4 +5,5 @@ type FortyTwoUser = {
 	email: string;
 	accessToken: string;
 	refreshToken: string;
+	picture: string;
 }

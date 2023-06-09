@@ -1,6 +1,5 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-42';
-import { AuthDto } from '../dto';
 import { UnauthorizedException } from '@nestjs/common';
 
 export class ftStrategy extends PassportStrategy(Strategy) {
@@ -10,7 +9,6 @@ export class ftStrategy extends PassportStrategy(Strategy) {
 				clientID: process.env.FT_CLIENT_ID,
 				clientSecret: process.env.FT_CLIENT_SECRET,
 				callbackURL: process.env.FT_CALLBACK_URL,
-				// scope: 'public',
 			},
 		);
 	}
@@ -27,6 +25,7 @@ export class ftStrategy extends PassportStrategy(Strategy) {
 				email: profile.emails[0].value,
 				firstName: profile.name.givenName,
 				lastName: profile.name.familyName,
+				picture: profile._json.image.link,
 				accessToken,
 				refreshToken,
 			};

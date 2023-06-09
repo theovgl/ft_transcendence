@@ -1,7 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { AuthDto } from './dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
@@ -14,18 +13,6 @@ export class AuthService {
 		private config: ConfigService
 	) {}
 	
-	// async signup(dto: AuthDto): Promise<User> {
-	// 	console.log('signup service', dto);
-	// 	// Create a new user in the database without storing a password
-	// 	const newUser = await this.prisma.user.create({
-	// 		data: {
-	// 			email: dto.email,
-	// 			name: dto.login,
-	// 		},
-	// 	});
-	// 	return newUser;
-	// }
-	
 	async handleCallback(user: FortyTwoUser): Promise<any> {
 		console.table(user);
 		const found = await this.prisma.user.findUnique({
@@ -33,9 +20,10 @@ export class AuthService {
 				email: user.email,
 			},
 		});
-		if (found)
-		{
+		if (found) {
 			this.signToken(found.id, found.email);
+			// res.cookie('auth', token);
+      		// res.redirect('http://' + process.env.SERVER_URL + ':' + process.env.SERVER_PORT + '/home');
 			return found;
 		}
 		console.log('Creating new User...', user);
@@ -45,65 +33,7 @@ export class AuthService {
 
 		return newUser;
 	}
-
-	// 	const newUser = this.prisma.user.create({
-	// 		data: {
-	// 			email: user.email,
-	// 			name: user.username,
-	// 			firstName: user.firstName,
-	// 			lastName: user.lastName,
-	// 		},
-	// });
-
-		// Ici on ajoute à la DB miam 🤤
-	// 	return newUser;
-	// }
-
-	// async signup(dto: AuthDto){
-	// 	//generate the password hash
-	// 	const hash = await argon.hash(dto.password);
-	// 	// save the new user in DB
-	// 	try {
-	// 		const user = await this.prisma.user.create({
-	// 			data: {
-	// 				name: dto.,
-	// 				email: dto.email,
-	// 				hashedPassword: hash,
-	// 			},
-	// 		});
-
-	// 		return this.signToken(user.id, user.email);
-	// 	} catch(error) {
-	// 		if (error.constructor.name === 'PrismaClientKnownRequestError'){
-	// 			if (error.code === 'P2002')
-	// 				throw new ForbiddenException('Credentials taken',);
-	// 		}
-	// 		throw error;
-	// 	}
-	// }
- 
-	// async signin(dto: AuthDto){
-	// 	//find the user by email
-	// 	const user = await this.prisma.user.findUnique({
-	// 		where: {
-	// 			email: dto.email
-	// 		}
-	// 	});
-
-	// 	//if user does not exist throw exception
-	// 	if (!user)
-	// 		throw new ForbiddenException('Credentials incorrect');
-
-	// 	//compare password
-	// 	const pwMatches = await argon.verify(user.hashedPassword, dto.password);
-
-	// 	//if password incorrect throw exception
-	// 	if (!pwMatches)
-	// 		throw new ForbiddenException('Credentials incorrect');
-
-	// 	return this.signToken(user.id, user.email);
-	// }
-
+	
 	async signToken(userId: number, email: string) {
 		const payload = {
 			sub: userId,
@@ -118,16 +48,16 @@ export class AuthService {
 		});
 
 		console.log('Token', token);
-		const updateUser = await this.prisma.user.update({
+		await this.prisma.user.update({
 			where: {
 				email: email,
 			},
 			data:{
-				accessToken: token,
+				jwt: token,
 			},
 		});
 	}
-
+	
 	async validateUser(details: FortyTwoUser) {
 		console.log('validateUser', details);
 		const user = await this.prisma.user.findUnique({
@@ -139,13 +69,6 @@ export class AuthService {
 			return user;
 		
 		const newUser = this.createUser(details);
-
-		// const newUser = await this.prisma.user.create({
-		// 	data: {
-		// 		email: details.email,
-		// 		name: details.username,
-		// 	},
-		// });
 		return newUser;
 	}
 
@@ -157,6 +80,7 @@ export class AuthService {
 					name: user.username,
 					firstName: user.firstName,
 					lastName: user.lastName,
+					picture: user.picture,
 				},
 			});
 			return newUser;
@@ -172,4 +96,4 @@ export class AuthService {
 			},
 		});
 	}
-}  
+}
