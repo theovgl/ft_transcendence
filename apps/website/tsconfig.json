@@ -17,7 +17,8 @@
 	"typeRoots": ["./types", "./node_modules/@types"],
 	"target": "es5",
 	"paths": {
-		"@/*": ["./src/*"]
+		"@/*": ["./src/*"],
+		"*": ["./types/*.d.ts"]
 	},
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
