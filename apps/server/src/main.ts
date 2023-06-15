@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as cors from 'cors';
@@ -9,7 +10,14 @@ async function bootstrap() {
 	app.useGlobalPipes(new ValidationPipe({
 		whitelist: true,
 	}));
-	app.use(cors());
+	app.use(cors(
+		{
+			origin: 'http://127.0.0.1:3000',
+			credentials: true,
+			exposedHeaders: ['Authorization'],
+		}
+	));
+	app.use(cookieParser());
 	app.use(
 		session({
 		  secret: 'your-secret-key',

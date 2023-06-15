@@ -14,61 +14,44 @@ export class AuthController {
 		return { message: 'Login successful' };
 	}
 
-	@Post('42/testCallback')
+	@Post('42/callback')
 	// @UseGuards(ftAuthGuard)
-	async handleTestCallback(@Query() query) {
+	async Callback(@Query() query, @Res({passthrough: true}) res) {
 		if(query.code !== undefined){
-			const params = {
-				grant_type: 'authorization_code',
-				code: query.code,
-				client_id: process.env.FT_CLIENT_ID,
-				client_secret: process.env.FT_CLIENT_SECRET,
-				redirect_uri: 'http://127.0.0.1:3000/callback',
-			};
-
-			const data = new URLSearchParams(params);
-			const response = await fetch('https://api.intra.42.fr/oauth/token', {
-				method: 'POST',
-				body: data,
-			})
-				.then((response) => response.json())
-				.then((data) => {
-					// console.log('Success:', data);
-					return data;
-				})
-				.catch((error) => {
-					console.error('Error:', error);
-				});
-			console.log('response', response);
-			// return {message: ret};
+			const response = await this.authService.exchangeCodeForToken(query.code);
+			const jwt = await this.authService.handleCallback(response);
+			res.setHeader('Access-Control-Allow-Credentials', 'true');
+			res.setHeader('Authorization', `Bearer ${jwt}`);
+			res.cookie('jwt', jwt);
+			res.status(200).send({ message: 'Login successful' });
 		}
 	}
 
-	@Get('42/callback')
-	@UseGuards(ftAuthGuard)
-	// @Redirect('http://localhost:3000/login', 301)
-	async handleLoginCallback(@Req() req, @Response() res) {
+	// @Get('42/callback')
+	// @UseGuards(ftAuthGuard)
+	// // @Redirect('http://localhost:3000/login', 301)
+	// async handleLoginCallback(@Req() req, @Response() res) {
 
-		const user = await this.authService.handleCallback(req.user);
-		const found = await this.prisma.user.findUnique({
-			where: {
-				email: user.email,
-			},
-		});
-		res.cookie('jwt', found.jwt, { httpOnly: true, secure: true });
-		// console.log('Cookie', res);
-		// const token = user.jwt;
-		// res.cookie('jwt', token), { 
-		// 	maxAge: 2592000000,
-		// 	sameSite: true,
-		// 	secure: false,
-		// }
-		// console.log('Cookie', res.cookie);
-		return user;//
-		// console.log('HttpStatus', HttpStatus.OK, 'res.status', res.status);
+	// 	const user = await this.authService.handleCallback(req.user);
+	// 	const found = await this.prisma.user.findUnique({
+	// 		where: {
+	// 			email: user.email,
+	// 		},
+	// 	});
+	// 	res.cookie('jwt', found.jwt, { httpOnly: true, secure: true });
+	// 	// console.log('Cookie', res);
+	// 	// const token = user.jwt;
+	// 	// res.cookie('jwt', token), { 
+	// 	// 	maxAge: 2592000000,
+	// 	// 	sameSite: true,
+	// 	// 	secure: false,
+	// 	// }
+	// 	// console.log('Cookie', res.cookie);
+	// 	return user;//
+	// 	// console.log('HttpStatus', HttpStatus.OK, 'res.status', res.status);
 
-		// return res.status(HttpStatus.OK);
-	}
+	// 	// return res.status(HttpStatus.OK);
+	// }
 
 	@UseGuards(JwtGuard)
 	@Get('42/test')
