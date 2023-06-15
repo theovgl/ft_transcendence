@@ -7,6 +7,8 @@ import {
  OnGatewayDisconnect,
 } from '@nestjs/websockets';
 
+import { ChatService } from './app.service';
+
 import {Message} from './app.interface';
 
 import { Logger } from '@nestjs/common';
@@ -14,16 +16,19 @@ import { Socket, Server } from 'socket.io';
 
 @WebSocketGateway({cors: {origin: ['https://hoppscotch.io', 'http://localhost:3000', 'http://localhost:4000']}})
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+	constructor(private readonly chatService: ChatService) {}
  @WebSocketServer() server: Server;
  private logger: Logger = new Logger('ChatGateway');
 
  //Message Events
  @SubscribeMessage('msgToServer')
  handleMessage(client: Socket, payload: Message): void {
-  console.log(payload.message);
+  this.chatService.storeMessage(payload);
+	console.log(payload.message);
   this.server.emit('msgToClient', payload);
+  
+  // server.to(payload.channel).emit('msgToClient', payload.message);
  }
-
 
  //Room Events
  @SubscribeMessage('CreateRoomfromServer')
@@ -45,7 +50,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   this.logger.log(`Client disconnected: ${client.id}`);
  }
 
- handleConnection(client: Socket, ...args: any[]) {
+ handleConnection(client: Socket, ...args: any[]) {;
+	this.chatService.userConnection(client, 'general');
+	// Put user in general chat
+	// Get messages from general
+	// Emit the messages
   this.logger.log(`Client connected: ${client.id}`);
  }
 }
