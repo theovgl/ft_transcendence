@@ -7,8 +7,7 @@ export default function LoginPage() {
 	const router = useRouter();
 	
 	function onSubmit() {
-		const ret = router.push('http://localhost:4000/auth/42/login');
-		console.log(ret);
+		router.push('http://localhost:4000/auth/42/login');
 	}
 
 	return (
