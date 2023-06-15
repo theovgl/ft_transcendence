@@ -3,7 +3,6 @@ import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { access } from 'fs';
 
 @Injectable()
 export class AuthService {
@@ -25,12 +24,12 @@ export class AuthService {
 			.then((data) => {
 				const newUser: FortyTwoUser = {
 					userId: data.id,
-					username: data.username,
+					username: data.login,
 					firstName: data.firstName,
 					email: data.email,
 					lastName: data.lastName,
 					picture: data.image.link,
-				}
+				};
 				return newUser;
 			})
 			.catch((error) => {
