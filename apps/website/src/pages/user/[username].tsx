@@ -17,17 +17,25 @@ export default function Profile() {
 		if (!router.isReady) return;
 		const fetchUserInfo = async () => {
 			try {
-				const response = await fetch(`http://localhost:4000/users/${router.query.username}`);
-				if (!response.ok) {
-					if (response.status === 404) {
-						router.push('/404');
-						return null;
+				await fetch(
+					`http://localhost:4000/users/${router.query.username}`, {
+						method: 'GET',
 					}
-					throw new Error('Failed to fetch user info');
-				}
-				const data = await response.json();
-				setUserInfo(data);
-				console.table(userInfo);
+				)
+					.then((response) => {
+						if (!response.ok) {
+							if (response.status === 404) {
+								router.push('/404');
+								return null;
+							}
+							throw new Error('Failed to fetch user info');
+						} else
+							return response.json();
+					})
+					.then((response) => {
+						setUserInfo(response);
+						console.table(userInfo);
+					});
 			} catch (error) {
 				console.error(error);
 			}
@@ -41,42 +49,58 @@ export default function Profile() {
 			<Navbar />
 			<main className={styles.main}>
 				{
-					userInfo ? (
-						<>
-							<div className={styles.header}>
-								<div className={styles.user_id_container}>
-									<ProfilePic />
-									<Name Username={userInfo.name} FirstName={userInfo.firstName} LastName={userInfo.lastName} />
+					userInfo
+						? (
+							<>
+								<div className={styles.header}>
+									<div className={styles.user_id_container}>
+										<ProfilePic />
+										<Name
+											Username={userInfo.name}
+											FirstName={userInfo.firstName}
+											LastName={userInfo.lastName}
+										/>
+									</div>
+									<div className={styles.header_buttons_container}>
+										<Button
+											text='Message'
+											theme='light'
+											boxShadow
+											icon={<BiMessageAltDetail />}
+										/>
+										<Button
+											text='Friend'
+											boxShadow={false}
+											theme='dark'
+											icon={<BiCheck />}
+										/>
+									</div>
 								</div>
-								<div className={styles.header_buttons_container}>
-									<Button text='Message' theme='light' boxShadow icon={<BiMessageAltDetail />}/>
-									<Button text='Friend' boxShadow={false} theme='dark' icon={<BiCheck />}/>
+								<div className={styles.content_container}>
+									<section className={styles.content_section}>
+										<h2 className={styles.title2}>Statistics</h2>
+										<Statistics
+											level={userInfo.level}
+											wins={userInfo.wins}
+											looses={userInfo.looses}
+											winRate={(5 / 80) * 100}
+										/>
+									</section>
+									<section className={styles.content_section}>
+										<h2 className={styles.title2}>Match history</h2>
+										<Match
+											matchDate={Date.now()}
+											player1Name='tvogel'
+											player1Score={8}
+											player2Name='ppiques'
+											player2Score={4}
+											matchDuration='18:20'
+										/>
+									</section>
 								</div>
-							</div>
-							<div className={styles.content_container}>
-								<section className={styles.content_section}>
-									<h2 className={styles.title2}>Statistics</h2>
-									<Statistics
-										level={userInfo.level}
-										wins={userInfo.wins}
-										looses={userInfo.looses}
-										winRate={(5 / 80) * 100}
-									/>
-								</section>
-								<section className={styles.content_section}>
-									<h2 className={styles.title2}>Match history</h2>
-									<Match
-										matchDate={Date.now()}
-										player1Name='tvogel'
-										player1Score={8}
-										player2Name='ppiques'
-										player2Score={4}
-										matchDuration='18:20'
-									/>
-								</section>
-							</div>
-						</>
-					) : ( <p>Loading...</p> )
+							</>
+						)
+						: ( <p>Loading...</p> )
 				}
 			</main>
 		</>
