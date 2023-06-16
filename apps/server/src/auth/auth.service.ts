@@ -14,85 +14,80 @@ export class AuthService {
 	) {}
 
 	async getUserInfo(accessToken: string): Promise<FortyTwoUser> {
-		const response: FortyTwoUser | void = await fetch('https://api.intra.42.fr/v2/me', {
-			method: 'GET',
-			headers: {
-				Authorization: 'Bearer ' + accessToken,
-			},
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				const newUser: FortyTwoUser = {
-					userId: data.id,
-					username: data.login,
-					firstName: data.firstName,
-					email: data.email,
-					lastName: data.lastName,
-					picture: data.image.link,
-				};
-				return newUser;
-			})
-			.catch((error) => {
-				console.error('Error:', error);
+		try {
+			const response = await fetch('https://api.intra.42.fr/v2/me', {
+				method: 'GET',
+				headers: {
+					Authorization: 'Bearer ' + accessToken,
+				},
 			});
-		if (response)
-			return response;
+
+			if (!response.ok || !response)
+				throw new Error('Failed to fetch user info');
+
+			const data = await response.json();
+			console.log(data);
+			const newUser: FortyTwoUser = {
+				userId: data.id,
+				username: data.login,
+				email: data.email,
+				firstName: data.first_name,
+				lastName: data.last_name,
+				picture: data.image.link,
+			};
+
+			return newUser;
+		} catch (error) {
+			console.error('Error: ', error);
+			throw error;
+		}
 	}
 
 	async exchangeCodeForToken(code: string): Promise<any> {
-		const params = {
-			grant_type: 'authorization_code',
-			code: code,
-			client_id: process.env.FT_CLIENT_ID,
-			client_secret: process.env.FT_CLIENT_SECRET,
-			redirect_uri: 'http://127.0.0.1:3000/callback',
-		};
-
-		const data = new URLSearchParams(params);
-		const response = await fetch('https://api.intra.42.fr/oauth/token', {
-			method: 'POST',
-			body: data,
-		})
-			.then((response) => response.json())
-			.then((data) => {
-				return data;
-			})
-			.catch((error) => {
-				console.error('Error:', error);
+		try {
+			const params = {
+				grant_type: 'authorization_code',
+				code: code,
+				client_id: process.env.FT_CLIENT_ID,
+				client_secret: process.env.FT_CLIENT_SECRET,
+				redirect_uri: process.env.FT_CALLBACK_URL,
+			};
+			
+			const data = new URLSearchParams(params);
+			const response = await fetch('https://api.intra.42.fr/oauth/token', {
+				method: 'POST',
+				body: data,
 			});
-		return response;
+
+			if (!response || !response.ok)
+				throw new Error('Failed to exchange code for token');
+
+			const responseData = await response.json();
+		    return responseData;
+		} catch (error) {
+			console.error('Error: ', error);
+			throw error;
+		}
 	}
 	
-	async handleCallback(response: any) {
-		console.log('Response', response);
+	async handleCallback(response: any): Promise<any> {
 		const user: FortyTwoUser = await this.getUserInfo(response.access_token);
 		const token = await this.signToken(user.userId, user.email, response);
-		const found = await this.prisma.user.findUnique({
-			where: {
+
+		await this.prisma.user.upsert({
+			where: { email: user.email },
+			create: {
 				email: user.email,
-			}
+				firstName: user.firstName,
+				lastName: user.lastName,
+				name: user.username,
+				profilePicPath: user.picture,
+				jwt: token,
+			},
+			update: {
+				jwt: token,
+			},
 		});
-		if (found) {
-			await this.prisma.user.update({
-				where: {
-					email: user.email,
-				},
-				data: {
-					jwt: token,
-				},
-			});
-		} else {
-			await this.prisma.user.create({
-				data: {
-					email: user.email,
-					firstName: user.firstName,
-					lastName: user.lastName,
-					name: user.username,
-					profilePicPath: user.picture,
-					jwt: token,
-				},
-			});
-		}
 		return token;
 	}
 
