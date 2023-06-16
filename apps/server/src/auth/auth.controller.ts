@@ -15,43 +15,26 @@ export class AuthController {
 	}
 
 	@Post('42/callback')
-	// @UseGuards(ftAuthGuard)
-	async Callback(@Query() query, @Res({passthrough: true}) res) {
-		if(query.code !== undefined){
-			const response = await this.authService.exchangeCodeForToken(query.code);
+	async Callback(@Query('code') code: string, @Res({passthrough: true}) res) {
+		if (!code) {
+			res.status(400).send('Missing code');
+			return;
+		}
+
+		try {
+			const response = await this.authService.exchangeCodeForToken(code);
 			const jwt = await this.authService.handleCallback(response);
 			res.setHeader('Access-Control-Allow-Credentials', 'true');
-			res.setHeader('Authorization', `Bearer ${jwt}`);
-			res.cookie('jwt', jwt);
-			res.status(200).send({ message: 'Login successful' });
+			res.cookie('jwt', jwt, {
+				httpOnly: true,
+				sameSite: 'strict'
+			});
+			res.status(200).send();
+		} catch (error) {
+			console.error(error);
+			res.statuts(500).send('Internal server error');
 		}
 	}
-
-	// @Get('42/callback')
-	// @UseGuards(ftAuthGuard)
-	// // @Redirect('http://localhost:3000/login', 301)
-	// async handleLoginCallback(@Req() req, @Response() res) {
-
-	// 	const user = await this.authService.handleCallback(req.user);
-	// 	const found = await this.prisma.user.findUnique({
-	// 		where: {
-	// 			email: user.email,
-	// 		},
-	// 	});
-	// 	res.cookie('jwt', found.jwt, { httpOnly: true, secure: true });
-	// 	// console.log('Cookie', res);
-	// 	// const token = user.jwt;
-	// 	// res.cookie('jwt', token), { 
-	// 	// 	maxAge: 2592000000,
-	// 	// 	sameSite: true,
-	// 	// 	secure: false,
-	// 	// }
-	// 	// console.log('Cookie', res.cookie);
-	// 	return user;//
-	// 	// console.log('HttpStatus', HttpStatus.OK, 'res.status', res.status);
-
-	// 	// return res.status(HttpStatus.OK);
-	// }
 
 	@UseGuards(JwtGuard)
 	@Get('42/test')
