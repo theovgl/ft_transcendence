@@ -22,7 +22,7 @@ export class AuthService {
 				},
 			});
 
-			if (!response.ok || !response)
+			if (!response || !response.ok)
 				throw new Error('Failed to fetch user info');
 
 			const data = await response.json();
