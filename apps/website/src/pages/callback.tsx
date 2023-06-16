@@ -40,8 +40,8 @@ export default function CallbackPage() {
 			getAccessToken(code)
 				.then((response) => {
 					const redirectPath = response === true
-						? '/'
-						: '/login';
+						? '/login'
+						: '/';
 					router.replace(redirectPath);
 				})
 				.catch((error) => {
