@@ -26,7 +26,6 @@ export class AuthService {
 				throw new Error('Failed to fetch user info');
 
 			const data = await response.json();
-			console.log(data);
 			const newUser: FortyTwoUser = {
 				userId: data.id,
 				username: data.login,

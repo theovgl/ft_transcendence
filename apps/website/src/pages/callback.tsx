@@ -22,7 +22,6 @@ export default function CallbackPage() {
 			}
 
 			const data = await response.text();
-			console.log(data);
 			return data
 				? JSON.parse(data)
 				: {};
