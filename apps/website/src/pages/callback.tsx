@@ -16,7 +16,7 @@ export default function CallbackPage() {
 					credentials: 'include',
 				}
 			);
-			if(!response.ok) {
+			if (!response.ok) {
 				const error = await response.json();
 				throw new Error(error.message);
 			}
@@ -36,7 +36,7 @@ export default function CallbackPage() {
 
 		const code: string = router.query.code as string;
 
-		if(code) {
+		if (code) {
 			getAccessToken(code)
 				.then((response) => {
 					const redirectPath = response === true
