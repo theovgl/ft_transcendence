@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { MessageDto } from './dto';
 import { Socket } from 'socket.io';
+import { Message } from './app.interface';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -33,15 +34,29 @@ export class ChatService implements OnModuleInit {
 			name: room,
 		},
 		include: {
-			messages: true,
+			messages: {
+				include: {
+				  author: true,
+				  room: true
+				},
+			  },
 		},
 	});
+	if (currentRoom) {
+		currentRoom.messages.forEach((message) => {
+			const msg: Message = {
+				author: message.author.name,
+				channel: message.room.name,
+				message: message.content
+			};
+			client.emit('msgToClient', msg);
+		});
+	}
 	// await this.prisma.user.update({
 	// 	where: {
-
 	// 	},
 	// })
-	client.emit('msgToClient', currentRoom.messages);
+	
   }
 
   async storeMessage(payload) {
@@ -56,7 +71,7 @@ export class ChatService implements OnModuleInit {
 		}
 	})
 
-	console.log(payload.author)
+	console.log(author)
 	console.log(room)
 	const message = await this.prisma.message.create({
 	  data: {
