@@ -15,11 +15,16 @@
 .title {
 	font-family: $font-family;
 	letter-spacing: 1px;
+	text-decoration: none;
 	vertical-align: middle;
 	text-transform: uppercase;
 	font-weight: 900;
 	font-style: italic;
 	font-size: 20px;
+
+	&:visited {
+		color: $white-font-color;
+	}
 }
 
 .button_container {

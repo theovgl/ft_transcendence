@@ -3,6 +3,7 @@ import LoginButton from './LoginButton';
 import { LoginContext } from '@/utils/contexts/LoginContext';
 import { useContext } from 'react';
 import NavbarLink from './NavbarLink';
+import Link from 'next/link';
 
 export default function Navbar() {
 	const loggedIn = useContext(LoginContext);
@@ -10,7 +11,7 @@ export default function Navbar() {
 	if (!loggedIn) {
 		return (
 			<nav className={navbarStyle.nav_container}>
-				<h1 className={navbarStyle.title}>Transcendence</h1>
+				<Link className={navbarStyle.title} href='/home'>Transcendence</Link>
 				<div className={navbarStyle.button_container}>
 					<LoginButton link="/signup" theme='dark'>Signup</LoginButton>
 					<LoginButton link="/login" theme='light'>Login</LoginButton>
