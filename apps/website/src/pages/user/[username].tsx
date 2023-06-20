@@ -55,7 +55,7 @@ export default function Profile() {
 								<div className={styles.header}>
 									<div className={styles.user_id_container}>
 										<ProfilePic
-											path={userInfo.profilePicPath}										
+											path={userInfo.profilePicPath}
 										/>
 										<Name
 											Username={userInfo.name}
