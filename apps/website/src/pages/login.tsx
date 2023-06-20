@@ -14,6 +14,7 @@ export default function LoginPage() {
 		<>
 			<Navbar />
 			<div className={styles.container}>
+				<h1 className={styles.welcomeTitle}>Welcome !</h1>
 				<Button
 					text='Login with 42'
 					theme='light'
