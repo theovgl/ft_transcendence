@@ -33,7 +33,7 @@ export class UserService {
 			}
 		});
 
-		if(!user)
+		if (!user)
 			throw new NotFoundException('User: ' + username + ' does not exists');
 		return user;
 	}
