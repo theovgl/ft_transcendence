@@ -7,19 +7,17 @@ export interface ITab
 {
 	label: string;
 	active: boolean;
+	onClick: () => boolean;
 }
 
 export default function Tab(option: ITab)
 {
 	const [buttonIsActive, changeButtonIsActive ] = useState(
-		option.active ? tabStyle.tab_single : tabStyle.tab_single_active
+		option.active ? tabStyle.tab_single_active : tabStyle.tab_single
 	);
 
 	const ChangeTab = () => {
-		if (buttonIsActive == tabStyle.tab_single)
-			changeButtonIsActive(tabStyle.tab_single_active);
-		else
-			changeButtonIsActive(tabStyle.tab_single);
+		option.onClick();
 	}
 	//implement signal create tab to server
 	return (
@@ -27,6 +25,6 @@ export default function Tab(option: ITab)
 			onClickFunction={ChangeTab}	
 			label={option.label} 
 			type="button" 
-			style={buttonIsActive}/>
+			style={option.active ? tabStyle.tab_single_active : tabStyle.tab_single}/>
 	);
 }

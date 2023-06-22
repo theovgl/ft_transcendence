@@ -8,24 +8,40 @@ import { Message } from './app.interface';
 export class ChatService implements OnModuleInit {
   constructor(private prisma: PrismaService) {}
 
+  private currentRoomName = "";
+  
   async onModuleInit()
+  {
+	this.createRoom('General');
+	this.currentRoomName = 'General';
+  }
+
+  public async createRoom(room: string)
   {
 	if (await this.prisma.room.findUnique({
 		where: {
-			name: 'general',
+			name: room,
 		}
 	}))
 		return;
+
 	await this.prisma.room.create({
 		data: {
-			name: 'general',
+			name: room,
 		},
 	})
   }
 
-  public async userConnection(client: Socket, room: any)
+  public async loadRoom(client: Socket, room: string)
   {
+	if (room !== this.currentRoomName)
+	{
+		console.log("client leaving : " + this.currentRoomName);
+		console.log("client joining : " + room);
+	}
+	client.leave(this.currentRoomName);
 	client.join(room);
+	this.currentRoomName = room;
 	// this.prisma.room.Update({
 	// Put user in the room in the db
 	// })
@@ -49,17 +65,29 @@ export class ChatService implements OnModuleInit {
 				channel: message.room.name,
 				message: message.content
 			};
+			console.log("oui message");
 			client.emit('msgToClient', msg);
 		});
 	}
+  }
+
+  public async changeRoom(client: Socket, room: string)
+  {
+	this.createRoom(room);
+	this.loadRoom(client, room);
+  }
+
+  public async userConnection(client: Socket, room: string)
+  {
+	this.loadRoom(client, room)
 	// await this.prisma.user.update({
 	// 	where: {
 	// 	},
 	// })
-	
   }
 
   async storeMessage(payload) {
+	console.log("channel name : " + payload.channel);
 	const author = await this.prisma.user.findUnique({
 		where: {
 			name: payload.author,

@@ -11,6 +11,7 @@ export interface IContact
 	picture: string;
 	content: string;
 	context: "message" | "presentation";
+	onClickFunction?: () => void;
 }
 
 function choose_content_style(context: string)
@@ -31,11 +32,16 @@ function choose_name_style(context: string)
 	return undefined;
 }
 
+function handleClick()
+{
+	console.log("click contact");
+}
+
 export default function Contact(option: IContact)
 {
 	return (
 	<>
-		<div className={contactStyle.grid}>
+		<div className={contactStyle.grid} onClick={option.onClickFunction}>
 		<div className={contactStyle.picture}>
 			<Image 
 			alt="Obamna"

@@ -25,8 +25,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
  handleMessage(client: Socket, payload: Message): void {
   this.chatService.storeMessage(payload);
 	console.log(payload.message);
-  this.server.emit('msgToClient', payload);
-  
+  this.server.to(payload.channel).emit('msgToClient', payload);
   // server.to(payload.channel).emit('msgToClient', payload.message);
  }
 
@@ -38,7 +37,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
  @SubscribeMessage('ChangeRoomFromClient')
  handleRoomChange(client: Socket, payload: string): void {
-	 this.server.emit('ChangeRoomFromServer', payload)
+	this.chatService.changeRoom(client, payload)
+	// this.server.emit('ChangeRoomFromServer', payload)
  }
 
  //WebSocket Log events
@@ -50,10 +50,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   this.logger.log(`Client disconnected: ${client.id}`);
  }
 
- handleConnection(client: Socket, ...args: any[]) {;
-	this.chatService.userConnection(client, 'general');
-	// Put user in general chat
-	// Get messages from general
+ handleConnection(client: Socket, ...args: any[]) {
+	setTimeout(() => {
+		this.chatService.userConnection(client, 'General');		
+	}, 150);
+	// client.emit('userConnected')
+	// Put user in General chat
+	// Get messages from General
 	// Emit the messages
   this.logger.log(`Client connected: ${client.id}`);
  }

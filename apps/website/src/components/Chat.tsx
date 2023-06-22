@@ -44,43 +44,54 @@ export default function Chat()
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [rooms, setRooms] = useState<Array<String>>([]);
-  const [room, setRoom] = useState("");
+  const [room, setRoom] = useState("General");
 
-	let tabList = [	
+	let [tabList, setTablist] = useState([	
 					{
 						label:"General",
-						active:true
+						active:true,
+						onClick: () => handleTabClick("General")
 					},
 					{
 						label:"Contact 1",
-						active:false
+						active:false,
+						onClick: () => handleTabClick("Contact 1")
 					}
-	];
+	]);
 
 	useEffect(() => {
-    	socketInitializer();
+		socketInitializer();
+		// socket.emit('ChangeRoomFromClient', room);
 		return () => {
 			socket.off('msgToClient');
 		  };
-  	}, []);
+  	}, [room]);
 
 	const socketInitializer = async () => {
     socket.on("msgToClient", (msg: Message) => {
-      setMessages((currentMsg) => [
-        ...currentMsg,
-        { author: msg.author, message: msg.message, channel: 'general' },
-      ]);
-      console.log(messages);
+		if (msg.channel === room)
+		{
+			setMessages((currentMsg) => [
+				...currentMsg,
+				{ author: msg.author, message: msg.message, channel: room },
+			  ]);
+		}
     });
 	};
 
 	const sendMessage = async () => {
-		socket.emit("msgToServer", { author: chosenUsername, message: message, channel: 'general' });
+		socket.emit("msgToServer", { author: chosenUsername, message: message, channel: room });
 		setMessages((currentMsg) => [
 			...currentMsg,
 		]);
 		setMessage("");
 	};	
+
+	const changeRoom = async (newRoom: string) => {
+		setRoom(newRoom);
+		setMessages([]);
+		socket.emit('ChangeRoomFromClient', newRoom);
+	}
 
 	const handleKeypress = (e:any) => {
 		if (e.keyCode === 13) {
@@ -90,15 +101,37 @@ export default function Chat()
 		}
 	}
 
+	const handleTabClick = (label: string) => {
+		const updatedTabs = tabList.map((tab) => {
+		  if (tab.label === label) {
+			changeRoom(label);
+			return { ...tab, active: true };
+		  }
+		  return { ...tab, active: false };
+		});
+
+		setTablist(updatedTabs);
+		return true;
+	};
+
+	const CreateConversation = (name: string) => {
+		console.log(name);
+	}
+
 	return (
 		<div className={chatStyle.grid}>
 
 				<div className={chatStyle.tab_list}>	
-				{tabList.map(item =>  <Tab key={item.label} label={item.label} active={item.active}/>)}
+				{tabList.map(item =>  
+				(
+					<Tab key={item.label} label={item.label} active={item.active}
+						onClick={() => handleTabClick(item.label)} />)
+				)}
 				</div>
 
 				<div className={chatStyle.contact_list}>
-					<Contact name="M.Obama" picture="temp" content="in-game" context="presentation"/>
+					<Contact name="M.Obama" picture="temp" content="in-game" context="presentation"
+					onClickFunction={() => CreateConversation("M.Obama")}/>
 					<Contact name="XxX_Obama_Gaming_XxX" picture="temp" content="online" context="presentation"/>
 					<Contact name="TheRealObama" picture="temp" content="offline" context="presentation"/>
 				</div>

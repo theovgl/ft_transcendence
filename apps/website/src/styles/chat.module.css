@@ -27,7 +27,13 @@
 	grid-column: col2 / span 1;
 	grid-row: row1/ span 3;
 	background-color: #9191ae;
-	padding:20px
+	padding:5%;
+}
+
+.contact_list > * {
+	padding-top: 10%;
+	padding-bottom: 10%;
+	font-size: 1.5vw;
 }
 
 .main
