@@ -8,6 +8,7 @@
 	background-color: $black-color;
 	color: $white-font-color;
 	padding: 15px 15px 15px 40px;
+	margin: 8px;
 	border-radius: 40px;
 	box-sizing: border-box;
 }
@@ -15,11 +16,16 @@
 .title {
 	font-family: $font-family;
 	letter-spacing: 1px;
+	text-decoration: none;
 	vertical-align: middle;
 	text-transform: uppercase;
 	font-weight: 900;
 	font-style: italic;
 	font-size: 20px;
+
+	&:visited {
+		color: $white-font-color;
+	}
 }
 
 .button_container {

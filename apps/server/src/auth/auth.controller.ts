@@ -1,11 +1,12 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtGuard } from './guard';
 import { ftAuthGuard } from './guard/ft.guards';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService) {}
+	constructor(private authService: AuthService, private prisma: PrismaService) {}
 
 	@Get('42/login')
 	@UseGuards(ftAuthGuard)
@@ -13,22 +14,26 @@ export class AuthController {
 		return { message: 'Login successful' };
 	}
 
-	@Get('42/callback')
-	@UseGuards(ftAuthGuard)
-	async handleLoginCallback(@Req() req,/* @Res() res: Response*/) {
+	@Post('42/callback')
+	async Callback(@Query('code') code: string, @Res({passthrough: true}) res) {
+		if (!code) {
+			res.status(400).send('Missing code');
+			return;
+		}
 
-		const user = await this.authService.handleCallback(req.user);
-		// const token = user.jwt;
-		// res.cookie('jwt', token), { 
-		// 	maxAge: 2592000000,
-		// 	sameSite: true,
-		// 	secure: false,
-		// }
-		// console.log('Cookie', res.cookie);
-		return user;//
-		// console.log('HttpStatus', HttpStatus.OK, 'res.status', res.status);
-
-		// return res.status(HttpStatus.OK);
+		try {
+			const response = await this.authService.exchangeCodeForToken(code);
+			const jwt = await this.authService.handleCallback(response);
+			res.setHeader('Access-Control-Allow-Credentials', 'true');
+			res.cookie('jwt', jwt, {
+				httpOnly: true,
+				sameSite: 'strict'
+			});
+			res.status(200).send();
+		} catch (error) {
+			console.error(error);
+			res.status(500).send('Internal server error');
+		}
 	}
 
 	@UseGuards(JwtGuard)

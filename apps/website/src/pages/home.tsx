@@ -7,12 +7,14 @@ import PlayButton from '@/components/PlayButton';
 export default function Home() {
 
 	return (
-		<div className={homepageStyle.container}>
+		<>
 			<Navbar />
-			<main className={homepageStyle.content}>
-				<PlayButton />
-				<Leaderboard />
-			</main>
-		</div>
+			<div className={homepageStyle.container}>
+				<main className={homepageStyle.content}>
+					<PlayButton />
+					<Leaderboard />
+				</main>
+			</div>
+		</>
 	);
 }

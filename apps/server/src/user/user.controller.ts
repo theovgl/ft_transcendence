@@ -1,6 +1,6 @@
-import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { JwtGuard } from '../auth/guard'
-import { GetUser } from '../auth/decorator'
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Res, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { JwtGuard } from '../auth/guard';
+import { GetUser } from '../auth/decorator';
 import { User } from '@prisma/client';
 import { EditUserDto } from './dto';
 import { UserService } from './user.service';
@@ -42,9 +42,8 @@ export class UserController {
 	@Post('profile-picture')
 	@UseInterceptors(FileInterceptor('profile-picture'))
 	async uploadProfilePicture(@UploadedFile() image: Express.Multer.File) {
-		if (!image || !image.buffer) {
+		if (!image || !image.buffer)
 			throw new BadRequestException('Invalid file');
-		}
 
 		await this.userService.uploadProfilePicture(1, image.buffer);
 		return { message: 'Profile picture uploaded successfully' };

@@ -5,9 +5,9 @@ const nextConfig = {
 		ignoreDuringBuilds: true,
 	},
 	images: {
-		domains: ['backend'],
+		domains: ['backend', 'cdn.intra.42.fr'],
 		formats: ['image/webp'],
-		loader: 'default',
+		loader: 'default'
 	},
 };
 
