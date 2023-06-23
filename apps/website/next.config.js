@@ -7,12 +7,7 @@ const nextConfig = {
 	images: {
 		domains: ['backend', 'cdn.intra.42.fr'],
 		formats: ['image/webp'],
-		loader: 'default',
-		// remotePatterns: [
-		// 	protocol + '//' + domain + '/users/*',
-		// 	'https://cdn.intra.42.fr/users/*',
-		// 	// 'cdn.intra.42.fr'
-		// ],
+		loader: 'default'
 	},
 };
 
