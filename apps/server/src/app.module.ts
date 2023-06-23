@@ -5,12 +5,13 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
 
 @Module({
 	imports: [AuthModule, MulterModule.register({
 		storage: memoryStorage()
 	}),
-	UserModule, PrismaModule,
+	UserModule, PrismaModule, LeaderboardModule,
 	ConfigModule.forRoot({
 		isGlobal: true
 	}),],
