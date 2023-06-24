@@ -9,28 +9,28 @@ export class JwtGuard extends AuthGuard('jwt') {
 	  }
 
 	canActivate(context: ExecutionContext) {
-		console.log('JwtGuard canActivate');
 		return super.canActivate(context);
 	}
 
-	handleRequest(err, user, info) {
-		console.log('JwtGuard handleRequest', 'err', err, 'user', user, 'info', info);
-
-		console.log('Creating prismaUser');
-		const prismaUser = this.prisma.user.findUniqueOrThrow({ where: { id: user.id } });
-		console.log('prismaUser', prismaUser);
-
-		if (!prismaUser) 
-			throw new UnauthorizedException('Invalid user');
-	
+	handleRequest(err, user, info)  {
 		if (err || !user) { 
-			console.log('JwtGuard handleRequest err');
+			console.log('JwtGuard handleRequest err ' + err);
 			// Handle authentication failure
 			throw err || new UnauthorizedException();
 		}
 
-		// Authentication success, return the user
-		return user;
+		let prismaUser = null;
+		(async () => {
+			try {
+				prismaUser = await this.prisma.user.findUniqueOrThrow({ where: { id: user.id } });
+				if (!prismaUser)
+					throw new UnauthorizedException('Invalid user');
+			} catch (error) {
+				console.log('JwtGuard handleRequest error', error);
+				throw error;
+			}
+		})();
+		return prismaUser;
 	}
 }
 
