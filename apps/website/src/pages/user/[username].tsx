@@ -8,11 +8,14 @@ import Button from '@/components/Button/Button';
 import { BiCheck, BiMessageAltDetail } from 'react-icons/bi';
 import Statistics from '@/components/UserProfile/Statistics';
 import Match from '@/components/UserProfile/Match';
+import Cookies from 'js-cookie';
+import { useCookies } from 'react-cookie';
 
 export default function Profile() {
 	const router = useRouter();
 	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
-
+	const [cookies] = useCookies();
+	
 	useEffect(() => {
 		if (!router.isReady) return;
 		const fetchUserInfo = async () => {
@@ -20,8 +23,11 @@ export default function Profile() {
 				await fetch(
 					`http://localhost:4000/users/${router.query.username}`, {
 						method: 'GET',
-					}
-				)
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': 'Bearer ' + cookies['jwt'],
+						},
+					})
 					.then((response) => {
 						if (!response.ok) {
 							if (response.status === 404) {
@@ -40,11 +46,11 @@ export default function Profile() {
 				console.error(error);
 			}
 		};
-
-		fetchUserInfo();
-	}, [router.isReady, router.query.username]);
-
-	return (
+			
+			fetchUserInfo();
+		}, [router.isReady, router.query.username]);
+		
+		return (
 		<>
 			<Navbar />
 			<main className={styles.main}>

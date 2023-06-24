@@ -26,7 +26,6 @@ export class AuthController {
 			const jwt = await this.authService.handleCallback(response);
 			res.setHeader('Access-Control-Allow-Credentials', 'true');
 			res.cookie('jwt', jwt, {
-				httpOnly: true,
 				sameSite: 'strict'
 			});
 			res.status(200).send();
