@@ -43,6 +43,7 @@ export class ChatService implements OnModuleInit {
 	client.join(room);
 	this.currentRoomName = room;
 	// this.prisma.room.Update({
+		
 	// Put user in the room in the db
 	// })
 	const currentRoom = await this.prisma.room.findUnique({

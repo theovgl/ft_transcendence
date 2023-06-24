@@ -20,8 +20,9 @@ interface ServerToClientEvents {
 }
 
 interface ClientToServerEvents {
-  hello: () => void;
+	hello: () => void;
 	msgToServer: (msg: Message) => void;
+	ChangeRoomFromClient: (payload: string) => void;
 }
 
 interface InterServerEvents {
@@ -61,6 +62,7 @@ export default function Chat()
 
 	useEffect(() => {
 		socketInitializer();
+		
 		// socket.emit('ChangeRoomFromClient', room);
 		return () => {
 			socket.off('msgToClient');
@@ -90,7 +92,7 @@ export default function Chat()
 	const changeRoom = async (newRoom: string) => {
 		setRoom(newRoom);
 		setMessages([]);
-		socket.emit('ChangeRoomFromClient', newRoom);
+		socket.emit("ChangeRoomFromClient", newRoom);
 	}
 
 	const handleKeypress = (e:any) => {
