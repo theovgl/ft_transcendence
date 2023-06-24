@@ -12,8 +12,14 @@ export class LeaderboardService {
 				wins: 'desc',
 			},
 			select: {
+				id: true,
 				name: true,
 				wins: true
+			},
+			where: {
+				wins: {
+					gt: 0
+				}
 			}
 		});
 	}
