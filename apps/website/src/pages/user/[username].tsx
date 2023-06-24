@@ -8,7 +8,6 @@ import Button from '@/components/Button/Button';
 import { BiCheck, BiMessageAltDetail } from 'react-icons/bi';
 import Statistics from '@/components/UserProfile/Statistics';
 import Match from '@/components/UserProfile/Match';
-import Cookies from 'js-cookie';
 import { useCookies } from 'react-cookie';
 
 export default function Profile() {
@@ -46,11 +45,10 @@ export default function Profile() {
 				console.error(error);
 			}
 		};
-			
-			fetchUserInfo();
-		}, [router.isReady, router.query.username]);
+		fetchUserInfo();
+	}, [router.isReady, router.query.username]);
 		
-		return (
+	return (
 		<>
 			<Navbar />
 			<main className={styles.main}>
