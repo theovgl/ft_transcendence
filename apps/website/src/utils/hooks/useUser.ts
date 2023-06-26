@@ -6,7 +6,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  authToken?: string;
+  authToken: string;
 }
 
 // This hook will store the user in our context and localStorage.
