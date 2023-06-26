@@ -2,7 +2,7 @@ import styles from '@/styles/components/Leaderboard.module.scss';
 import ContentRow from './ContentRow';
 import { BiMedal } from 'react-icons/bi';
 
-export default function Leaderboard({ data }) {
+export default function Leaderboard({ data }: any) {
 	return (
 		<div className={styles.container}>
 			<div className={styles.header}>
@@ -12,7 +12,7 @@ export default function Leaderboard({ data }) {
 				${styles.content}
 				${data.length === 0 ? styles.content_empty : ''}
 			`}>
-				{data.length === 0 ? (
+				{data.length === 0 || !data ? (
 					<>
 						<BiMedal />
 						<p className={styles.empty_disclaimer}>
@@ -21,7 +21,7 @@ export default function Leaderboard({ data }) {
 						</p>
 					</>
 				) : (
-					data.map(row => (
+					data.map((row: any) => (
 						<ContentRow
 							key={row.id}
 							username={row.name}

@@ -6,7 +6,7 @@ import Head from 'next/head';
 import Button from '@/components/Button/Button';
 import { useRouter } from 'next/router';
 
-export default function Home(props) {
+export default function Home(props: any) {
 	const router = useRouter();
 
 	const onButtonClick = () => {
