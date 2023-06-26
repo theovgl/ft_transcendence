@@ -58,5 +58,5 @@ services:
     networks:
       - backend
     depends_on:
-        - database
+      - database
 
