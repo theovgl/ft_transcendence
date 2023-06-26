@@ -8,9 +8,6 @@ RUN npm ci
 
 COPY . .
 
-# Generate Prisma db client code
-RUN npm run prisma:generate
-
 # Stage n.2: production build
 
 FROM node:lts-alpine AS build
