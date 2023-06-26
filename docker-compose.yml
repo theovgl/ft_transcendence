@@ -43,7 +43,7 @@ services:
       context: ./apps/server/
       target: dev
     container_name: backend
-    command: sh -c "npx prisma migrate dev && npx prisma generate && npm run start:dev"
+    command: sh -c "npx prisma migrate dev --name migration && npm run start:dev"
     entrypoint: ./docker-entrypoint.sh
     environment:
       - POSTGRES_PASSWORD=123
