@@ -1,14 +1,13 @@
 import navbarStyle from '../styles/navbar.module.scss';
 import LoginButton from './LoginButton';
-import { LoginContext } from '@/utils/contexts/LoginContext';
-import { useContext } from 'react';
 import NavbarLink from './NavbarLink';
 import Link from 'next/link';
+import { useAuth } from '@/utils/hooks/useAuth';
 
 export default function Navbar() {
-	const loggedIn = useContext(LoginContext);
+	const { user } = useAuth();
 
-	if (!loggedIn) {
+	if (!user) {
 		return (
 			<nav className={navbarStyle.nav_container}>
 				<Link className={navbarStyle.title} href='/home'>Transcendence</Link>
