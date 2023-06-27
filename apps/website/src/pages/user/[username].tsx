@@ -41,7 +41,6 @@ export default function Profile() {
 					.then((response: UserInfos) => {
 						setUserInfo(response);
 					});
-				console.table(userInfo);
 			} catch (error) {
 				console.error(error);
 			}
@@ -95,6 +94,14 @@ export default function Profile() {
 									</section>
 									<section className={styles.content_section}>
 										<h2 className={styles.title2}>Match history</h2>
+										<Match
+											matchDate={Date.now()}
+											player1Name='tvogel'
+											player1Score={8}
+											player2Name='ppiques'
+											player2Score={4}
+											matchDuration='18:20'
+										/>
 										<Match
 											matchDate={Date.now()}
 											player1Name='tvogel'
