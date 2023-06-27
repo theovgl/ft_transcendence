@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import styles from '@/styles/components/NavLink.module.scss';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 
 export interface INavLink {
 	href: string,

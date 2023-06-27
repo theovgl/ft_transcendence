@@ -16,7 +16,9 @@ type InputProps = {
 	pattern?: ValidationRule<RegExp>;
 }
 
-export default function LabeledTextInput({label, register, required, pattern }: InputProps) {
+export default function LabeledTextInput(
+	{ label, register, required, pattern }: InputProps
+) {
 	return (
 		<div className={styles.labeledInput_container}>
 			<FormLabel content={label}/>
