@@ -71,7 +71,7 @@ export class AuthService {
 	
 	async handleCallback(response: any): Promise<any> {
 		const user: FortyTwoUser = await this.getUserInfo(response.access_token);
-		const token = await this.signToken(user.userId, user.email, response);
+		const token = await this.signToken(user.userId, user.username, user.email, response);
 
 		await this.prisma.user.upsert({
 			where: { email: user.email },
@@ -90,12 +90,13 @@ export class AuthService {
 		return token;
 	}
 
-	async signToken(userId: number, email: string, response: any): Promise<string> {
+	async signToken(userId: number, username: string, email: string, response: any): Promise<string> {
 		const payload = {
 			exp: response.expires_in,
 			iat: response.created_at,
-			sub: userId,
-			email
+			userId,
+			email,
+			username
 		};
 		const secret = this.config.get('JWT_SECRET');
 		const token = await this.jwt.sign(payload, {
