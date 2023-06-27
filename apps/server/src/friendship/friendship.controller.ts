@@ -8,14 +8,15 @@ export class FriendshipController {
 	}
 
 	@Get('add')
-	addFriend(@Query() req) {
-		this.friendshipService.handleAddFriend(req.requesterName, req.addresseeName);
+	addFriend(@Query() qry) {
+		this.friendshipService.handleAddFriend(qry.qryuesterName, qry.addresseeName);
 		return;
 	}
 
 	@Get('remove')
 	removeFriend() {
-		return { message: 'Remove friend' };
+		this.friendshipService.handleRemoveFriend();
+		return;
 	}
 
 	@Get('accept')
