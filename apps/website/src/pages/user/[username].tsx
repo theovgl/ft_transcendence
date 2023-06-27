@@ -9,6 +9,7 @@ import { BiCheck, BiMessageAltDetail } from 'react-icons/bi';
 import Statistics from '@/components/UserProfile/Statistics';
 import Match from '@/components/UserProfile/Match';
 import { useCookies } from 'react-cookie';
+import type { UserInfos } from 'global';
 
 export default function Profile() {
 	const router = useRouter();
@@ -37,10 +38,10 @@ export default function Profile() {
 						} else
 							return response.json();
 					})
-					.then((response) => {
+					.then((response: UserInfos) => {
 						setUserInfo(response);
-						console.table(userInfo);
 					});
+				console.table(userInfo);
 			} catch (error) {
 				console.error(error);
 			}
@@ -88,7 +89,7 @@ export default function Profile() {
 										<Statistics
 											level={userInfo.level}
 											wins={userInfo.wins}
-											looses={userInfo.looses}
+											looses={userInfo.loose}
 											winRate={(5 / 80) * 100}
 										/>
 									</section>

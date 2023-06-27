@@ -1,15 +1,17 @@
 type UserInfos = {
-		id: number;
-		email: string;
-		name: string;
+	id: number;
+	email: string;
+	name: string;
 
-		profilePicPath: string;
+	profilePicPath: string;
 
-		firstName: string;
-		lastName: string;
+	firstName: string;
+	lastName: string;
 
-		score: number;
-		level: number;
-		wins: number;
-		looses: number;
-	}
+	score: number;
+	level: number;
+	wins: number;
+	loose: number;
+}
+
+export { UserInfos };

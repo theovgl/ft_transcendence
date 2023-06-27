@@ -30,6 +30,16 @@ export class UserService {
 		const user = await this.prisma.user.findUnique({
 			where: {
 				name: username,
+			},
+			select: {
+				id: true,
+				name: true,
+				firstName: true,
+				lastName: true,
+				profilePicPath: true,
+				wins: true,
+				loose: true,
+				level: true
 			}
 		});
 
