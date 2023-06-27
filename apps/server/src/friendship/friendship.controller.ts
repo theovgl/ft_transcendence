@@ -9,7 +9,7 @@ export class FriendshipController {
 
 	@Get('add')
 	addFriend(@Query() qry) {
-		this.friendshipService.handleAddFriend(qry.qryuesterName, qry.addresseeName);
+		this.friendshipService.handleAddFriend(qry.requesterName, qry.addresseeName);
 		return;
 	}
 
