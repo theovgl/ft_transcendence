@@ -16,7 +16,7 @@ model User {
   lastName       String?
   profilePicPath String?
   wins           Int    @default(0)
-  loose          Int    @default(0)
+  losses         Int    @default(0)
   level          Float   @default(0)
   role           Role    @default(USER)
 }

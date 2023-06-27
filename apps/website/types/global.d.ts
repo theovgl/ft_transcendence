@@ -11,7 +11,7 @@ type UserInfos = {
 	score: number;
 	level: number;
 	wins: number;
-	loose: number;
+	losses: number;
 }
 
 export { UserInfos };

@@ -88,7 +88,7 @@ export default function Profile() {
 										<Statistics
 											level={userInfo.level}
 											wins={userInfo.wins}
-											looses={userInfo.loose}
+											losses={userInfo.losses}
 											winRate={(5 / 80) * 100}
 										/>
 									</section>

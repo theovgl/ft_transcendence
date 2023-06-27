@@ -3,7 +3,7 @@ import styles from './Statistics.module.scss';
 interface Props {
 	level: number,
 	wins: number,
-	looses: number,
+	losses: number,
 	winRate: number,
 }
 
@@ -28,14 +28,14 @@ function StatisticsElement(options: IStatisticsElement) {
 export default function Statistics({
 	level,
 	wins,
-	looses,
+	losses,
 	winRate
 }: Props) {
 	return (
 		<div className={styles.stats_container}>
 			<StatisticsElement title='Level' value={level}/>
 			<StatisticsElement title='Wins' value={wins}/>
-			<StatisticsElement title='Looses' value={looses}/>
+			<StatisticsElement title='Losses' value={losses}/>
 			<StatisticsElement title='W/L Ratio' value={winRate}/>
 		</div>
 	);

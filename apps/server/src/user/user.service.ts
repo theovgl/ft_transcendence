@@ -38,7 +38,7 @@ export class UserService {
 				lastName: true,
 				profilePicPath: true,
 				wins: true,
-				loose: true,
+				losses: true,
 				level: true
 			}
 		});
