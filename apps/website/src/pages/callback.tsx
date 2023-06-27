@@ -1,19 +1,19 @@
-import { useAuth } from '@/utils/hooks/useAuth';
 import jwtDecode from 'jwt-decode';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import {useContext, useEffect} from 'react';
 import { useCookies } from 'react-cookie';
+import {AuthContext} from '@/utils/contexts/AuthContext.tsx';
 
 export default function CallbackPage() {
+	const auth = useContext(AuthContext);
 	const router = useRouter();
-	const { login } = useAuth();
 	const [ cookies ] = useCookies();
 	
 	const saveLoginState = () => {
 		const jwt = cookies.jwt;
 		const jwtPayload: any = jwtDecode(jwt);
 
-		login({
+		auth?.login({
 			id: jwtPayload.userId,
 			name: jwtPayload.username,
 			email: jwtPayload.email,

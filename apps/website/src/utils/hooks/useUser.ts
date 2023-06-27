@@ -1,5 +1,4 @@
-import { useContext } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
+import { useState } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 
 export interface User {
@@ -11,8 +10,8 @@ export interface User {
 
 // This hook will store the user in our context and localStorage.
 export const useUser = () => {
-	const { user, setUser } = useContext(AuthContext);
-	const { setItem } = useLocalStorage();
+	const [user, setUser] = useState<User | null>(null);
+	const { setItem, removeItem } = useLocalStorage();
 
 	const addUser = (user: User) => {
 		setUser(user);
@@ -21,8 +20,7 @@ export const useUser = () => {
 
 	const removeUser = () => {
 		setUser(null);
-		setItem('user', '');
+		removeItem('user');
 	};
-
 	return { user, addUser, removeUser };
 };

@@ -39,7 +39,6 @@ export async function getServerSideProps() {
 		const res = await fetch('http://backend:4000/leaderboard');
 		const data = await res.json();
 		
-		console.table(data);
 		return { props: { data } };
 	} catch (error) {
 		console.error('Error fetching leaderboard data: ', error);

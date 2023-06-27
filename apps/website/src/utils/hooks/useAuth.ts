@@ -1,25 +1,26 @@
-import { useEffect } from 'react';
-import { useUser, User } from './useUser';
-import { useLocalStorage } from './useLocalStorage';
+import { useEffect, useState } from 'react';
+import { User, useUser } from './useUser';
 
 // This react hook will be responsible for checking if the user is logged in or not.
 export const useAuth = () => {
-	const { user, addUser, removeUser } = useUser();
-	const { getItem } = useLocalStorage();
+	const { addUser, removeUser, user } = useUser();
+	const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 	useEffect(() => {
-		const user = getItem('user');
 		if (user) 
-			addUser(JSON.parse(user));
-	}, []);
+			setIsAuthenticated(true);
+		else
+			setIsAuthenticated(false);
+	}, [user]);
 
-	const login = (user: User) => {
-		addUser(user);
+	// login
+	const login = (newUser: User) => {
+		addUser(newUser);
 	};
 
 	const logout = () => {
 		removeUser();
 	};
 
-	return { user, login, logout };
+	return { login, logout, user, isAuthenticated };
 };
