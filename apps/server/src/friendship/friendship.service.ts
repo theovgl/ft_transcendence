@@ -32,19 +32,15 @@ export class FriendshipService {
 				},
 			},
 		});
-		console.log('Requester', requester, 'Addressee', addressee, 'Friendship')
-		console.log('friendship', friendship);
 		return friendship;
 	}
 	
 	async handleAddFriend(requesterName: string, addresseeName: string) {
-		console.log('requesterName', requesterName, 'addresseeName', addresseeName);
 		const { requester, addressee } = await this.getRequesterAddressee(requesterName, addresseeName);
 		if (!requester || !addressee)
 			return null;
 		let friendship = await this.getFriendship(requester, addressee);
 		if (!friendship) {
-			console.log('Creating friendship...');
 			friendship = await this.prisma.friendship.create({
 				data: {
 					requester: {

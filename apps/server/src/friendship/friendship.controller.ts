@@ -9,7 +9,6 @@ export class FriendshipController {
 
 	@Get('add')
 	addFriend(@Query() req) {
-		console.log('req', req);
 		this.friendshipService.handleAddFriend(req.requesterName, req.addresseeName);
 		return;
 	}
