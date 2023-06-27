@@ -6,16 +6,16 @@
 	justify-content: center;
 	border-radius: 40px;
 	box-sizing: border-box;
-	width: 100px;
-	height: 47px;
+	width: 90px;
+	height: 43px;
 	text-transform: uppercase;
 
 	transition: transform cubic-bezier(.17,.67,.83,.67) 0.12s;
 	
-	&:hover {
-		transform: rotate(3deg);
-		transition: all cubic-bezier(.17,.67,.83,.67) 0.12s;
-	}
+	// &:hover {
+	// 	transform: rotate(3deg);
+	// 	transition: all cubic-bezier(.17,.67,.83,.67) 0.12s;
+	// }
 
 	.link {
 		font-family: $font-family;

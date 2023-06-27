@@ -12,7 +12,6 @@ export default function Navbar() {
 			<nav className={navbarStyle.nav_container}>
 				<Link className={navbarStyle.title} href='/'>Transcendence</Link>
 				<div className={navbarStyle.button_container}>
-					<LoginButton link="/signup" theme='dark'>Signup</LoginButton>
 					<LoginButton link="/login" theme='light'>Login</LoginButton>
 				</div>
 			</nav>
