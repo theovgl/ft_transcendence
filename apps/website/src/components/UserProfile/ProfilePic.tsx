@@ -10,7 +10,7 @@ export default function ProfilePic({path}: Props) {
 		<Image
 			className={styles.profilePic}
 			alt='Profile picture of the user'
-			src={path ? path : '/test_image.jpeg'}
+			src={path ? path : '/default_profil_picture.jpg'}
 			width={90}
 			height={90}
 		/>
