@@ -1,5 +1,4 @@
 import { useAuth } from '@/utils/hooks/useAuth';
-import { User } from '@/utils/hooks/useUser';
 import jwtDecode from 'jwt-decode';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
