@@ -15,6 +15,11 @@
 	justify-content: space-around;
 	align-items: center;
 	gap: 20px;
+
+	@media only screen and (max-width: 741px) {
+		flex-direction: column;
+		align-items: flex-start;
+	}
 }
 
 .header_buttons_container {
@@ -24,6 +29,13 @@
 	align-items: center;
 	padding: 0px 50px;
 	gap: 20px;
+
+	@media only screen and (max-width: 741px) {
+		justify-content: flex-start;
+		flex-wrap: wrap;
+		width: 100%;
+		padding: 0px;
+	}
 }
 
 .user_id_container {
@@ -36,11 +48,15 @@
 
 .content_container {
 	display: flex;
-	// width: 100%;
 	flex-direction: row;
 	justify-content: center;
 	align-items: center;
 	gap: 50px;
+
+	@media only screen and (max-width: 900px) {
+		flex-direction: column;
+		width: 100%;
+	}
 }
 
 .content_section {
@@ -50,6 +66,11 @@
 	padding: 10px;
 	gap: 10px;
 	width: 50%;
+
+	@media only screen and (max-width: 900px) {
+		flex-direction: column;
+		width: 100%;
+	}
 }
 
 .title2 {
