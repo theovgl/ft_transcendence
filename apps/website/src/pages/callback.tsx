@@ -12,9 +12,7 @@ export default function CallbackPage() {
 	
 	const saveLoginState = () => {
 		const jwt = cookies.jwt;
-		const jwtPayload = jwtDecode(jwt);
-		console.log(jwt);
-		console.table(jwtPayload);
+		const jwtPayload: any = jwtDecode(jwt);
 
 		login({
 			id: jwtPayload.userId,
