@@ -3,9 +3,7 @@ import { FriendshipService } from './friendship.service';
 
 @Controller('friendship')
 export class FriendshipController {
-	constructor(private friendshipService: FriendshipService) {
-		console.log('FriendshipController.constructor()');
-	}
+	constructor(private friendshipService: FriendshipService) {}
 
 	@Get('add')
 	addFriend(@Query() qry) {
@@ -14,28 +12,32 @@ export class FriendshipController {
 	}
 
 	@Get('remove')
-	removeFriend() {
-		this.friendshipService.handleRemoveFriend();
+	removeFriend(@Query() qry) {
+		this.friendshipService.handleRemoveFriend(qry.requesterName, qry.addresseeName);
 		return;
 	}
 
 	@Get('accept')
-	acceptFriend() {
-		return { message: 'Accept friend' };
+	acceptFriend(@Query() qry) {
+		this.friendshipService.handleAcceptFriend(qry.requesterName, qry.addresseeName);
+		return;
 	}
 
 	@Get('decline')
-	declineFriend() {
-		return { message: 'Decline friend' };
+	declineFriend(@Query() qry) {
+		this.friendshipService.handleDeclineFriend(qry.requesterName, qry.addresseeName);
+		return;
 	}
 
 	@Get('block')
-	blockFriend() {
-		return { message: 'Block friend' };
+	blockFriend(@Query() qry) {
+		this.friendshipService.handleBlockFriend(qry.requesterName, qry.addresseeName);
+		return;
 	}
 
 	@Get('unblock')
-	unblockFriend() {
-		return { message: 'Unblock friend' };
+	unblockFriend(@Query() qry) {
+		this.friendshipService.handleUnblockFriend(qry.requesterName, qry.addresseeName);
+		return;
 	}
 }

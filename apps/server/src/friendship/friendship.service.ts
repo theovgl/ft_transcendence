@@ -39,8 +39,9 @@ export class FriendshipService {
 		const { requester, addressee } = await this.getRequesterAddressee(requesterName, addresseeName);
 		if (!requester || !addressee)
 			return null;
+		let requested = await this.getFriendship(addressee, requester);
 		let friendship = await this.getFriendship(requester, addressee);
-		if (!friendship) {
+		if (!requested && !friendship) {
 			friendship = await this.prisma.friendship.create({
 				data: {
 					requester: {
@@ -55,37 +56,137 @@ export class FriendshipService {
 					},
 				},
 			});
+		} else if (requested && !friendship) {
+			if (requested.status == 'PENDING') {
+				requested = await this.prisma.friendship.update({
+					where: {
+						requesterId_addresseeId: {
+							requesterId: requested.requesterId,
+							addresseeId: requested.addresseeId,
+						},
+					},
+					data: {
+						status: 'ACCEPTED',
+					},
+				});
+			}
 			return friendship;
 		}
 	}
 
-	handleRemoveFriend() {
-		return {
-			message: 'Remove friend',
-		};
+	async handleRemoveFriend(requesterName: string, addresseeName: string) {
+		if (!requesterName || !addresseeName)
+			return null;
+		const { requester, addressee } = await this.getRequesterAddressee(requesterName, addresseeName);
+		const friendship = await this.getFriendship(requester, addressee);
+		if (friendship && friendship.status === 'ACCEPTED') {
+			return this.prisma.friendship.delete({
+				where: {
+					requesterId_addresseeId: {
+						requesterId: friendship.requesterId,
+						addresseeId: friendship.addresseeId,
+					},
+				},
+			});
+		}
+		return;
 	}
 
-	handleAcceptFriend() {
-		return {
-			message: 'Accept friend',
-		};
+	async handleAcceptFriend(requesterName: string, addresseeName: string) {
+		if (!requesterName || !addresseeName)
+			return null;
+		const { requester, addressee } = await this.getRequesterAddressee(requesterName, addresseeName);
+		const friendship = await this.getFriendship(addressee, requester);
+		if (friendship 
+			&& friendship.status === 'PENDING') {
+			return this.prisma.friendship.update({
+				where: {
+					requesterId_addresseeId: {
+						requesterId: friendship.requesterId,
+						addresseeId: friendship.addresseeId,
+					},
+				},
+				data: {
+					status: 'ACCEPTED',
+				},
+			});
+		}
+
+		return;
 	}
 
-	handleDeclineFriend() {
-		return {
-			message: 'Decline friend',
-		};
+	async handleDeclineFriend(requesterName: string, addresseeName: string) {
+		if (!requesterName || !addresseeName)
+			return null;
+		const { requester, addressee } = await this.getRequesterAddressee(requesterName, addresseeName);
+		const friendship = await this.getFriendship(requester, addressee);
+		if (friendship && friendship.status === 'PENDING') {
+			return this.prisma.friendship.delete({
+				where: {
+					requesterId_addresseeId: {
+						requesterId: friendship.requesterId,
+						addresseeId: friendship.addresseeId,
+					},
+				},
+			});
+		}
+		return;
 	}
 
-	handleBlockFriend() {
-		return {
-			message: 'Block friend',
-		};
+	async handleBlockFriend(requesterName: string, addresseeName: string) {
+		if (!requesterName || !addresseeName)
+			return null;
+		const { requester, addressee } = await this.getRequesterAddressee(requesterName, addresseeName);
+		if (!requester || !addressee)
+			return null;
+		let friendship = await this.getFriendship(requester, addressee);
+		if (!friendship) {
+			friendship = await this.prisma.friendship.create({
+				data: {
+					requester: {
+						connect: {
+							id: requester.id,
+						},
+					},
+					addressee: {
+						connect: {
+							id: addressee.id,
+						},
+					},
+					status: 'BLOCKED',
+				},
+			});
+		} else {
+			return this.prisma.friendship.update({
+				where: {
+					requesterId_addresseeId: {
+						requesterId: friendship.requesterId,
+						addresseeId: friendship.addresseeId,
+					},
+				},
+				data: {
+					status: 'BLOCKED',
+				},
+			});
+		}
+		return;
 	}
 
-	handleUnblockFriend() {
-		return {
-			message: 'Unblock friend',
-		};
+	async handleUnblockFriend(requesterName: string, addresseeName: string) {
+		if (!requesterName || !addresseeName)
+			return null;
+		const { requester, addressee } = await this.getRequesterAddressee(requesterName, addresseeName);
+		const friendship = await this.getFriendship(requester, addressee);
+		if (friendship && friendship.status === 'BLOCKED') {
+			return this.prisma.friendship.delete({
+				where: {
+					requesterId_addresseeId: {
+						requesterId: friendship.requesterId,
+						addresseeId: friendship.addresseeId,
+					},
+				},
+			});
+		}
+		return;
 	}
 }
