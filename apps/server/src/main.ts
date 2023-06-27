@@ -1,5 +1,4 @@
 import { NestFactory } from '@nestjs/core';
-import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as cors from 'cors';
@@ -13,14 +12,11 @@ async function bootstrap() {
 	app.use(cors(
 		{
 			origin: [
-				'http://127.0.0.1:3000',
 				'http://localhost:3000',
 			],
 			credentials: true,
-			exposedHeaders: ['Authorization'],
 		}
 	));
-	app.use(cookieParser());
 	app.use(
 		session({
 		  secret: 'your-secret-key',
