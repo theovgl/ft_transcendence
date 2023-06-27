@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { get } from 'http';
 
 @Injectable()
 export class FriendshipService {
@@ -188,5 +187,74 @@ export class FriendshipService {
 			});
 		}
 		return;
+	}
+
+	async handleGetFriendList(requesterName: string) {
+		if (!requesterName)
+			return null;
+		const friendList = await this.prisma.friendship.findMany({
+			where: {
+				OR: [
+					{
+						requester: {
+							name: requesterName,
+						},
+					},
+					{
+						addressee: {
+							name: requesterName,
+						},
+					},
+				],
+				status: 'ACCEPTED',
+			},
+		});
+		console.log(friendList);
+		return friendList;
+	}
+
+	async handleGetBlockedList(requesterName: string) {
+		if (!requesterName)
+			return null;
+		const blockedList = await this.prisma.friendship.findMany({
+			where: {
+				requester: {
+					name: requesterName,
+				},
+				status: 'BLOCKED',
+			},
+		});
+		console.log(blockedList);
+		return blockedList;
+	}
+
+	async handleGetSentRequestList(requesterName: string) {
+		if (!requesterName)
+			return null;
+		const sentRequestList = await this.prisma.friendship.findMany({
+			where: {
+				requester: {
+					name: requesterName,
+				},
+				status: 'PENDING',
+			},
+		});
+		console.log(sentRequestList);
+		return sentRequestList;
+	}
+
+	async handleGetReceivedRequestList(requesterName: string) {
+		if (!requesterName)
+			return null;
+		const receivedRequestList = await this.prisma.friendship.findMany({
+			where: {
+				addressee: {
+					name: requesterName,
+				},
+				status: 'PENDING',
+			},
+		});
+		console.log(receivedRequestList);
+		return receivedRequestList;
 	}
 }

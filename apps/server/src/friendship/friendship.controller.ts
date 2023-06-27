@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { FriendshipService } from './friendship.service';
 
 @Controller('friendship')
@@ -39,5 +39,25 @@ export class FriendshipController {
 	unblockFriend(@Query() qry) {
 		this.friendshipService.handleUnblockFriend(qry.requesterName, qry.addresseeName);
 		return;
+	}
+
+	@Get('getFriendList')
+	getFriendList(@Query() qry) {
+		return this.friendshipService.handleGetFriendList(qry.requesterName);
+	}
+
+	@Get('getBlockedList')
+	getBlockedList(@Query() qry) {
+		return this.friendshipService.handleGetBlockedList(qry.requesterName);
+	}
+
+	@Get('getSentRequestList')
+	getSentRequestList(@Query() qry) {
+		return this.friendshipService.handleGetSentRequestList(qry.requesterName);
+	}
+
+	@Get('getReceivedRequestList')
+	getReceivedRequestList(@Query() qry) {
+		return this.friendshipService.handleGetReceivedRequestList(qry.requesterName);
 	}
 }
