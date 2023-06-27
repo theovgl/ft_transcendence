@@ -12,52 +12,99 @@ export class AuthService {
 		private jwt: JwtService,
 		private config: ConfigService
 	) {}
-	
-	async handleCallback(user: FortyTwoUser): Promise<any> {
-		console.table(user);
-		const found = await this.prisma.user.findUnique({
-			where: {
-				email: user.email,
-			},
-		});
-		if (found) {
-			this.signToken(found.id, found.email);
-			// res.cookie('auth', token);
-      		// res.redirect('http://' + process.env.SERVER_URL + ':' + process.env.SERVER_PORT + '/home');
-			return found;
-		}
-		console.log('Creating new User...', user);
-		
-		const newUser = await this.createUser(user);
-		this.signToken(newUser.id, newUser.email);
 
-		return newUser;
+	async getUserInfo(accessToken: string): Promise<FortyTwoUser> {
+		try {
+			const response = await fetch('https://api.intra.42.fr/v2/me', {
+				method: 'GET',
+				headers: {
+					Authorization: 'Bearer ' + accessToken,
+				},
+			});
+
+			if (!response || !response.ok)
+				throw new Error('Failed to fetch user info');
+
+			const data = await response.json();
+			const newUser: FortyTwoUser = {
+				userId: data.id,
+				username: data.login,
+				email: data.email,
+				firstName: data.first_name,
+				lastName: data.last_name,
+				picture: data.image.link,
+			};
+
+			return newUser;
+		} catch (error) {
+			console.error('Error: ', error);
+			throw error;
+		}
 	}
 
-	async signToken(userId: number, email: string) {
-		const payload = {
-			sub: userId,
-			email
-		};
+	async exchangeCodeForToken(code: string): Promise<any> {
+		try {
+			const params = {
+				grant_type: 'authorization_code',
+				code: code,
+				client_id: process.env.FT_CLIENT_ID,
+				client_secret: process.env.FT_CLIENT_SECRET,
+				redirect_uri: process.env.FT_CALLBACK_URL,
+			};
+			
+			const data = new URLSearchParams(params);
+			const response = await fetch('https://api.intra.42.fr/oauth/token', {
+				method: 'POST',
+				body: data,
+			});
 
-		const secret = this.config.get('JWT_SECRET');
+			if (!response || !response.ok)
+				throw new Error('Failed to exchange code for token');
 
-		const token = await this.jwt.sign(payload, {
-			// expiresIn: '15m',
-			secret: secret
-		});
+			const responseData = await response.json();
+		    return responseData;
+		} catch (error) {
+			console.error('Error: ', error);
+			throw error;
+		}
+	}
+	
+	async handleCallback(response: any): Promise<any> {
+		const user: FortyTwoUser = await this.getUserInfo(response.access_token);
+		const token = await this.signToken(user.userId, user.username, user.email, response);
 
-		console.log('Token', token);
-		await this.prisma.user.update({
-			where: {
-				email: email,
+		await this.prisma.user.upsert({
+			where: { email: user.email },
+			create: {
+				email: user.email,
+				firstName: user.firstName,
+				lastName: user.lastName,
+				name: user.username,
+				profilePicPath: user.picture,
+				jwt: token,
 			},
-			data:{
+			update: {
 				jwt: token,
 			},
 		});
+		return token;
 	}
-	
+
+	async signToken(userId: number, username: string, email: string, response: any): Promise<string> {
+		const payload = {
+			exp: response.expires_in,
+			iat: response.created_at,
+			userId,
+			email,
+			username
+		};
+		const secret = this.config.get('JWT_SECRET');
+		const token = await this.jwt.sign(payload, {
+			secret: secret
+		});
+		return token;
+	}
+
 	async validateUser(details: FortyTwoUser) {
 		console.log('validateUser', details);
 		const user = await this.prisma.user.findUnique({
@@ -76,11 +123,12 @@ export class AuthService {
 		try {
 			const newUser = this.prisma.user.create({
 				data: {
+					id: user.userId,
 					email: user.email,
 					name: user.username,
 					firstName: user.firstName,
 					lastName: user.lastName,
-					picture: user.picture,
+					profilePicPath: user.picture,
 				},
 			});
 			return newUser;

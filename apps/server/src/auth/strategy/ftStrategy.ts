@@ -21,6 +21,7 @@ export class ftStrategy extends PassportStrategy(Strategy) {
 	): Promise<any> {
 		try {
 			const user = {
+				userId: profile.id,
 				username: profile.username,
 				email: profile.emails[0].value,
 				firstName: profile.name.givenName,
