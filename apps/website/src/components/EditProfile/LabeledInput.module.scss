@@ -1,0 +1,22 @@
+.labeledInput_container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+}
+
+.input {
+	box-sizing: border-box;
+	padding: 12px;
+	border: solid rgb(222, 222, 222) 3px;
+	border-radius: 15px;
+	transition: border ease-out 0.10s;
+	margin: 0;
+	width: 100%;
+
+	&:focus-visible {
+		border: solid rgb(0, 0, 0) 3px;
+		outline: none;
+		transition: border ease-out 0.15s;
+	}
+}

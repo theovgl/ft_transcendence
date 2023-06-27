@@ -4,11 +4,17 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { FriendshipModule } from './friendship/friendship.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+import { LeaderboardModule } from './leaderboard/leaderboard.module';
 
 @Module({
-	imports: [AuthModule, UserModule, PrismaModule, FriendshipModule,
-		ConfigModule.forRoot({
-			isGlobal: true
-		}),],
+	imports: [AuthModule, UserModule, PrismaModule, FriendshipModule, MulterModule.register({
+		storage: memoryStorage()
+	}),
+	UserModule, PrismaModule, LeaderboardModule,
+	ConfigModule.forRoot({
+		isGlobal: true
+	}),],
 })
 export class AppModule {}

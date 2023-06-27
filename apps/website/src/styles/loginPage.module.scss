@@ -1,0 +1,16 @@
+@import './library';
+
+.container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	width: 100%;
+
+	margin-top: 50px;
+}
+
+.welcomeTitle {
+	font-family: $font-family;
+	font-weight: 700;
+}

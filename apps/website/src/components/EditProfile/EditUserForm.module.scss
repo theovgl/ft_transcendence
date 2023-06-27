@@ -1,0 +1,24 @@
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    // max-width: 700px;
+    width: 100%;
+    margin: auto;
+}
+
+.formSection {
+    display: flex;
+    width: 100%;
+    gap: 10px;
+}
+
+@media screen and (max-width: 500px) {
+    .formContainer {
+        width: 100%;
+    }
+
+    .formSection {
+        display: flex;
+        flex-direction: column;
+    }
+}

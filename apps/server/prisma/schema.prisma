@@ -8,64 +8,19 @@ generator client {
 }
 
 model User {
-  id             Int          @id @default(autoincrement())
-  name           String				@unique
-  email          String				@unique
-  hashedPassword String?
+  id             Int     @id @default(autoincrement())
+  name           String  @unique
+  email          String  @unique
+  jwt            String?
   firstName      String?
   lastName       String?
-  picture        String?
-  level          Float        @default(0)
-  jwt            String?
-  role           Role         @default(USER)
-  rooms          Talk[]
-  messages       Message[]
-  matches        Play[]
+  profilePicPath String?
+  wins           Int    @default(0)
+  losses         Int    @default(0)
+  level          Float   @default(0)
+  role           Role    @default(USER)
   friendProposal Friendship[] @relation("requester")
   friendRequest  Friendship[] @relation("addressee")
-}
-
-model Room {
-  id       String    @id @default(uuid())
-  name     String
-  users    Talk[]
-  messages Message[]
-}
-
-model Message {
-  id        String   @id @default(uuid())
-  content   String
-  timestamp DateTime @default(now())
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-  room      Room     @relation(fields: [roomId], references: [id])
-  roomId    String
-}
-
-model Talk {
-  user   User   @relation(fields: [userId], references: [id])
-  userId Int
-  room   Room   @relation(fields: [roomId], references: [id])
-  roomId String
-
-  @@id([userId, roomId])
-}
-
-model Match {
-  id        String    @id @default(uuid())
-  createdAt DateTime  @default(now())
-  endedAt   DateTime?
-  users     Play[]
-}
-
-model Play {
-  user    User   @relation(fields: [userId], references: [id])
-  userId  Int
-  match   Match  @relation(fields: [matchId], references: [id])
-  matchId String
-  score   Int    @default(0)
-
-  @@id([userId, matchId])
 }
 
 model Friendship {
@@ -83,9 +38,7 @@ enum FriendshipStatus {
   ACCEPTED
   BLOCKED
 }
-
 enum Role {
   USER
   ADMIN
 }
-

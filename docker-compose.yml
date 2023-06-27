@@ -5,10 +5,9 @@ volumes:
   uploads:
 
 networks:
-  backend:
+  transcendence:
 
 services:
-# FRONTEND
   front:
     container_name: frontend
     build:
@@ -20,9 +19,12 @@ services:
       NODE_ENV: development
     volumes:
       - ./apps/website:/app
+      - uploads:/app/uploads
     ports:
       - "3000:3000"
     restart: unless-stopped
+    networks:
+      - transcendence
     depends_on:
       - backend
 
@@ -36,7 +38,7 @@ services:
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: nest
     networks:
-      - backend
+      - transcendence
 
   backend:
     build:
@@ -51,12 +53,13 @@ services:
       - POSTGRES_DB=nest
     volumes:
       - ./apps/server:/app
+      - uploads:/app/uploads
     ports:
       - "4000:4000"
       - "5555:5555"
     restart: unless-stopped
     networks:
-      - backend
+      - transcendence
     depends_on:
       - database
 
