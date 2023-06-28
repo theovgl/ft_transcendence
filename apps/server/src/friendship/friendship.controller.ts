@@ -60,4 +60,14 @@ export class FriendshipController {
 	getReceivedRequestList(@Query() qry) {
 		return this.friendshipService.handleGetReceivedRequestList(qry.requesterName);
 	}
+
+	@Get('getRelationshipList')
+	getRelationshipList(@Query() qry) {
+		return {
+			friendList: this.friendshipService.handleGetFriendList(qry.requesterName),
+			blockedList: this.friendshipService.handleGetBlockedList(qry.requesterName),
+			sentRequestList: this.friendshipService.handleGetSentRequestList(qry.requesterName),
+			receivedRequestList: this.friendshipService.handleGetReceivedRequestList(qry.requesterName),
+		};
+	}
 }
