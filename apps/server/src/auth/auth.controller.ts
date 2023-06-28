@@ -78,7 +78,7 @@ console.log('user in authenticate', user);
 		if (!isCodeValid)
 			throw new UnauthorizedException('Wrong authentication code');
 
-    	return this.authService.loginWith2fa(req.user);
+    	return this.authService.loginWith2fa(user);
 	}
 
 	@UseGuards(JwtGuard)
