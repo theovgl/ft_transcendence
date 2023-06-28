@@ -19,8 +19,25 @@ model User {
   losses         Int    @default(0)
   level          Float   @default(0)
   role           Role    @default(USER)
+  friendProposal Friendship[] @relation("requester")
+  friendRequest  Friendship[] @relation("addressee")
 }
 
+model Friendship {
+  requester   User             @relation("requester", fields: [requesterId], references: [id])
+  requesterId Int
+  addressee   User             @relation("addressee", fields: [addresseeId], references: [id])
+  addresseeId Int
+  status      FriendshipStatus @default(PENDING)
+
+  @@id([requesterId, addresseeId])
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+}
 enum Role {
   USER
   ADMIN
