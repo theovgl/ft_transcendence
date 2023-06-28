@@ -39,8 +39,6 @@ export class AuthController {
 	@Post('2fa/generate')
 	@UseGuards(JwtGuard)
 	async register(@Res() res, @Req() req) {
-		console.log('req in generate', jwt_decode(req.rawHeaders[7]));
-		console.log('req.user. in generate', jwt_decode(req.headers.authorization));
 		const user = jwt_decode(req.headers.authorization);
 	  const { otpauthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
   
@@ -52,15 +50,17 @@ export class AuthController {
 	@Post('2fa/turn-on')
 	@UseGuards(JwtGuard)
 	async turnOnTwoFactorAuthentication(@Req() req, @Body() body) {
+		const user = jwt_decode(req.headers.authorization);
 	  const isCodeValid =
 		this.authService.isTwoFactorAuthenticationCodeValid(
 		  body.twoFactorAuthenticationCode,
-		  req.user,
+		  user,
 		);
 	  if (!isCodeValid)
 			throw new UnauthorizedException('Wrong authentication code');
 
-	  await this.authService.turnOnTwoFactorAuthentication(req.user.id);
+	  await this.authService.turnOnTwoFactorAuthentication(user);
+	  return this.authService.loginWith2fa(user);
 	}
 
 	@Post('2fa/authenticate')
@@ -68,8 +68,6 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	async authenticate(@Req() req, @Body() body) {
 		const user = jwt_decode(req.headers.authorization);
-console.log('user in authenticate', user);
-
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
 			user,
@@ -85,7 +83,6 @@ console.log('user in authenticate', user);
 	@Get('42/test')
 	test(@Req() req) {
 		const user = req;
-		console.log('user in test in auth.controller', user);
 		return { message: req };
 	}
 }

@@ -104,12 +104,10 @@ export class AuthService {
 			secret: secret,
 			expiresIn: '15d',
 		});
-		console.log('expiresIn', expiresIn,);
 		return token;
 	}
 
 	async validateUser(details: FortyTwoUser) {
-		console.log('validateUser', details);
 		const user = await this.prisma.user.findUnique({
 			where: {
 				email: details.email,
@@ -150,16 +148,8 @@ export class AuthService {
 
 	async generateTwoFactorAuthenticationSecret(user) {
 		const secret = authenticator.generateSecret();
-		console.log('user', user);
-		console.log('user.email', user.email);
-		console.log('secret', secret);
-	
 		const otpauthUrl = authenticator.keyuri(user.email, 'ft_transcendence', secret);
-		console.log('otpauthUrl', otpauthUrl);
-	
 		await this.setTwoFactorAuthenticationSecret(secret, user.id, user.email);
-		console.log('secret', secret, '\notpauthUrl', otpauthUrl);
-	
 		return {secret, otpauthUrl};
 	  }
 
@@ -184,10 +174,10 @@ export class AuthService {
 		}
 	}			
 
-	  async turnOnTwoFactorAuthentication(userId: number) {
+	  async turnOnTwoFactorAuthentication(jwtDecoded: any) {
 		await this.prisma.user.update({
 			where: {
-				id: userId
+				email: jwtDecoded.email,
 			},
 			data: {
 				twoFAEnabled: true
