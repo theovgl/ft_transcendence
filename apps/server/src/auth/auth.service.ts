@@ -148,12 +148,17 @@ export class AuthService {
 		});
 	}
 
-	async generateTwoFactorAuthenticationSecret(user: User) {
+	async generateTwoFactorAuthenticationSecret(user) {
 		const secret = authenticator.generateSecret();
+		console.log('user', user);
+		console.log('user.email', user.email);
+		console.log('secret', secret);
 	
 		const otpauthUrl = authenticator.keyuri(user.email, 'ft_transcendence', secret);
+		console.log('otpauthUrl', otpauthUrl);
 	
-		await this.setTwoFactorAuthenticationSecret(secret, user.id);
+		await this.setTwoFactorAuthenticationSecret(secret, user.id, user.email);
+		console.log('secret', secret, '\notpauthUrl', otpauthUrl);
 	
 		return {secret, otpauthUrl};
 	  }
@@ -162,16 +167,22 @@ export class AuthService {
 		return toDataURL(otpAuthUrl);
 	  }
 
-	  async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
-		await this.prisma.user.update({
-			where: {
-				id: userId
-			},
-			data: {
-				twoFASecret: secret
-			},
-		});
-	  }
+	  async setTwoFactorAuthenticationSecret(secret: string, userId: number, email: string) {
+		try {
+			return await this.prisma.user.update({
+				where: {
+					id: userId,
+					email: email,
+				},
+				data: {
+					twoFASecret: secret,
+				},
+			});
+	  } catch (e) {
+			console.error('Error when setting 2FA secret:', e);
+			throw (new InternalServerErrorException('Failed to set two factor authentication secret'));
+		}
+	}			
 
 	  async turnOnTwoFactorAuthentication(userId: number) {
 		await this.prisma.user.update({
@@ -184,7 +195,7 @@ export class AuthService {
 		});
 	  }
 
-	  isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+	  isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: any) {
 		return authenticator.verify({
 		  token: twoFactorAuthenticationCode,
 		  secret: user.twoFASecret,

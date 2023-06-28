@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import { JwtGuard } from './guard';
 import { ftAuthGuard } from './guard/ft.guards';
 import { PrismaService } from '../prisma/prisma.service';
+import jwt_decode from 'jwt-decode';
 
 @Controller('auth')
 export class AuthController {
@@ -38,10 +39,13 @@ export class AuthController {
 	@Post('2fa/generate')
 	@UseGuards(JwtGuard)
 	async register(@Res() res, @Req() req) {
-	  const { otpauthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(req.user);
+		console.log('req in generate', jwt_decode(req.rawHeaders[7]));
+		console.log('req.user. in generate', jwt_decode(req.headers.authorization));
+		const user = jwt_decode(req.headers.authorization);
+	  const { otpauthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
   
 	  return res.json(
-		await this.authService.generateQrCodeDataURL(otpauthUrl),
+			await this.authService.generateQrCodeDataURL(otpauthUrl),
 	  );
 	}
 
@@ -63,16 +67,19 @@ export class AuthController {
 	@HttpCode(200)
 	@UseGuards(JwtGuard)
 	async authenticate(@Req() req, @Body() body) {
+		const user = jwt_decode(req.headers.authorization);
+console.log('user in authenticate', user);
+
 		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
-			req.user,
+			user,
 		);
 
 		if (!isCodeValid)
 			throw new UnauthorizedException('Wrong authentication code');
 
     	return this.authService.loginWith2fa(req.user);
-}
+	}
 
 	@UseGuards(JwtGuard)
 	@Get('42/test')
