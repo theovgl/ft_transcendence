@@ -3,6 +3,8 @@ import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
 
 @Injectable()
 export class AuthService {
@@ -57,7 +59,7 @@ export class AuthService {
 				method: 'POST',
 				body: data,
 			});
-
+			
 			if (!response || !response.ok)
 				throw new Error('Failed to exchange code for token');
 
@@ -102,6 +104,7 @@ export class AuthService {
 			secret: secret,
 			expiresIn: '15d',
 		});
+		console.log('expiresIn', expiresIn,);
 		return token;
 	}
 
@@ -144,4 +147,62 @@ export class AuthService {
 			},
 		});
 	}
+
+	async generateTwoFactorAuthenticationSecret(user: User) {
+		const secret = authenticator.generateSecret();
+	
+		const otpauthUrl = authenticator.keyuri(user.email, 'ft_transcendence', secret);
+	
+		await this.setTwoFactorAuthenticationSecret(secret, user.id);
+	
+		return {secret, otpauthUrl};
+	  }
+
+	  async generateQrCodeDataURL(otpAuthUrl: string) {
+		return toDataURL(otpAuthUrl);
+	  }
+
+	  async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+		await this.prisma.user.update({
+			where: {
+				id: userId
+			},
+			data: {
+				twoFASecret: secret
+			},
+		});
+	  }
+
+	  async turnOnTwoFactorAuthentication(userId: number) {
+		await this.prisma.user.update({
+			where: {
+				id: userId
+			},
+			data: {
+				twoFAEnabled: true
+			},
+		});
+	  }
+
+	  isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {
+		return authenticator.verify({
+		  token: twoFactorAuthenticationCode,
+		  secret: user.twoFASecret,
+		});
+	  }
+
+	  async loginWith2fa(user: Partial<User>) {
+		const payload = {
+			userId: user.id,
+			username: user.name,
+			email: user.email,
+			twoFAEnabled: !!user.twoFAEnabled,
+			isTwoFactorAuthenticated: true,
+		};
+	
+		return {
+		  email: payload.email,
+		  access_token: this.jwt.sign(payload),
+		};
+	  }
 }
