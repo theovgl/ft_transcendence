@@ -34,9 +34,10 @@ services:
     ports:
       - 5435:5432
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: nest
+      env_file: ./apps/server/.env
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     networks:
       - transcendence
 
@@ -48,9 +49,10 @@ services:
     command: sh -c "npx prisma migrate dev --name migration && npm run start:dev"
     entrypoint: ./docker-entrypoint.sh
     environment:
-      - POSTGRES_PASSWORD=123
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=nest
+      env_file: ./apps/server/.env
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./apps/server:/app
       - uploads:/app/uploads
