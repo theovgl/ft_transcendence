@@ -5,17 +5,18 @@ import { useEffect, useState } from 'react';
 import Name from '@/components/UserProfile/Name';
 import ProfilePic from '@/components/UserProfile/ProfilePic';
 import Button from '@/components/Button/Button';
-import { BiCheck, BiMessageAltDetail } from 'react-icons/bi';
+import { BiBlock, BiCheck, BiMessageAltDetail } from 'react-icons/bi';
 import Statistics from '@/components/UserProfile/Statistics';
 import Match from '@/components/UserProfile/Match';
 import { useCookies } from 'react-cookie';
 import type { UserInfos } from 'global';
+import jwtDecode from 'jwt-decode';
 
 export default function Profile() {
 	const router = useRouter();
 	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
 	const [cookies] = useCookies();
-	
+
 	useEffect(() => {
 		if (!router.isReady) return;
 		const fetchUserInfo = async () => {
@@ -46,7 +47,7 @@ export default function Profile() {
 			}
 		};
 		fetchUserInfo();
-	}, [router.isReady, router.query.username]);
+	}, [router.isReady, router.query.username, router, cookies]);
 		
 	return (
 		<>
@@ -65,6 +66,7 @@ export default function Profile() {
 											Username={userInfo.name}
 											FirstName={userInfo.firstName}
 											LastName={userInfo.lastName}
+											blockIcon={<BiBlock />}
 										/>
 									</div>
 									<div className={styles.header_buttons_container}>
@@ -77,6 +79,25 @@ export default function Profile() {
 										<Button
 											text='Friend'
 											boxShadow={false}
+											onClick={ () =>
+											{ fetch(
+												`http://localhost:4000/friendship/add?requesterName=${encodeURIComponent(
+													jwtDecode(cookies['jwt']).username
+												  )}&addresseeName=${router.query.username}`, {
+													method: 'GET',
+													headers: {
+														'Content-Type': 'application/json',
+														'Authorization': 'Bearer ' + cookies['jwt'],
+													},
+											})
+												.then((response) => {
+													if (!response.ok)
+														throw new Error('Failed to add friend');
+												})
+												.catch((error) => {
+													console.error(error);
+												});
+											}}
 											theme='dark'
 											icon={<BiCheck />}
 										/>
