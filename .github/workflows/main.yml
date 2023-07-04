@@ -25,17 +25,20 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Install pnpm
+        run: npm i -g pnpm
+
       - name: Install dependencies
-        run: (cd apps/website && npm install)
+        run: (cd apps/website && pnpm install)
 
       - name: Lint the codebase
-        run: (cd apps/website && npm run lint)
+        run: (cd apps/website && pnpm run lint)
 
      # - name: Test our code
      #   run: npm test
 
       - name: Build
-        run: (cd apps/website && npm run build)
+        run: (cd apps/website && pnpm run build)
 
      # - name: Login
      #   run: npx warp login --api-key=${{ secrets.SD_API_KEY }}
