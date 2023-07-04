@@ -5,6 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
+import { FortyTwoUser } from '../../types/global';
 
 @Injectable()
 export class AuthService {
