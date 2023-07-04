@@ -10,12 +10,10 @@ export class FriendshipController {
 	@UseGuards(JwtGuard)
 	@Get('add')
 	addFriend(@Query() qry, @Res() response: Response) {
-		console.log('qry:\n', qry);
 		this.friendshipService.handleAddFriend(qry.requesterName, qry.addresseeName);
 		response
 			.header('content-type', 'plain/text')
 			.status(200)
-			.send('Friend request sent.');
 	}
 
 	@Get('remove')
@@ -38,6 +36,7 @@ export class FriendshipController {
 
 	@Get('block')
 	blockFriend(@Query() qry) {
+		
 		this.friendshipService.handleBlockFriend(qry.requesterName, qry.addresseeName);
 		return;
 	}
@@ -76,5 +75,13 @@ export class FriendshipController {
 			sentRequestList: this.friendshipService.handleGetSentRequestList(qry.requesterName),
 			receivedRequestList: this.friendshipService.handleGetReceivedRequestList(qry.requesterName),
 		};
+	}
+
+	@Get('getRelationship')
+	async getRelationship(@Query() qry) {
+		console.log('qry:\n', qry);
+		const status = await this.friendshipService.handleGetRelationship(qry.requesterName, qry.addresseeName);
+		console.log('status:\n', status);
+		return status;
 	}
 }

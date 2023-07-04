@@ -11,16 +11,43 @@ import Match from '@/components/UserProfile/Match';
 import { useCookies } from 'react-cookie';
 import type { UserInfos } from 'global';
 import jwtDecode from 'jwt-decode';
+import { stat } from 'fs';
 
 export default function Profile() {
 	const router = useRouter();
 	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
 	const [cookies] = useCookies();
+	const [buttonText, setButtonText] = useState<string>('Add friend');
+	const [status, setStatus] = useState<string>('');
+
+
 
 	useEffect(() => {
 		if (!router.isReady) return;
 		const fetchUserInfo = async () => {
 			try {
+				const statusResponse = await fetch(`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
+					jwtDecode(cookies['jwt']).username
+					)}&addresseeName=${router.query.username}`, {
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+							'Authorization': 'Bearer ' + cookies['jwt'],
+						},
+					})
+				const status = await statusResponse.text();
+				console.log('status', status);
+				let buttonText = 'Add friend';
+				if (status === 'ACCEPTED')
+					buttonText = 'Friend';
+				else if (status === 'PENDING')
+					buttonText = 'Pending request';
+				else if (status === 'BLOCKED')
+					buttonText = 'Blocked';
+				else if (status === 'RECEIVED')
+					buttonText = 'Accept request';
+				setButtonText(buttonText);
+				setStatus(status);
 				await fetch(
 					`http://localhost:4000/users/${router.query.username}`, {
 						method: 'GET',
@@ -47,7 +74,7 @@ export default function Profile() {
 			}
 		};
 		fetchUserInfo();
-	}, [router.isReady, router.query.username, router, cookies]);
+	}, [router.isReady, router.query.username, router, cookies, buttonText, status]);
 		
 	return (
 		<>
@@ -77,11 +104,19 @@ export default function Profile() {
 											icon={<BiMessageAltDetail />}
 										/>
 										<Button
-											text='Friend'
+											text={buttonText}
 											boxShadow={false}
 											onClick={ () =>
-											{ fetch(
-												`http://localhost:4000/friendship/add?requesterName=${encodeURIComponent(
+											{ let route = 'add';
+											if (status === 'ACCEPTED')
+												route = 'remove';
+											else if (status === 'PENDING')
+												route = 'decline';
+											else if (status === 'BLOCKED')
+												route = 'unblock';
+												
+												fetch(
+												`http://localhost:4000/friendship/${route}?requesterName=${encodeURIComponent(
 													jwtDecode(cookies['jwt']).username
 												  )}&addresseeName=${router.query.username}`, {
 													method: 'GET',
@@ -92,7 +127,21 @@ export default function Profile() {
 											})
 												.then((response) => {
 													if (!response.ok)
-														throw new Error('Failed to add friend');
+														throw new Error('Failed to update relationship');
+													return response.text();
+												})
+												.then((status) => { 
+													console.log('status', status);
+													let updateButtonText = 'Add friend';
+													if (status === 'ACCEPTED')
+														updateButtonText = 'Friend';
+													else if (status === 'PENDING')
+														updateButtonText = 'Pending request';
+													else if (status === 'BLOCKED')
+														updateButtonText = 'Blocked';
+													else if (status === 'RECEIVED')
+														updateButtonText = 'Accept request';
+													setButtonText(updateButtonText);
 												})
 												.catch((error) => {
 													console.error(error);
