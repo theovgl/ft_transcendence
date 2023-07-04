@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3'
 
 volumes:
   data:
@@ -12,8 +12,8 @@ services:
     container_name: frontend
     build:
       context: ./apps/website/
-      target: runner
-    command: npm run dev
+      target: run
+    command: pnpm run dev
     entrypoint: ./docker-entrypoint.sh
     environment:
       NODE_ENV: development
@@ -33,7 +33,8 @@ services:
     container_name: postgres
     ports:
       - 5432:5432
-    env_file: ./apps/server/.env
+    env_file:
+      - ./apps/server/.env
     networks:
       - transcendence
 
@@ -42,10 +43,11 @@ services:
       context: ./apps/server/
       target: dev
     container_name: backend
-    stdin_open: true
-    tty: true
-    command: sh -c "npx prisma migrate dev --name migration && npm run start:dev"
+    command: pnpm run start:dev
     entrypoint: ./docker-entrypoint.sh
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?schema=public
     env_file: ./apps/server/.env
     volumes:
       - ./apps/server:/app
