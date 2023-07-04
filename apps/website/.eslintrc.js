@@ -19,6 +19,8 @@ module.exports = {
 	rules: {
 		'@typescript-eslint/indent': 'off',
 		'react/react-in-jsx-scope': 'off',
+		'react/jsx-indent-props': ['error', 'tab'],
+		'react/jsx-indent': ['error', 'tab'],
 		'no-tabs': 'off',
 		'semi': [ 'error', 'always' ],
 		'indent': [ 'error', 'tab' ],
