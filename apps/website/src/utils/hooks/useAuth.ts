@@ -7,7 +7,7 @@ export const useAuth = () => {
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 	useEffect(() => {
-		if (user) 
+		if (user)
 			setIsAuthenticated(true);
 		else
 			setIsAuthenticated(false);

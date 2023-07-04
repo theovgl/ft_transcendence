@@ -1,16 +1,25 @@
 @import '../../styles/library';
 
+.overlay {
+	z-index: 50;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: rgba(0, 0, 0, 0.429);
+}
+
 .modal_main {
 	display: flex;
 	flex-direction: column;
 	padding: 10px;
-	height: 100vh;
 	z-index: 999;
 	position: fixed;
 	min-width: 280px;
 	top: 0;
-	bottom: 0;
 	right: 0;
+	bottom: 0;
 	background-color: $black-color;
 	box-shadow: 0 0 0 1px #30363d, 0 16px 32px rgba(1,4,9,0.85);
 	border: none;
@@ -25,12 +34,13 @@
 
 	svg {
 		color: rgb(108, 106, 105);
-		transition: background-color 0.1s;
+		transition: all 0.1s;
 
 		&:hover {
 			background-color: #3c3c3c;
+			color: white;
 			border-radius: 15%;
-			transition: background-color 0.1s;
+			transition: all 0.1s;
 			cursor: pointer;
 		}
 	}

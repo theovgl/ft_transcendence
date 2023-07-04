@@ -1,18 +1,19 @@
-import React, {useContext, useEffect, useState} from 'react';
+import React, { useContext, useEffect, useState} from 'react';
 import style from './SettingsModal.module.scss';
 import ModalLink from './ModalLink/ModalLink';
-import {AuthContext} from '@/utils/contexts/AuthContext';
-import { BiSolidChat, BiSolidGroup, BiSolidPencil, BiSolidUser } from 'react-icons/bi';
+import { BiSolidGroup, BiSolidPencil, BiSolidUser } from 'react-icons/bi';
 import { RxCross2 } from 'react-icons/rx';
 import { useCookies } from 'react-cookie';
 import { UserInfos } from 'global';
 import ProfilePic from '../UserProfile/ProfilePic';
+import { AuthContext } from '@/utils/contexts/AuthContext';
 
 export default function SettingsModal() {
-	const { user } = useContext(AuthContext);
+	const auth = useContext(AuthContext);
 	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
 	const [ cookies ] = useCookies();
-	
+	const [ isOpen, setIsOpen ] = useState(false);
+
 	const fetchUserInfo = async (username: string) => {
 		try {
 			await fetch(
@@ -40,15 +41,15 @@ export default function SettingsModal() {
 	};
 
 	useEffect(() => {
-		const username: string | undefined  = user?.name;
+		const username: string | undefined  = auth?.user?.name;
 
-		console.log(username);
 		if (username)
 			fetchUserInfo(username);
 	});
 	
 	return (
 		<>
+			<div className={style.overlay}></div>
 			<div className={style.modal_main}>
 				<div className={style.modal_header}>
 					<div className={style.modal_userInfo}>
@@ -56,15 +57,35 @@ export default function SettingsModal() {
 							path={userInfo?.profilePicPath}
 							size={30} stroke={false}
 						/>
-						<p className={style.modal_username}>tvogel</p>
+						<p className={style.modal_username}>{userInfo?.name}</p>
 					</div>
 					<RxCross2 />
 				</div>
 				<div className={style.modal_links_container}>
-					<ModalLink title='Your profile' href='/' icon={ <BiSolidUser /> }/>
-					<ModalLink title='Edit your profile' href='/' icon={ <BiSolidPencil /> }/>
-					<ModalLink title='Your friends' href='/' icon={ <BiSolidGroup /> }/>
-					<ModalLink title='Chat' href='/chat' icon={<BiSolidChat />}/>
+					<ModalLink
+						title='Your profile'
+						href={'/user/' + userInfo?.name}
+						icon={ <BiSolidUser /> }
+						onClick={() => setIsOpen(false)}
+					/>
+					<ModalLink
+						title='Edit your profile'
+						href='/edit'
+						icon={ <BiSolidPencil /> }
+						onClick={() => setIsOpen(false)}
+					/>
+					<ModalLink
+						title='Your friends'
+						href='/'
+						icon={ <BiSolidGroup /> }
+						onClick={() => setIsOpen(false)}
+					/>
+					<ModalLink
+						title='Chat'
+						href='/chat'
+						// icon={<BiSolidChat />}
+						onClick={() => setIsOpen(false)}
+					/>
 				</div>
 			</div>
 		</>

@@ -3,16 +3,20 @@ import Image from 'next/image';
 
 interface Props {
 	path?: string;
+	size: number;
+	stroke: boolean;
 }
 
-export default function ProfilePic({path}: Props) {
+export default function ProfilePic({path, size, stroke}: Props) {
 	return (
 		<Image
-			className={styles.profilePic}
+			className={
+				stroke === true ? styles.profilePic_stroke : styles.profilePic
+			}
 			alt='Profile picture of the user'
 			src={path ? path : '/default_profil_picture.jpg'}
-			width={90}
-			height={90}
+			width={size}
+			height={size}
 		/>
 	);
 }

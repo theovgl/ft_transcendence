@@ -12,6 +12,7 @@ import Match from '@/components/UserProfile/Match';
 import { useCookies } from 'react-cookie';
 import type { UserInfos } from 'global';
 import jwtDecode from 'jwt-decode';
+import Head from 'next/head';
 
 type jwtType = {
 	userId: number;
@@ -169,6 +170,9 @@ export default function Profile() {
 		
 	return (
 		<>
+			<Head>
+				<title>Profile - {userInfo?.name}</title>
+			</Head>
 			<Navbar />
 			<main className={styles.main}>
 				{
@@ -179,6 +183,8 @@ export default function Profile() {
 									<div className={styles.user_id_container}>
 										<ProfilePic
 											path={userInfo.profilePicPath}
+											size={90}
+											stroke
 										/>
 										<Name
 											Username={userInfo.name}
