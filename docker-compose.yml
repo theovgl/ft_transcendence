@@ -14,11 +14,9 @@ services:
       context: ./apps/website/
       target: run
     command: pnpm run dev
-    entrypoint: ./docker-entrypoint.sh
     environment:
       NODE_ENV: development
     volumes:
-      - ./apps/website:/app
       - uploads:/app/public/images
     ports:
       - "3000:3000"
@@ -44,13 +42,11 @@ services:
       target: dev
     container_name: backend
     command: pnpm run start:dev
-    entrypoint: ./docker-entrypoint.sh
     environment:
       NODE_ENV: ${NODE_ENV}
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}?schema=public
     env_file: ./apps/server/.env
     volumes:
-      - ./apps/server:/app
       - uploads:/app/uploads
     ports:
       - "4000:4000"

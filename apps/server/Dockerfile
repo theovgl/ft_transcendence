@@ -1,6 +1,5 @@
 # Stage n.1: local development
 FROM node:lts-alpine as dev
-# RUN apk add --no-cache --virtual vips-dev g++ make py3-pip
 
 RUN npm install -g pnpm
 
@@ -12,7 +11,7 @@ COPY tsconfig*.json ./
 RUN pnpm install
 
 COPY src/ src/
-COPY prisma/ ./
+COPY prisma/ prisma/
 COPY types/ types/
 
 RUN pnpm run prisma:generate
@@ -22,6 +21,8 @@ RUN pnpm run build
 # Stage n.2: production
 
 FROM node:lts-alpine AS production
+
+RUN npm install -g pnpm
 
 WORKDIR /app
 
