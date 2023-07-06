@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState} from 'react';
 import style from './SettingsModal.module.scss';
 import ModalLink from './ModalLink/ModalLink';
-import { BiSolidGroup, BiSolidPencil, BiSolidUser } from 'react-icons/bi';
+import { BiSolidChat, BiSolidGroup, BiSolidPencil, BiSolidUser } from 'react-icons/bi';
 import { RxCross2 } from 'react-icons/rx';
 import { useCookies } from 'react-cookie';
 import { UserInfos } from 'global';
@@ -12,7 +12,7 @@ export default function SettingsModal() {
 	const auth = useContext(AuthContext);
 	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
 	const [ cookies ] = useCookies();
-	const [ isOpen, setIsOpen ] = useState(false);
+	const [ isOpen, setIsOpen ] = useState(true);
 
 	const fetchUserInfo = async (username: string) => {
 		try {
@@ -49,8 +49,8 @@ export default function SettingsModal() {
 	
 	return (
 		<>
-			<div className={style.overlay}></div>
-			<div className={style.modal_main}>
+			<div className={`${style.overlay} ${isOpen ? '' : style.hidden}`} />
+			<div className={`${style.modal_main} ${isOpen ? '' : style.hidden}`}>
 				<div className={style.modal_header}>
 					<div className={style.modal_userInfo}>
 						<ProfilePic
@@ -59,7 +59,7 @@ export default function SettingsModal() {
 						/>
 						<p className={style.modal_username}>{userInfo?.name}</p>
 					</div>
-					<RxCross2 />
+					<RxCross2 onClick={() => setIsOpen(!isOpen)} />
 				</div>
 				<div className={style.modal_links_container}>
 					<ModalLink
@@ -83,7 +83,7 @@ export default function SettingsModal() {
 					<ModalLink
 						title='Chat'
 						href='/chat'
-						// icon={<BiSolidChat />}
+						icon={<BiSolidChat />}
 						onClick={() => setIsOpen(false)}
 					/>
 				</div>

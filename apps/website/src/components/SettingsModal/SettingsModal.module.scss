@@ -8,6 +8,10 @@
 	left: 0;
 	right: 0;
 	background-color: rgba(0, 0, 0, 0.429);
+	
+	&.hidden {
+		display: none;
+	}
 }
 
 .modal_main {
@@ -24,6 +28,10 @@
 	box-shadow: 0 0 0 1px #30363d, 0 16px 32px rgba(1,4,9,0.85);
 	border: none;
 	border-radius: 12px 0 0 12px;
+	
+	&.hidden {
+		display: none;
+	}
 }
 
 .modal_header {
