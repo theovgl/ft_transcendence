@@ -1,37 +1,36 @@
-# Stage n.1 : Install deps
+#Stage n.1: deps
 FROM node:lts-alpine AS deps
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
+COPY package*.json .
+RUN npm install -g pnpm
+RUN pnpm i
 
-COPY package*.json ./
+# Stage n.2: builder
+FROM node:lts-alpine as builder
 
-RUN npm ci && npm cache clean --force
+RUN npm install -g pnpm
 
-# Stage n.2 : Builder
-FROM node:lts-alpine AS builder
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
 
-ENV NEXT_TELEMETRY_DISABLE 1
+COPY src/ src/
+COPY types/ types/
+COPY public/ public/
 
-RUN npm run build
+COPY package*.json next.config.js tsconfig*.json ./
 
-# Stage n.3 : Run
-FROM node:lts-alpine AS runner
+RUN pnpm run build
+
+# Stage n.2: production
+
+FROM node:lts-alpine AS run
+
+RUN npm install -g pnpm
+
 WORKDIR /app
 
-ENV NODE_ENV production
-ENV NEXT_TELEMETRY_DISABLE 1
-
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-
-EXPOSE 3000
-
-ENV PORT 3000
+COPY --from=builder /app/ .
 
 # Start the production build
-CMD ["npm", "start"]
+CMD [ "npm", "run", "start" ]

@@ -12,7 +12,6 @@
     "baseUrl": "./",
     "paths": {
       "@nestjs/*": ["node_modules/@nestjs/*"],
-      "*": ["types/*.d.ts"]
     },
     "incremental": true,
     "skipLibCheck": true,
