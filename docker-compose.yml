@@ -48,6 +48,7 @@ services:
     env_file: ./apps/server/.env
     volumes:
       - uploads:/app/uploads
+      - ./apps/server/src:/app/src
     ports:
       - "4000:4000"
       - "5555:5555"
