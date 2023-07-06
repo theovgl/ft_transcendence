@@ -43,51 +43,58 @@ export default function SettingsModal() {
 	useEffect(() => {
 		const username: string | undefined  = auth?.user?.name;
 
-		if (username)
+		if (username && auth?.isAuthenticated)
 			fetchUserInfo(username);
 	});
 	
-	return (
-		<>
-			<div className={`${style.overlay} ${isOpen ? '' : style.hidden}`} />
-			<div className={`${style.modal_main} ${isOpen ? '' : style.hidden}`}>
-				<div className={style.modal_header}>
-					<div className={style.modal_userInfo}>
-						<ProfilePic
-							path={userInfo?.profilePicPath}
-							size={30} stroke={false}
-						/>
-						<p className={style.modal_username}>{userInfo?.name}</p>
+	if (auth?.isAuthenticated) {
+		return (
+			<>
+				<div className={`${style.overlay} ${isOpen ? '' : style.hidden}`} />
+				<div className={`${style.modal_main} ${isOpen ? '' : style.hidden}`}>
+					<div className={style.modal_header}>
+						<div className={style.modal_userInfo}>
+							<ProfilePic
+								path={userInfo?.profilePicPath}
+								size={30} stroke={false}
+							/>
+							<p className={style.modal_username}>{userInfo?.name}</p>
+						</div>
+						<RxCross2 onClick={() => setIsOpen(!isOpen)} />
 					</div>
-					<RxCross2 onClick={() => setIsOpen(!isOpen)} />
+					<div className={style.modal_links_container}>
+						<ModalLink
+							title='Your profile'
+							href={'/user/' + userInfo?.name}
+							icon={ <BiSolidUser /> }
+							onClick={() => setIsOpen(false)}
+						/>
+						<ModalLink
+							title='Edit your profile'
+							href='/edit'
+							icon={ <BiSolidPencil /> }
+							onClick={() => setIsOpen(false)}
+						/>
+						<ModalLink
+							title='Your friends'
+							href='/'
+							icon={ <BiSolidGroup /> }
+							onClick={() => setIsOpen(false)}
+						/>
+						<ModalLink
+							title='Chat'
+							href='/chat'
+							icon={<BiSolidChat />}
+							onClick={() => setIsOpen(false)}
+						/>
+					</div>
 				</div>
-				<div className={style.modal_links_container}>
-					<ModalLink
-						title='Your profile'
-						href={'/user/' + userInfo?.name}
-						icon={ <BiSolidUser /> }
-						onClick={() => setIsOpen(false)}
-					/>
-					<ModalLink
-						title='Edit your profile'
-						href='/edit'
-						icon={ <BiSolidPencil /> }
-						onClick={() => setIsOpen(false)}
-					/>
-					<ModalLink
-						title='Your friends'
-						href='/'
-						icon={ <BiSolidGroup /> }
-						onClick={() => setIsOpen(false)}
-					/>
-					<ModalLink
-						title='Chat'
-						href='/chat'
-						icon={<BiSolidChat />}
-						onClick={() => setIsOpen(false)}
-					/>
-				</div>
-			</div>
-		</>
+			</>
+		);
+	}
+
+	return (
+		<></>
 	);
+
 }
