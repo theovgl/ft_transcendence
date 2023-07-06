@@ -8,8 +8,6 @@ module.exports = {
 	plugins: ['@typescript-eslint/eslint-plugin'],
 	extends: [
 		'plugin:@typescript-eslint/recommended',
-		'airbnb-base',
-		'airbnb-typescript',
 	],
 	root: true,
 	env: {
@@ -22,10 +20,14 @@ module.exports = {
 		'@typescript-eslint/explicit-function-return-type': 'off',
 		'@typescript-eslint/explicit-module-boundary-types': 'off',
 		'@typescript-eslint/no-explicit-any': 'off',
-		'@typescript-eslint/indent': 'off',
-		'no-tabs': 'off',
 		'semi': [ 'error', 'always' ],
 		'indent': [ 'error', 'tab' ],
+		'brace-style': [ 'error', '1tbs' ],
 		'quotes': [ 'error', 'single' ],
+		'linebreak-style': [ 'error', 'unix' ],
+		'curly': ['error', 'multi-or-nest'],
+		'no-multiple-empty-lines': ['error', { max: 1 }],
+		"keyword-spacing": ["error", { "after": true, "before": true }],
+
 	},
 };
