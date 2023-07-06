@@ -6,12 +6,12 @@ import Name from '@/components/UserProfile/Name';
 import ProfilePic from '@/components/UserProfile/ProfilePic';
 import Button from '@/components/Button/Button';
 import { BiBlock, BiCheck, BiMessageAltDetail } from 'react-icons/bi';
+import { AiOutlineUserAdd } from 'react-icons/ai';
 import Statistics from '@/components/UserProfile/Statistics';
 import Match from '@/components/UserProfile/Match';
 import { useCookies } from 'react-cookie';
 import type { UserInfos } from 'global';
 import jwtDecode from 'jwt-decode';
-import { stat } from 'fs';
 
 export default function Profile() {
 	const router = useRouter();
@@ -20,7 +20,44 @@ export default function Profile() {
 	const [buttonText, setButtonText] = useState<string>('Add friend');
 	const [status, setStatus] = useState<string>('');
 
+	function updateButtonState(response: string) {
+		if (response === 'ACCEPTED')
+			setButtonText('Friend');
+		else if (response === 'PENDING')
+			setButtonText('Pending request ...');
+		else if (response === 'BLOCKED')
+			setButtonText('Blocked');
+		else if (response === 'RECEIVED')
+			setButtonText('Accept request');
+		else
+			setButtonText('Add friend');
+		setStatus(response);
+	}
 
+	async function relationshipUpdate() {
+		let route = 'add';
+		if (status === 'ACCEPTED')
+			route = 'remove';
+		else if (status === 'PENDING')
+			route = 'decline';
+		else if (status === 'BLOCKED')
+			route = 'unblock';
+		
+		const response = await fetch(
+			`http://localhost:4000/friendship/${route}?requesterName=${encodeURIComponent(
+				jwtDecode(cookies['jwt']).username
+			)}&addresseeName=${router.query.username}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': 'Bearer ' + cookies['jwt'],
+				},
+			});
+		console.log(response);
+		
+		const responseText = await response.text();
+		updateButtonState(responseText);
+	}
 
 	useEffect(() => {
 		if (!router.isReady) return;
@@ -28,20 +65,19 @@ export default function Profile() {
 			try {
 				const statusResponse = await fetch(`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
 					jwtDecode(cookies['jwt']).username
-					)}&addresseeName=${router.query.username}`, {
-						method: 'GET',
-						headers: {
-							'Content-Type': 'application/json',
-							'Authorization': 'Bearer ' + cookies['jwt'],
-						},
-					})
+				)}&addresseeName=${router.query.username}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': 'Bearer ' + cookies['jwt'],
+					},
+				});
 				const status = await statusResponse.text();
-				console.log('status', status);
 				let buttonText = 'Add friend';
 				if (status === 'ACCEPTED')
 					buttonText = 'Friend';
 				else if (status === 'PENDING')
-					buttonText = 'Pending request';
+					buttonText = 'Pending request ...';
 				else if (status === 'BLOCKED')
 					buttonText = 'Blocked';
 				else if (status === 'RECEIVED')
@@ -105,50 +141,13 @@ export default function Profile() {
 										/>
 										<Button
 											text={buttonText}
-											boxShadow={false}
-											onClick={ () =>
-											{ let route = 'add';
-											if (status === 'ACCEPTED')
-												route = 'remove';
-											else if (status === 'PENDING')
-												route = 'decline';
-											else if (status === 'BLOCKED')
-												route = 'unblock';
-												
-												fetch(
-												`http://localhost:4000/friendship/${route}?requesterName=${encodeURIComponent(
-													jwtDecode(cookies['jwt']).username
-												  )}&addresseeName=${router.query.username}`, {
-													method: 'GET',
-													headers: {
-														'Content-Type': 'application/json',
-														'Authorization': 'Bearer ' + cookies['jwt'],
-													},
-											})
-												.then((response) => {
-													if (!response.ok)
-														throw new Error('Failed to update relationship');
-													return response.text();
-												})
-												.then((status) => { 
-													console.log('status', status);
-													let updateButtonText = 'Add friend';
-													if (status === 'ACCEPTED')
-														updateButtonText = 'Friend';
-													else if (status === 'PENDING')
-														updateButtonText = 'Pending request';
-													else if (status === 'BLOCKED')
-														updateButtonText = 'Blocked';
-													else if (status === 'RECEIVED')
-														updateButtonText = 'Accept request';
-													setButtonText(updateButtonText);
-												})
-												.catch((error) => {
-													console.error(error);
-												});
-											}}
-											theme='dark'
-											icon={<BiCheck />}
+											boxShadow={buttonText === 'Add friend' ? true : false}
+											onClick={relationshipUpdate}
+											theme={buttonText === 'Add friend' ? 'light' : 'dark'}
+											icon={buttonText === 'Add friend' ? <AiOutlineUserAdd /> :
+												buttonText === 'Blocked' ? <BiBlock /> :
+													buttonText === 'Friend' ? <BiCheck /> :
+														null}
 										/>
 									</div>
 								</div>

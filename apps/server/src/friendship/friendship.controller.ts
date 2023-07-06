@@ -9,11 +9,13 @@ export class FriendshipController {
 	
 	@UseGuards(JwtGuard)
 	@Get('add')
-	addFriend(@Query() qry, @Res() response: Response) {
-		this.friendshipService.handleAddFriend(qry.requesterName, qry.addresseeName);
+	async addFriend(@Query() qry, @Res() response: Response) {
+		const ret = await this.friendshipService.handleAddFriend(qry.requesterName, qry.addresseeName);
+		console.log('ret:\n', ret);
 		response
+			.send(ret)
 			.header('content-type', 'plain/text')
-			.status(200)
+			.status(200);
 	}
 
 	@Get('remove')

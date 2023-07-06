@@ -29,7 +29,7 @@ export class FriendshipService {
 					requesterId: requester.id,
 					addresseeId: addressee.id,
 				},
-			},
+			}
 		});
 		return friendship;
 	}
@@ -55,6 +55,7 @@ export class FriendshipService {
 					},
 				},
 			});
+			return friendship;
 		} else if (requested && !friendship) {
 			if (requested.status == 'PENDING') {
 				requested = await this.prisma.friendship.update({
