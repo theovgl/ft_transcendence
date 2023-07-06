@@ -45,7 +45,7 @@ export default function SettingsModal() {
 
 		if (username && auth?.isAuthenticated)
 			fetchUserInfo(username);
-	});
+	}, []);
 	
 	if (auth?.isAuthenticated) {
 		return (
