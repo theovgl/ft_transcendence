@@ -1,16 +1,18 @@
 import navbarStyle from '../styles/navbar.module.scss';
 import LoginButton from './LoginButton';
-import NavbarLink from './NavbarLink';
 import Link from 'next/link';
-import { useAuth } from '@/utils/hooks/useAuth';
 import SettingsModal from './SettingsModal/SettingsModal';
-import { useContext } from 'react';
-import { AuthContext } from '@/utils/contexts/AuthContext';
+import { useState } from 'react';
+import { useUser } from '@/utils/hooks/useUser';
+import ProfilePic from './UserProfile/ProfilePic';
+import { useAuth } from '@/utils/hooks/useAuth';
 
 export default function Navbar() {
-	const auth = useContext(AuthContext);
+	const { isAuthenticated } = useAuth();
+	const [isModalOpen, setIsModalOpen ]= useState(false);
+	const { user } = useUser();
 
-	if (auth?.isAuthenticated === false) {
+	if (isAuthenticated === false) {
 		return (
 			<nav className={navbarStyle.nav_container}>
 				<Link className={navbarStyle.title} href='/'>Transcendence</Link>
@@ -24,12 +26,14 @@ export default function Navbar() {
 			<>
 				<nav className={navbarStyle.nav_container}>
 					<h1 className={navbarStyle.title}>Transcendence</h1>
-					<div className={navbarStyle.links_container}>
-						<NavbarLink href="/home">Home</NavbarLink>
-						<NavbarLink href="/chat">Chat</NavbarLink>
+					<div
+						className={navbarStyle.profilePicButton}
+						onClick={() => setIsModalOpen(true)}
+					>
+						<ProfilePic path={user?.profilePic} stroke={false} size={35}/>
 					</div>
 				</nav>
-				<SettingsModal />
+				<SettingsModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>
 			</>
 		);
 	}
