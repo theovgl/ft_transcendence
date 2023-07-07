@@ -12,29 +12,29 @@ export default function Navbar() {
 	const [isModalOpen, setIsModalOpen ]= useState(false);
 	const { user } = useUser();
 
-	if (isAuthenticated === false) {
-		return (
+	return (
+		<>
 			<nav className={navbarStyle.nav_container}>
 				<Link className={navbarStyle.title} href='/'>Transcendence</Link>
-				<div className={navbarStyle.button_container}>
-					<LoginButton link="/login" theme='light'>Login</LoginButton>
-				</div>
-			</nav>
-		);
-	} else {
-		return (
-			<>
-				<nav className={navbarStyle.nav_container}>
-					<h1 className={navbarStyle.title}>Transcendence</h1>
+				{isAuthenticated ? (
 					<div
 						className={navbarStyle.profilePicButton}
 						onClick={() => setIsModalOpen(true)}
 					>
 						<ProfilePic path={user?.profilePic} stroke={false} size={35}/>
 					</div>
-				</nav>
-				<SettingsModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}/>
-			</>
-		);
-	}
+				) : (
+					<div className={navbarStyle.button_container}>
+						<LoginButton link="/login" theme='light'>Login</LoginButton>
+					</div>
+				)}
+			</nav>
+			{isAuthenticated && (
+				<SettingsModal
+					isModalOpen={isModalOpen}
+					setIsModalOpen={setIsModalOpen}
+				/>
+			)}
+		</>
+	);
 }
