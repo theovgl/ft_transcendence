@@ -17,6 +17,7 @@ export default function CallbackPage() {
 			id: jwtPayload.userId,
 			name: jwtPayload.username,
 			email: jwtPayload.email,
+			profilePic: jwtPayload.profilePic,
 			authToken: jwt
 		});
 	};
