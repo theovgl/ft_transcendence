@@ -35,86 +35,66 @@ export default function Profile() {
 		setStatus(response);
 	}
 
-	// useEffect(() => {
-	// 	console.log('before status: ', status);
-	// 	updateButtonState(status);
-	// 	console.log('after status: ', status);
-	// }, [status]);
-
 	function toggleBlockStatus() {
-		console.log('toggle isBlocked: ', !isBlocked);
 		setIsBlocked(!isBlocked);
 		updateButtonState(status);
-	  }
+	}
 
-  useEffect(() => {
-    if (!router.isReady) return;
+	useEffect(() => {
+		if (!router.isReady) return;
+		const updateBlockStatus = async () => {
+			try {
+				const statusResponse = await fetch(
+					`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
+						jwtDecode(cookies['jwt']).username
+					)}&addresseeName=${router.query.username}`,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: 'Bearer ' + cookies['jwt'],
+						},
+					}
+				);
+				const status = await statusResponse.text();
+				if (status === 'BLOCKED') 
+					setIsBlocked(true);
+				else 
+					setIsBlocked(false);
+			} catch (error) {
+				console.error(error);
+			}
+		};
+		updateBlockStatus();
+	}, [router.isReady, router.query.username, router, cookies]);
 
-    const fetchUserInfo = async () => {
-      try {
-        const statusResponse = await fetch(
-          `http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
-            jwtDecode(cookies['jwt']).username
-          )}&addresseeName=${router.query.username}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'Bearer ' + cookies['jwt'],
-            },
-          }
-        );
-
-        const status = await statusResponse.text();
-        if (status === 'BLOCKED') {
-          setIsBlocked(true);
-        } else {
-		  setIsBlocked(false);
-		}
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchUserInfo();
-  }, [router.isReady, router.query.username, router, cookies]);
-
-		
-	//   function unblockUser() {
-	// 	setIsBlocked(false);
-	//   }
-	  
-	  useEffect(() => {
+	useEffect(() => {
 		setStatus(isBlocked ? 'BLOCKED' : 'EMPTY');
 		updateButtonState(status);
-	  }, [isBlocked, status, router.isReady, router.query.username, router, cookies]);
-	  
-	
-	async function relationshipUpdate() {
+		}, [isBlocked, status, router.isReady, router.query.username, router, cookies]);
 
+	async function relationshipUpdate() {
 		let route = 'add';
 		if (status === 'ACCEPTED')
 			route = 'remove';
 		else if (status === 'PENDING')
 			route = 'decline';
-		else if (status === 'BLOCKED')
-		{
+		else if (status === 'BLOCKED') {
 			route = 'unblock';
 			toggleBlockStatus();
 		}
-		
 		const response = await fetch(
 			`http://localhost:4000/friendship/${route}?requesterName=${encodeURIComponent(
 				jwtDecode(cookies['jwt']).username
-				)}&addresseeName=${router.query.username}`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': 'Bearer ' + cookies['jwt'],
-					},
-				});
-				const responseText = await response.text();
-				setStatus(responseText);
+			)}&addresseeName=${router.query.username}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': 'Bearer ' + cookies['jwt'],
+				},
+			});
+		const responseText = await response.text();
+		setStatus(responseText);
 	}
 
 	useEffect(() => {
@@ -189,7 +169,8 @@ export default function Profile() {
 											LastName={userInfo.lastName}
 											initialIsBlocked={isBlocked}
 											toggleBlockStatus={toggleBlockStatus}
-											updateButtonState={updateButtonState}											/>
+											updateButtonState={updateButtonState}
+											/>
 									</div>
 									<div className={styles.header_buttons_container}>
 										<Button
