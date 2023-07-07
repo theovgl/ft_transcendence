@@ -19,6 +19,7 @@ export default function Profile() {
 	const [cookies] = useCookies();
 	const [buttonText, setButtonText] = useState<string>('Add friend');
 	const [status, setStatus] = useState<string>('');
+	const [isBlocked, setIsBlocked] = useState(false);
 
 	function updateButtonState(response: string) {
 		if (response === 'ACCEPTED')
@@ -34,29 +35,47 @@ export default function Profile() {
 		setStatus(response);
 	}
 
+	// useEffect(() => {
+	// 	console.log('before status: ', status);
+	// 	updateButtonState(status);
+	// 	console.log('after status: ', status);
+	// }, [status]);
+
+	function toggleBlockStatus() {
+		setIsBlocked(!isBlocked);
+		updateButtonState(status);
+	  }
+	  
+	  useEffect(() => {
+		console.log('before isBlocked: ', isBlocked);
+		setStatus(isBlocked ? 'BLOCKED' : 'EMPTY');
+		console.log('after isBlocked: ', isBlocked);
+		updateButtonState(status);
+	  }, [isBlocked, status]);
+	  
+	
 	async function relationshipUpdate() {
+
 		let route = 'add';
 		if (status === 'ACCEPTED')
-			route = 'remove';
+		route = 'remove';
 		else if (status === 'PENDING')
-			route = 'decline';
+		route = 'decline';
 		else if (status === 'BLOCKED')
-			route = 'unblock';
+		route = 'unblock';
 		
 		const response = await fetch(
 			`http://localhost:4000/friendship/${route}?requesterName=${encodeURIComponent(
 				jwtDecode(cookies['jwt']).username
-			)}&addresseeName=${router.query.username}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': 'Bearer ' + cookies['jwt'],
-				},
-			});
-		console.log(response);
-		
-		const responseText = await response.text();
-		updateButtonState(responseText);
+				)}&addresseeName=${router.query.username}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': 'Bearer ' + cookies['jwt'],
+					},
+				});
+				const responseText = await response.text();
+				setStatus(responseText);
 	}
 
 	useEffect(() => {
@@ -73,16 +92,19 @@ export default function Profile() {
 					},
 				});
 				const status = await statusResponse.text();
+				console.log('status after fetch getRel: ', status);
 				let buttonText = 'Add friend';
 				if (status === 'ACCEPTED')
 					buttonText = 'Friend';
 				else if (status === 'PENDING')
 					buttonText = 'Pending request ...';
 				else if (status === 'BLOCKED')
+				{
+					setIsBlocked(true);
 					buttonText = 'Blocked';
+				}
 				else if (status === 'RECEIVED')
 					buttonText = 'Accept request';
-				setButtonText(buttonText);
 				setStatus(status);
 				await fetch(
 					`http://localhost:4000/users/${router.query.username}`, {
@@ -105,12 +127,14 @@ export default function Profile() {
 					.then((response: UserInfos) => {
 						setUserInfo(response);
 					});
+			console.log('buttonText: ', buttonText);
 			} catch (error) {
 				console.error(error);
 			}
 		};
+		updateButtonState(status);
 		fetchUserInfo();
-	}, [router.isReady, router.query.username, router, cookies, buttonText, status]);
+	}, [router.isReady, router.query.username, router, cookies, status]);
 		
 	return (
 		<>
@@ -129,8 +153,8 @@ export default function Profile() {
 											Username={userInfo.name}
 											FirstName={userInfo.firstName}
 											LastName={userInfo.lastName}
-											blockIcon={<BiBlock />}
-										/>
+											initialIsBlocked={isBlocked}
+											toggleBlockStatus={toggleBlockStatus}										/>
 									</div>
 									<div className={styles.header_buttons_container}>
 										<Button

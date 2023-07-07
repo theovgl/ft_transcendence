@@ -11,10 +11,9 @@ export class FriendshipController {
 	@Get('add')
 	async addFriend(@Query() qry, @Res() response: Response) {
 		const ret = await this.friendshipService.handleAddFriend(qry.requesterName, qry.addresseeName);
-		console.log('ret:\n', ret);
 		response
-			.send(ret)
 			.header('content-type', 'plain/text')
+			.send(ret)
 			.status(200);
 	}
 
@@ -81,9 +80,7 @@ export class FriendshipController {
 
 	@Get('getRelationship')
 	async getRelationship(@Query() qry) {
-		console.log('qry:\n', qry);
 		const status = await this.friendshipService.handleGetRelationship(qry.requesterName, qry.addresseeName);
-		console.log('status:\n', status);
 		return status;
 	}
 }
