@@ -47,7 +47,12 @@ export default function SettingsModal(props: SettingsModalProps) {
 					</div>
 					<RxCross2 onClick={() => setIsModalOpen(!isModalOpen)} />
 				</div>
-				<div className={style.modal_links_container}>
+				<ul
+					className={`
+						${style.modal_link_list}
+						${isModalOpen ? '' : style.hidden}
+					`}
+				>
 					<ModalLink
 						title='Your profile'
 						href={'/user/' + user?.name}
@@ -78,7 +83,7 @@ export default function SettingsModal(props: SettingsModalProps) {
 						icon={<BiSolidExit />}
 						onClick={() => handleLogout()}
 					/>
-				</div>
+				</ul>
 			</div>
 		</>
 	);
