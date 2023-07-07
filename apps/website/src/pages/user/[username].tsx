@@ -71,7 +71,7 @@ export default function Profile() {
 	useEffect(() => {
 		setStatus(isBlocked ? 'BLOCKED' : 'EMPTY');
 		updateButtonState(status);
-		}, [isBlocked, status, router.isReady, router.query.username, router, cookies]);
+	}, [isBlocked, status, router.isReady, router.query.username, router, cookies]);
 
 	async function relationshipUpdate() {
 		let route = 'add';
@@ -170,7 +170,7 @@ export default function Profile() {
 											initialIsBlocked={isBlocked}
 											toggleBlockStatus={toggleBlockStatus}
 											updateButtonState={updateButtonState}
-											/>
+										/>
 									</div>
 									<div className={styles.header_buttons_container}>
 										<Button

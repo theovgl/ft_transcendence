@@ -6,12 +6,12 @@ import { useCookies } from 'react-cookie';
 import { BiBlock } from 'react-icons/bi';
 
 interface IName {
-  FirstName: string;
-  LastName: string;
-  Username: string;
-  initialIsBlocked: boolean;
-  toggleBlockStatus: () => void;
-  updateButtonState: (response: string) => void;
+	FirstName: string;
+	LastName: string;
+	Username: string;
+	initialIsBlocked: boolean;
+	toggleBlockStatus: () => void;
+	updateButtonState: (response: string) => void;
 }
 
 export default function Name({ FirstName,
@@ -26,7 +26,7 @@ export default function Name({ FirstName,
 	const router = useRouter();
 
 	useEffect(() => {
-	  setIsBlocked(initialIsBlocked);
+		setIsBlocked(initialIsBlocked);
 	}, [initialIsBlocked]);
 
 	useEffect(() => {
@@ -49,10 +49,10 @@ export default function Name({ FirstName,
 				const status = await statusResponse.text();
 				if (status === 'BLOCKED') {
 					setIsBlocked(true);
-		  updateButtonState('BLOCKED');
+					updateButtonState('BLOCKED');
 				} else {
-		  setIsBlocked(false);
-		  updateButtonState('EMPTY');
+					setIsBlocked(false);
+					updateButtonState('EMPTY');
 				}
 			} catch (error) {
 				console.error(error);
