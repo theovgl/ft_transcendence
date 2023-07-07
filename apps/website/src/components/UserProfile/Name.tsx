@@ -12,14 +12,22 @@ interface IName {
   Username: string;
   initialIsBlocked: boolean;
   toggleBlockStatus: () => void;
+  updateButtonState: (response: string) => void;
 }
 
-export default function Name({ FirstName, LastName, Username, initialIsBlocked, toggleBlockStatus }: IName) {
+export default function Name({ FirstName, LastName, Username, initialIsBlocked, toggleBlockStatus, updateButtonState }: IName) {
   const [isBlocked, setIsBlocked] = useState(initialIsBlocked);
   const [cookies] = useCookies();
   const router = useRouter();
+  const [buttonText, setButtonText] = useState<string>('Add friend');
   const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
   const [status, setStatus] = useState<string>('');
+
+  useEffect(() => {
+	console.log('b initialIsBlocked: ', initialIsBlocked);  
+	  setIsBlocked(initialIsBlocked);
+	console.log('a initialIsBlocked: ', initialIsBlocked);  
+  }, [initialIsBlocked]);
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -42,14 +50,18 @@ export default function Name({ FirstName, LastName, Username, initialIsBlocked, 
         const status = await statusResponse.text();
         if (status === 'BLOCKED') {
           setIsBlocked(true);
-        }
+		  updateButtonState('BLOCKED');
+        } else {
+		  setIsBlocked(false);
+		  updateButtonState('EMPTY');
+		}
       } catch (error) {
         console.error(error);
       }
     };
 
     fetchUserInfo();
-  }, [router.isReady, router.query.username, router, cookies]);
+  }, [router.isReady, router.query.username, router, cookies, isBlocked]);
 
   const toggleBlock = async () => {
     let blockString = isBlocked ? 'unblock' : 'block';
@@ -66,11 +78,7 @@ export default function Name({ FirstName, LastName, Username, initialIsBlocked, 
           },
         }
       );
-
       const status = await response.text();
-      if (status === 'BLOCKED') {
-        setIsBlocked(true);
-      }
       if (response.ok) {
         setIsBlocked(!isBlocked);
         toggleBlockStatus();

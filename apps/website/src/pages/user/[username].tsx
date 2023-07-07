@@ -42,27 +42,66 @@ export default function Profile() {
 	// }, [status]);
 
 	function toggleBlockStatus() {
+		console.log('toggle isBlocked: ', !isBlocked);
 		setIsBlocked(!isBlocked);
 		updateButtonState(status);
 	  }
+
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const fetchUserInfo = async () => {
+      try {
+        const statusResponse = await fetch(
+          `http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
+            jwtDecode(cookies['jwt']).username
+          )}&addresseeName=${router.query.username}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + cookies['jwt'],
+            },
+          }
+        );
+
+        const status = await statusResponse.text();
+        if (status === 'BLOCKED') {
+          setIsBlocked(true);
+        } else {
+		  setIsBlocked(false);
+		}
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchUserInfo();
+  }, [router.isReady, router.query.username, router, cookies]);
+
+		
+	//   function unblockUser() {
+	// 	setIsBlocked(false);
+	//   }
 	  
 	  useEffect(() => {
-		console.log('before isBlocked: ', isBlocked);
 		setStatus(isBlocked ? 'BLOCKED' : 'EMPTY');
-		console.log('after isBlocked: ', isBlocked);
 		updateButtonState(status);
-	  }, [isBlocked, status]);
+	  }, [isBlocked, status, router.isReady, router.query.username, router, cookies]);
 	  
 	
 	async function relationshipUpdate() {
 
 		let route = 'add';
 		if (status === 'ACCEPTED')
-		route = 'remove';
+			route = 'remove';
 		else if (status === 'PENDING')
-		route = 'decline';
+			route = 'decline';
 		else if (status === 'BLOCKED')
-		route = 'unblock';
+		{
+			route = 'unblock';
+			toggleBlockStatus();
+		}
 		
 		const response = await fetch(
 			`http://localhost:4000/friendship/${route}?requesterName=${encodeURIComponent(
@@ -92,17 +131,13 @@ export default function Profile() {
 					},
 				});
 				const status = await statusResponse.text();
-				console.log('status after fetch getRel: ', status);
 				let buttonText = 'Add friend';
 				if (status === 'ACCEPTED')
 					buttonText = 'Friend';
 				else if (status === 'PENDING')
 					buttonText = 'Pending request ...';
 				else if (status === 'BLOCKED')
-				{
-					setIsBlocked(true);
 					buttonText = 'Blocked';
-				}
 				else if (status === 'RECEIVED')
 					buttonText = 'Accept request';
 				setStatus(status);
@@ -127,7 +162,6 @@ export default function Profile() {
 					.then((response: UserInfos) => {
 						setUserInfo(response);
 					});
-			console.log('buttonText: ', buttonText);
 			} catch (error) {
 				console.error(error);
 			}
@@ -154,7 +188,8 @@ export default function Profile() {
 											FirstName={userInfo.firstName}
 											LastName={userInfo.lastName}
 											initialIsBlocked={isBlocked}
-											toggleBlockStatus={toggleBlockStatus}										/>
+											toggleBlockStatus={toggleBlockStatus}
+											updateButtonState={updateButtonState}											/>
 									</div>
 									<div className={styles.header_buttons_container}>
 										<Button
