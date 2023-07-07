@@ -11,11 +11,6 @@
 	text-transform: uppercase;
 
 	transition: transform cubic-bezier(.17,.67,.83,.67) 0.12s;
-	
-	// &:hover {
-	// 	transform: rotate(3deg);
-	// 	transition: all cubic-bezier(.17,.67,.83,.67) 0.12s;
-	// }
 
 	.link {
 		font-family: $font-family;
