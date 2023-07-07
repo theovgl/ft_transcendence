@@ -1,7 +1,7 @@
 import styles from '@/styles/userProfile/header.module.scss';
 import { UserInfos } from 'global';
 import jwtDecode from 'jwt-decode';
-import router from 'next/router';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { BiBlock } from 'react-icons/bi';
@@ -15,87 +15,83 @@ interface IName {
 }
 
 export default function Name({ FirstName, LastName, Username, initialIsBlocked, toggleBlockStatus }: IName) {
-	const [isBlocked, setIsBlocked] = useState(initialIsBlocked);
-	const [cookies] = useCookies();
-	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
-	const [status, setStatus] = useState<string>('');
+  const [isBlocked, setIsBlocked] = useState(initialIsBlocked);
+  const [cookies] = useCookies();
+  const router = useRouter();
+  const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
+  const [status, setStatus] = useState<string>('');
 
-	useEffect(() => {
-		if (!router.isReady) return;
-		
-		const fetchUserInfo = async () => {
-		  try {
-			const statusResponse = await fetch(`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
-			  jwtDecode(cookies['jwt']).username
-			)}&addresseeName=${router.query.username}`, {
-			  method: 'GET',
-			  headers: {
-				'Content-Type': 'application/json',
-				'Authorization': 'Bearer ' + cookies['jwt'],
-			  },
-			});
-			
-			const status = await statusResponse.text();
-			if (status === 'BLOCKED') {
-			  setIsBlocked(true);
-			}
-		  } catch (error) {
-			console.error(error);
-		  }
-		};
-		
-		fetchUserInfo();
-	  }, [router.isReady, router.query.username, router, cookies]);
-			  
-				
+  useEffect(() => {
+    if (!router.isReady) return;
 
-		// 			.then((response) => {
-		// 				if (!response.ok) {
-		// 					if (response.status === 404) {
-		// 						router.push('/404');
-		// 						return null;
-		// 					}
-		// 					throw new Error('Failed to fetch user info');
-		// 				} else
-		// 					return response.json();
-		// 			})
-		// 			.then((response: UserInfos) => {
-		// 				setUserInfo(response);
-		// 			});
-		// };
-		// fetchUserInfo();
+    const fetchUserInfo = async () => {
+      try {
+        const statusResponse = await fetch(
+          `http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
+            jwtDecode(cookies['jwt']).username
+          )}&addresseeName=${router.query.username}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + cookies['jwt'],
+            },
+          }
+        );
 
-	const toggleBlock = async () => {
-		let blockString = isBlocked ? 'unblock' : 'block';
-		try {
-		const response = await fetch(`http://localhost:4000/friendship/${blockString}?requesterName=${encodeURIComponent(
-			jwtDecode(cookies['jwt']).username
-			)}&addresseeName=${router.query.username}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': 'Bearer ' + cookies['jwt'],
-				},
-			}
-			)
-			if(response.ok) {
-				setIsBlocked(!isBlocked); // Toggle the isBlocked state
-				toggleBlockStatus(); // Call the toggleBlockStatus prop function
-			  }
-		} catch (error) {
-			console.error(error);
-		}
-		};
+        const status = await statusResponse.text();
+        if (status === 'BLOCKED') {
+          setIsBlocked(true);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
 
-	return (
-		<div className={styles.id_container}>
-			<p className={styles.fullname}>
-				{FirstName + ' ' + LastName}
-				<span className={ `${styles.blockIcon} ${isBlocked ? styles.blocked : ''}`} onClick={toggleBlock}>
-					<BiBlock size={20} color={isBlocked ? 'red' : 'black'} />
-				</span>
-			</p>
-			<p className={styles.username}>{'@' + Username}</p>
-		</div>
-	);
+    fetchUserInfo();
+  }, [router.isReady, router.query.username, router, cookies]);
+
+  const toggleBlock = async () => {
+    let blockString = isBlocked ? 'unblock' : 'block';
+    try {
+      const response = await fetch(
+        `http://localhost:4000/friendship/${blockString}?requesterName=${encodeURIComponent(
+          jwtDecode(cookies['jwt']).username
+        )}&addresseeName=${router.query.username}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + cookies['jwt'],
+          },
+        }
+      );
+
+      const status = await response.text();
+      if (status === 'BLOCKED') {
+        setIsBlocked(true);
+      }
+      if (response.ok) {
+        setIsBlocked(!isBlocked);
+        toggleBlockStatus();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return (
+    <div className={styles.id_container}>
+      <p className={styles.fullname}>
+        {FirstName + ' ' + LastName}
+        <span
+          className={`${styles.blockIcon} ${isBlocked ? styles.blocked : ''}`}
+          onClick={toggleBlock}
+        >
+          <BiBlock size={20} color={isBlocked ? 'red' : 'black'} />
+        </span>
+      </p>
+      <p className={styles.username}>{'@' + Username}</p>
+    </div>
+  );
 }
