@@ -1,39 +1,33 @@
 # Stage n.1: local development
 FROM node:lts-alpine as dev
-
-RUN npm install -g pnpm
-
 WORKDIR /app
 
 COPY package*.json ./
-COPY tsconfig*.json ./
 
-RUN pnpm install
+RUN npm ci
 
-COPY src/ src/
-COPY prisma/ prisma/
-COPY types/ types/
+COPY . .
 
-RUN pnpm run prisma:generate
+# Stage n.2: production build
 
-RUN pnpm run build
-
-# Stage n.2: production
-
-FROM node:lts-alpine AS production
-
-RUN npm install -g pnpm
-
+FROM node:lts-alpine AS build
 WORKDIR /app
 
 COPY package*.json ./
-COPY tsconfig*.json ./
+COPY --from=dev /app/node_modules ./node_modules
+COPY . .
 
-RUN pnpm install -P
+RUN npm run build
 
 ENV NODE_ENV production
 
-COPY --from=dev /app/dist ./dist/
+RUN npm ci --only=production && npm cache clean --force
+
+# Stage n.3: production
+FROM node:lts-alpine as production
+
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
 
 # Start the production build
 CMD [ "node", "dist/main.js" ]

@@ -3,7 +3,6 @@ import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { FortyTwoUser } from '../../types/global';
 
 @Injectable()
 export class AuthService {

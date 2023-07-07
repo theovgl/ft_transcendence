@@ -1,7 +1,6 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy } from 'passport-42';
 import { UnauthorizedException } from '@nestjs/common';
-import { FortyTwoUser } from '../../../types/global';
 
 export class ftStrategy extends PassportStrategy(Strategy) {
 	constructor() {
