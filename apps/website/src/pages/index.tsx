@@ -10,7 +10,7 @@ export default function Home(props: any) {
 	const router = useRouter();
 
 	const onButtonClick = () => {
-		router.push('/matchmaking');
+		router.push('/game');
 	};
 
 	return (

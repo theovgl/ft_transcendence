@@ -7,9 +7,10 @@ import { FriendshipModule } from './friendship/friendship.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
+import { GameModule } from './game/game.module';
 
 @Module({
-	imports: [AuthModule, UserModule, PrismaModule, FriendshipModule, MulterModule.register({
+	imports: [AuthModule, UserModule, PrismaModule, GameModule, FriendshipModule, MulterModule.register({
 		storage: memoryStorage()
 	}),
 	UserModule, PrismaModule, LeaderboardModule,
