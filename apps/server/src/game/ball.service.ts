@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
 import { Server, Socket } from 'socket.io';
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "../prisma/prisma.service";
 
 const GAME_WIDTH = 991;
 const GAME_HEIGHT = 678;
