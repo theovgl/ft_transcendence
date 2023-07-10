@@ -37,7 +37,6 @@ export class FriendshipController {
 
 	@Get('block')
 	blockFriend(@Query() qry) {
-		
 		this.friendshipService.handleBlockFriend(qry.requesterName, qry.addresseeName);
 		return;
 	}
