@@ -185,13 +185,28 @@ export class AuthService {
 		});
 	  }
 
-	  async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, jwtDecoded: any) {
+	  async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, jwtDecoded: any): Promise<boolean> {
 		const user = await this.prisma.user.findUnique({ where: { email: jwtDecoded.email } });
-		return authenticator.verify({
-		  token: twoFactorAuthenticationCode,
-		  secret: user.twoFASecret,
-		});
+		const isCodeValid = authenticator.verify({
+			token: twoFactorAuthenticationCode,
+			secret: user.twoFASecret,
+		})
+
+		return isCodeValid;
 	  }
+
+	  async turnOffTwoFactorAuthentication(jwtDecoded: any) {
+		await this.prisma.user.update({
+			where: {
+				email: jwtDecoded.email,
+			},
+			data: {
+				twoFAEnabled: false,
+				twoFASecret: null,
+			},
+		});
+	}
+		
 
 	  async loginWith2fa(jwtDecoded: any) {
 		const user = await this.prisma.user.findUnique({ where: { email: jwtDecoded.email } });
@@ -199,7 +214,7 @@ export class AuthService {
 			userId: user.id,
 			username: user.name,
 			email: user.email,
-			twoFAEnabled: !!user.twoFAEnabled,
+			twoFAEnabled: user.twoFAEnabled,
 			isTwoFactorAuthenticated: true,
 		};
 	

@@ -51,16 +51,30 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	async turnOnTwoFactorAuthentication(@Req() req, @Body() body) {
 		const user = jwt_decode(req.headers.authorization);
-	  const isCodeValid =
-		this.authService.isTwoFactorAuthenticationCodeValid(
+		const isCodeValid = await this.authService.isTwoFactorAuthenticationCodeValid(
 		  body.twoFactorAuthenticationCode,
 		  user,
 		);
-	  if (!isCodeValid)
+		if (!isCodeValid)
 			throw new UnauthorizedException('Wrong authentication code');
 
 	  await this.authService.turnOnTwoFactorAuthentication(user);
-	  return this.authService.loginWith2fa(user);
+	  return await this.authService.loginWith2fa(user);
+	}
+
+	@Post('2fa/turn-off')
+	@UseGuards(JwtGuard)
+	async turnOffTwoFactorAuthentication(@Req() req, @Body() body) {
+		const user = jwt_decode(req.headers.authorization);
+		const isCodeValid = await this.authService.isTwoFactorAuthenticationCodeValid(
+		  body.twoFactorAuthenticationCode,
+		  user,
+		);
+		if (!isCodeValid)
+			throw new UnauthorizedException('Wrong authentication code');
+		
+		await this.authService.turnOffTwoFactorAuthentication(user);
+		return await this.authService.loginWith2fa(user);
 	}
 
 	@Post('2fa/authenticate')
@@ -68,7 +82,7 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	async authenticate(@Req() req, @Body() body) {
 		const user = jwt_decode(req.headers.authorization);
-		const isCodeValid = this.authService.isTwoFactorAuthenticationCodeValid(
+		const isCodeValid = await this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
 			user,
 		);
@@ -76,7 +90,7 @@ export class AuthController {
 		if (!isCodeValid)
 			throw new UnauthorizedException('Wrong authentication code');
 
-    	return this.authService.loginWith2fa(user);
+    	return await this.authService.loginWith2fa(user);
 	}
 
 	@UseGuards(JwtGuard)
