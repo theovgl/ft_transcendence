@@ -3,6 +3,8 @@ import { User } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
 
 @Injectable()
 export class AuthService {
@@ -57,7 +59,7 @@ export class AuthService {
 				method: 'POST',
 				body: data,
 			});
-
+			
 			if (!response || !response.ok)
 				throw new Error('Failed to exchange code for token');
 
@@ -71,7 +73,7 @@ export class AuthService {
 	
 	async handleCallback(response: any): Promise<any> {
 		const user: FortyTwoUser = await this.getUserInfo(response.access_token);
-		const token = await this.signToken(user.userId, user.username, user.email, response);
+		const token = await this.signToken(user.userId, user.username, user.email);
 
 		await this.prisma.user.upsert({
 			where: { email: user.email },
@@ -90,13 +92,12 @@ export class AuthService {
 		return token;
 	}
 
-	async signToken(userId: number, username: string, email: string, response: any): Promise<string> {
+	async signToken(userId: number, username: string, email: string): Promise<string> {
 		const payload = {
 			userId,
 			email,
 			username
 		};
-		const expiresIn = response.expires_in;
 		const secret = this.config.get('JWT_SECRET');
 		const token = await this.jwt.sign(payload, {
 			secret: secret,
@@ -106,7 +107,6 @@ export class AuthService {
 	}
 
 	async validateUser(details: FortyTwoUser) {
-		console.log('validateUser', details);
 		const user = await this.prisma.user.findUnique({
 			where: {
 				email: details.email,
@@ -144,4 +144,81 @@ export class AuthService {
 			},
 		});
 	}
+
+	async generateTwoFactorAuthenticationSecret(user) {
+		const secret = authenticator.generateSecret();
+		const otpauthUrl = authenticator.keyuri(user.email, 'ft_transcendence', secret);
+		await this.setTwoFactorAuthenticationSecret(secret, user.id, user.email);
+		return {secret, otpauthUrl};
+	  }
+
+	  async generateQrCodeDataURL(otpAuthUrl: string) {
+		return toDataURL(otpAuthUrl);
+	  }
+
+	  async setTwoFactorAuthenticationSecret(secret: string, userId: number, email: string) {
+		try {
+			return await this.prisma.user.update({
+				where: {
+					id: userId,
+					email: email,
+				},
+				data: {
+					twoFASecret: secret,
+				},
+			});
+	  } catch (e) {
+			console.error('Error when setting 2FA secret:', e);
+			throw (new InternalServerErrorException('Failed to set two factor authentication secret'));
+		}
+	}			
+
+	  async turnOnTwoFactorAuthentication(jwtDecoded: any) {
+		await this.prisma.user.update({
+			where: {
+				email: jwtDecoded.email,
+			},
+			data: {
+				twoFAEnabled: true
+			},
+		});
+	  }
+
+	  async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, jwtDecoded: any): Promise<boolean> {
+		const user = await this.prisma.user.findUnique({ where: { email: jwtDecoded.email } });
+		const isCodeValid = authenticator.verify({
+			token: twoFactorAuthenticationCode,
+			secret: user.twoFASecret,
+		});
+
+		return isCodeValid;
+	  }
+
+	  async turnOffTwoFactorAuthentication(jwtDecoded: any) {
+		await this.prisma.user.update({
+			where: {
+				email: jwtDecoded.email,
+			},
+			data: {
+				twoFAEnabled: false,
+				twoFASecret: null,
+			},
+		});
+	}
+
+	  async loginWith2fa(jwtDecoded: any) {
+		const user = await this.prisma.user.findUnique({ where: { email: jwtDecoded.email } });
+		const payload = {
+			userId: user.id,
+			username: user.name,
+			email: user.email,
+			twoFAEnabled: user.twoFAEnabled,
+			isTwoFactorAuthenticated: true,
+		};
+	
+		return {
+		  email: payload.email,
+		  access_token: this.jwt.sign(payload),
+		};
+	  }
 }

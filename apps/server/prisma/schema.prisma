@@ -21,6 +21,8 @@ model User {
   role           Role    @default(USER)
   friendProposal Friendship[] @relation("requester")
   friendRequest  Friendship[] @relation("addressee")
+  twoFAEnabled   Boolean @default(false)
+  twoFASecret    String?
 }
 
 model Friendship {
@@ -29,7 +31,6 @@ model Friendship {
   addressee   User             @relation("addressee", fields: [addresseeId], references: [id])
   addresseeId Int
   status      FriendshipStatus @default(PENDING)
-
   @@id([requesterId, addresseeId])
 }
 
@@ -38,6 +39,7 @@ enum FriendshipStatus {
   ACCEPTED
   BLOCKED
 }
+
 enum Role {
   USER
   ADMIN
