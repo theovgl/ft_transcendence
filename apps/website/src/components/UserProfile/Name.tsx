@@ -58,13 +58,9 @@ export default function Name({ FirstName,
 					}
 				);
 				const status = await statusResponse.text();
-				if (status === 'BLOCKED') {
-					setIsBlocked(true);
-					updateButtonState('BLOCKED');
-				} else {
-					setIsBlocked(false);
-					updateButtonState('EMPTY');
-				}
+
+				setIsBlocked(status === 'BLOCKED');
+				updateButtonState(status === 'BLOCKED' ? 'BLOCKED' : 'EMPTY');
 			} catch (error) {
 				console.error(error);
 			}
