@@ -73,7 +73,7 @@ export class AuthService {
 	
 	async handleCallback(response: any): Promise<any> {
 		const user: FortyTwoUser = await this.getUserInfo(response.access_token);
-		const token = await this.signToken(user.userId, user.username, user.email, response);
+		const token = await this.signToken(user.userId, user.username, user.email);
 
 		await this.prisma.user.upsert({
 			where: { email: user.email },
@@ -92,13 +92,12 @@ export class AuthService {
 		return token;
 	}
 
-	async signToken(userId: number, username: string, email: string, response: any): Promise<string> {
+	async signToken(userId: number, username: string, email: string): Promise<string> {
 		const payload = {
 			userId,
 			email,
 			username
 		};
-		const expiresIn = response.expires_in;
 		const secret = this.config.get('JWT_SECRET');
 		const token = await this.jwt.sign(payload, {
 			secret: secret,
@@ -190,7 +189,7 @@ export class AuthService {
 		const isCodeValid = authenticator.verify({
 			token: twoFactorAuthenticationCode,
 			secret: user.twoFASecret,
-		})
+		});
 
 		return isCodeValid;
 	  }
@@ -206,7 +205,6 @@ export class AuthService {
 			},
 		});
 	}
-		
 
 	  async loginWith2fa(jwtDecoded: any) {
 		const user = await this.prisma.user.findUnique({ where: { email: jwtDecoded.email } });
