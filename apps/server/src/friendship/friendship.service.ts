@@ -29,7 +29,7 @@ export class FriendshipService {
 					requesterId: requester.id,
 					addresseeId: addressee.id,
 				},
-			},
+			}
 		});
 		return friendship;
 	}
@@ -40,7 +40,7 @@ export class FriendshipService {
 			return null;
 		let requested = await this.getFriendship(addressee, requester);
 		let friendship = await this.getFriendship(requester, addressee);
-		if (!requested && !friendship) {
+		if ((!requested && !friendship) || requested.status === 'BLOCKED' ) {
 			friendship = await this.prisma.friendship.create({
 				data: {
 					requester: {
@@ -55,6 +55,7 @@ export class FriendshipService {
 					},
 				},
 			});
+			return friendship;
 		} else if (requested && !friendship) {
 			if (requested.status == 'PENDING') {
 				requested = await this.prisma.friendship.update({
@@ -84,6 +85,17 @@ export class FriendshipService {
 					requesterId_addresseeId: {
 						requesterId: friendship.requesterId,
 						addresseeId: friendship.addresseeId,
+					},
+				},
+			});
+		}
+		const requested = await this.getFriendship(addressee, requester);
+		if (requested && requested.status === 'ACCEPTED') {
+			return this.prisma.friendship.delete({
+				where: {
+					requesterId_addresseeId: {
+						requesterId: requested.requesterId,
+						addresseeId: requested.addresseeId,
 					},
 				},
 			});
@@ -256,5 +268,22 @@ export class FriendshipService {
 		});
 		console.log(receivedRequestList);
 		return receivedRequestList;
+	}
+
+	async handleGetRelationship(requesterName: string, addresseeName: string) {
+		if (!requesterName || !addresseeName)
+			return null;
+		const { requester, addressee } = await this.getRequesterAddressee(requesterName, addresseeName);
+		let friendship = await this.getFriendship(requester, addressee);
+		if (friendship)
+			return friendship.status;
+		friendship = await this.getFriendship(addressee, requester);
+		if (!friendship)
+			return 'EMPTY';
+		if (friendship.status === 'PENDING')
+			return 'RECEIVED';
+		else if (friendship.status === 'ACCEPTED')
+			return friendship.status;
+		return 'EMPTY';
 	}
 }

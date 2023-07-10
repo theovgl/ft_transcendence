@@ -18,6 +18,10 @@
 	color: black;
 	font-weight: 700;
 	font-size: 24px;
+
+	span {
+		vertical-align: text-bottom;
+	}
 }
 
 .username {
@@ -27,3 +31,42 @@
 	color: #8D8D8D;
 }
 
+.blockIcon {
+	font-size: 0.6em;
+	margin-left: 5px;
+	color: #ee4f4f;
+	position: relative;
+	display: inline-block;
+	cursor: pointer;
+  
+	&:hover::before {  
+		opacity: 1;
+		visibility: visible;
+		transform: translateX(30%);
+		transition: transform 0.3s ease-out,
+					opacity 0.3s,
+					visibility 0.3s;
+	}
+  
+	&::before {
+	  content: "Block";
+	  position: absolute;
+	  left: 60%;
+	  top: -10%;
+	  background-color: #333;
+	  color: white;
+	  padding: 5px 10px;
+	  border-radius: 5px;
+	  font-size: 12px;
+	  opacity: 0;
+	  visibility: hidden;
+	  transition: transform 0.2s ease-in,
+	  				opacity 0.2s ease-in,
+					visibility 0.2s ease-in;
+	}
+
+	&.blocked::before {
+		content: "Unblock";
+	  }
+  }
+  
