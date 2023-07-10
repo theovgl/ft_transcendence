@@ -1,0 +1,28 @@
+@import '../../../styles/library';
+
+.modal_link {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px;
+	color: $white-font-color;
+	font-family: $font-family;
+	text-decoration: none;
+	font-size: 16px;
+	transition: all 0.12s;
+
+	svg {
+		color: grey;
+	}
+
+	&:hover {
+		background-color: #3c3c3c;
+		border-radius: 8px;
+		transition: all 0.12s;
+		cursor: pointer;
+
+		svg {
+			color: white;
+		}
+	}
+}

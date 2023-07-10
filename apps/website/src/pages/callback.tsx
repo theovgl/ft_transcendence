@@ -1,23 +1,25 @@
 import jwtDecode from 'jwt-decode';
 import { useRouter } from 'next/router';
 import {useContext, useEffect} from 'react';
-import { useCookies } from 'react-cookie';
 import {AuthContext} from '@/utils/contexts/AuthContext.tsx';
+import Cookies from 'universal-cookie';
 
 export default function CallbackPage() {
 	const auth = useContext(AuthContext);
 	const router = useRouter();
-	const [ cookies ] = useCookies();
+	const cookies = new Cookies();
 	
 	const saveLoginState = () => {
-		const jwt = cookies.jwt;
-		const jwtPayload: any = jwtDecode(jwt);
+		const jwt = cookies.get('jwt');
+		if (!jwt) return;
+		const decodedPayload: any = jwtDecode(jwt);
 
 		auth?.login({
-			id: jwtPayload.userId,
-			name: jwtPayload.username,
-			email: jwtPayload.email,
-			authToken: jwt
+			id: decodedPayload.userId,
+			name: decodedPayload.username,
+			email: decodedPayload.email,
+			profilePic: decodedPayload.profilePic,
+			authToken: decodedPayload.authToken,
 		});
 	};
 

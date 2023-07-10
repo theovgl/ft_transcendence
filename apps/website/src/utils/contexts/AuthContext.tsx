@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useUser, User } from '../hooks/useUser';
 
-export type AuthContextType = {
+type AuthContextType = {
 	user: User | null;
 	login: (newUser: User) => void;
 	logout: () => void;
