@@ -41,8 +41,6 @@ export default function Name({ FirstName,
 		if (!router.isReady) return;
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 
-		console.log(jwtPayload.username);
-
 		const updateBlockStatus = async () => {
 			try {
 				const statusResponse = await fetch(
