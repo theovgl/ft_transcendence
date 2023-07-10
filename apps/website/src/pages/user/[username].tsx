@@ -13,6 +13,14 @@ import { useCookies } from 'react-cookie';
 import type { UserInfos } from 'global';
 import jwtDecode from 'jwt-decode';
 
+type jwtType = {
+	userId: number;
+	email: string;
+	username: string;
+	iat: number;
+	exp: number;
+}
+
 export default function Profile() {
 	const router = useRouter();
 	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
@@ -42,11 +50,14 @@ export default function Profile() {
 
 	useEffect(() => {
 		if (!router.isReady) return;
+
+		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
+
 		const updateBlockStatus = async () => {
 			try {
 				const statusResponse = await fetch(
 					`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
-						jwtDecode(cookies['jwt']).username
+						jwtPayload.username
 					)}&addresseeName=${router.query.username}`,
 					{
 						method: 'GET',
@@ -83,9 +94,12 @@ export default function Profile() {
 			route = 'unblock';
 			toggleBlockStatus();
 		}
+
+		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
+
 		const response = await fetch(
 			`http://localhost:4000/friendship/${route}?requesterName=${encodeURIComponent(
-				jwtDecode(cookies['jwt']).username
+				jwtPayload.username
 			)}&addresseeName=${router.query.username}`, {
 				method: 'GET',
 				headers: {
@@ -99,10 +113,13 @@ export default function Profile() {
 
 	useEffect(() => {
 		if (!router.isReady) return;
+
+		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
+
 		const fetchUserInfo = async () => {
 			try {
 				const statusResponse = await fetch(`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
-					jwtDecode(cookies['jwt']).username
+					jwtPayload.username
 				)}&addresseeName=${router.query.username}`, {
 					method: 'GET',
 					headers: {

@@ -14,6 +14,14 @@ interface IName {
 	updateButtonState: (response: string) => void;
 }
 
+type jwtType = {
+	userId: number;
+	email: string;
+	username: string;
+	iat: number;
+	exp: number;
+}
+
 export default function Name({ FirstName,
 	LastName,
 	Username,
@@ -31,12 +39,15 @@ export default function Name({ FirstName,
 
 	useEffect(() => {
 		if (!router.isReady) return;
+		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
+
+		console.log(jwtPayload.username);
 
 		const updateBlockStatus = async () => {
 			try {
 				const statusResponse = await fetch(
 					`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
-						jwtDecode(cookies['jwt']).username
+						jwtPayload.username
 					)}&addresseeName=${router.query.username}`,
 					{
 						method: 'GET',
@@ -64,10 +75,12 @@ export default function Name({ FirstName,
 
 	const toggleBlock = async () => {
 		let blockString = isBlocked ? 'unblock' : 'block';
+		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
+
 		try {
 			const response = await fetch(
 				`http://localhost:4000/friendship/${blockString}?requesterName=${encodeURIComponent(
-					jwtDecode(cookies['jwt']).username
+					jwtPayload.username
 				)}&addresseeName=${router.query.username}`,
 				{
 					method: 'GET',
