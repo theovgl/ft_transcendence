@@ -26,7 +26,7 @@ export default function CallbackPage() {
 	async function getAccessToken(code: string): Promise<boolean> {
 		try {
 			const response = await fetch(
-				'http://localhost:4000/auth/42/callback?code=' + code, {
+				`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/auth/42/callback?code=` + code, {
 					method: 'POST',
 					mode: 'cors',
 					headers: {
