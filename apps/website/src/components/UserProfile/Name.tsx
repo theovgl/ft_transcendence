@@ -32,6 +32,9 @@ export default function Name({ FirstName,
 	const [isBlocked, setIsBlocked] = useState(initialIsBlocked);
 	const [cookies] = useCookies();
 	const router = useRouter();
+	const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
+
+	const isOwnName = jwtPayload.username === router.query.username;
 
 	useEffect(() => {
 		setIsBlocked(initialIsBlocked);
@@ -101,7 +104,11 @@ export default function Name({ FirstName,
 					className={`${styles.blockIcon} ${isBlocked ? styles.blocked : ''}`}
 					onClick={toggleBlock}
 				>
-					<BiBlock size={20} color={isBlocked ? 'red' : 'black'} />
+					{
+						!isOwnName &&
+						<BiBlock size={ 20 }
+							color={isBlocked ? 'red' : 'black'} />
+					}
 				</span>
 			</p>
 			<p className={styles.username}>{'@' + Username}</p>

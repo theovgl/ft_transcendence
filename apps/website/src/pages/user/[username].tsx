@@ -26,7 +26,7 @@ export default function Profile() {
 	const router = useRouter();
 	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
 	const [cookies] = useCookies();
-	const [buttonText, setButtonText] = useState<string>('Add friend');
+	const [buttonText, setButtonText] = useState<string>('');
 	const [status, setStatus] = useState<string>('');
 	const [isBlocked, setIsBlocked] = useState(false);
 
@@ -56,16 +56,12 @@ export default function Profile() {
 		updateButtonState(status);
 	}
 
+
+	// This useEffect is used to update the button text when the user changes as blocked or unblocked
 	useEffect(() => {
 		if (!router.isReady) return;
 
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
-		if (encodeURIComponent(jwtPayload.username) === router.query.username) {
-			updateButtonState('EDIT');
-			return;
-		}
-
-
 		const updateBlockStatus = async () => {
 		console.log('updateBlockStatus');
 			try {
@@ -91,17 +87,7 @@ export default function Profile() {
 			}
 		};
 		updateBlockStatus();
-	}, [router.isReady, router.query.username, router, cookies]);
-
-	useEffect(() => {
-		console.log('useEffect 94');
-		// const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
-		// if (encodeURIComponent(jwtPayload.username) === router.query.username)
-		// 	setStatus('EDIT');
-		// else
-		// 	setStatus(isBlocked ? 'BLOCKED' : 'EMPTY');
-		updateButtonState(status);
-	}, [isBlocked, status, router.isReady, router.query.username, router, cookies]);
+	}, [router.query.username]);
 
 	function redirectToEdit() {
 		router.push('/user/edit');
@@ -137,6 +123,7 @@ console.log('relationshipUpdate');
 		setStatus(responseText);
 	}
 
+	// Verify if the user exists and setUserInfo. Fetch the relationship status between the user and the profile owner and set the button text
 	useEffect(() => {
 		if (!router.isReady) return;
 
@@ -144,29 +131,7 @@ console.log('relationshipUpdate');
 
 		const fetchUserInfo = async () => {
 		console.log('fetchUserInfo');
-			try {
-				const statusResponse = await fetch(`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
-					jwtPayload.username
-				)}&addresseeName=${router.query.username}`, {
-					method: 'GET',
-					headers: {
-						'Content-Type': 'application/json',
-						'Authorization': 'Bearer ' + cookies['jwt'],
-					},
-				});
-				const status = await statusResponse.text();
-				let buttonText = 'Add friend';
-				if (status === 'ACCEPTED')
-					buttonText = 'Friend';
-				else if (status === 'PENDING')
-					buttonText = 'Pending request ...';
-				else if (status === 'BLOCKED')
-					buttonText = 'Blocked';
-				else if (status === 'RECEIVED')
-					buttonText = 'Accept request';
-				else if (status === 'EDIT')
-					buttonText = 'Edit profile';
-				setStatus(status);
+		try {
 				await fetch(
 					`http://localhost:4000/users/${router.query.username}`, {
 						method: 'GET',
@@ -188,15 +153,35 @@ console.log('relationshipUpdate');
 					.then((response: UserInfos) => {
 						setUserInfo(response);
 					});
+				const statusResponse = await fetch(`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
+					jwtPayload.username
+				)}&addresseeName=${router.query.username}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': 'Bearer ' + cookies['jwt'],
+					},
+				});
+				let status = await statusResponse.text();
+				let buttonText = 'Add friend';
+				if (status === 'ACCEPTED')
+					buttonText = 'Friend';
+				else if (status === 'PENDING')
+					buttonText = 'Pending request ...';
+				else if (status === 'BLOCKED')
+					buttonText = 'Blocked';
+				else if (status === 'RECEIVED')
+					buttonText = 'Accept request';
+				else if (encodeURIComponent(jwtPayload.username) === router.query.username) {
+					status = 'EDIT';
+					buttonText = 'Edit profile';
+				}
+				setStatus(status);
 			} catch (error) {
 				console.error(error);
 			}
 		};
-		if (encodeURIComponent(jwtPayload.username) === router.query.username) {
-			updateButtonState('EDIT');
-		}
-		else
-			updateButtonState(status);
+		updateButtonState(status);
 		fetchUserInfo();
 	}, [router.isReady, router.query.username, router, cookies, status]);
 		
