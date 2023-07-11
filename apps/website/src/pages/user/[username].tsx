@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import Name from '@/components/UserProfile/Name';
 import ProfilePic from '@/components/UserProfile/ProfilePic';
 import Button from '@/components/Button/Button';
-import { BiBlock, BiCheck, BiMessageAltDetail } from 'react-icons/bi';
+import { BiBlock, BiCheck, BiMessageAltDetail, BiEdit } from 'react-icons/bi';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 import Statistics from '@/components/UserProfile/Statistics';
 import Match from '@/components/UserProfile/Match';
@@ -39,12 +39,19 @@ export default function Profile() {
 			setButtonText('Blocked');
 		else if (response === 'RECEIVED')
 			setButtonText('Accept request');
-		else
+		else if (response === 'EDIT') {
+			console.log('edit');
+			setButtonText('Edit profile');
+		}
+		else {
+			console.log('empty');
 			setButtonText('Add friend');
+		}
 		setStatus(response);
 	}
 
 	function toggleBlockStatus() {
+	console.log('toggleBlockStatus');
 		setIsBlocked(!isBlocked);
 		updateButtonState(status);
 	}
@@ -53,8 +60,14 @@ export default function Profile() {
 		if (!router.isReady) return;
 
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
+		if (encodeURIComponent(jwtPayload.username) === router.query.username) {
+			updateButtonState('EDIT');
+			return;
+		}
+
 
 		const updateBlockStatus = async () => {
+		console.log('updateBlockStatus');
 			try {
 				const statusResponse = await fetch(
 					`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
@@ -81,11 +94,21 @@ export default function Profile() {
 	}, [router.isReady, router.query.username, router, cookies]);
 
 	useEffect(() => {
-		setStatus(isBlocked ? 'BLOCKED' : 'EMPTY');
+		console.log('useEffect 94');
+		// const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
+		// if (encodeURIComponent(jwtPayload.username) === router.query.username)
+		// 	setStatus('EDIT');
+		// else
+		// 	setStatus(isBlocked ? 'BLOCKED' : 'EMPTY');
 		updateButtonState(status);
 	}, [isBlocked, status, router.isReady, router.query.username, router, cookies]);
 
+	function redirectToEdit() {
+		router.push('/user/edit');
+	}
+	
 	async function relationshipUpdate() {
+console.log('relationshipUpdate');
 		let route = 'add';
 		if (status === 'ACCEPTED')
 			route = 'remove';
@@ -95,7 +118,6 @@ export default function Profile() {
 			route = 'unblock';
 			toggleBlockStatus();
 		}
-
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 
 		const response = await fetch(
@@ -108,7 +130,10 @@ export default function Profile() {
 					'Authorization': 'Bearer ' + cookies['jwt'],
 				},
 			});
-		const responseText = await response.text();
+		let responseText = await response.text();
+		if (encodeURIComponent(jwtPayload.username) === router.query.username)
+			responseText = 'EDIT';
+		console.log('responseText', responseText);
 		setStatus(responseText);
 	}
 
@@ -118,6 +143,7 @@ export default function Profile() {
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 
 		const fetchUserInfo = async () => {
+		console.log('fetchUserInfo');
 			try {
 				const statusResponse = await fetch(`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
 					jwtPayload.username
@@ -138,6 +164,8 @@ export default function Profile() {
 					buttonText = 'Blocked';
 				else if (status === 'RECEIVED')
 					buttonText = 'Accept request';
+				else if (status === 'EDIT')
+					buttonText = 'Edit profile';
 				setStatus(status);
 				await fetch(
 					`http://localhost:4000/users/${router.query.username}`, {
@@ -164,7 +192,11 @@ export default function Profile() {
 				console.error(error);
 			}
 		};
-		updateButtonState(status);
+		if (encodeURIComponent(jwtPayload.username) === router.query.username) {
+			updateButtonState('EDIT');
+		}
+		else
+			updateButtonState(status);
 		fetchUserInfo();
 	}, [router.isReady, router.query.username, router, cookies, status]);
 		
@@ -204,13 +236,16 @@ export default function Profile() {
 										/>
 										<Button
 											text={buttonText}
-											boxShadow={buttonText === 'Add friend' ? true : false}
-											onClick={relationshipUpdate}
-											theme={buttonText === 'Add friend' ? 'light' : 'dark'}
-											icon={buttonText === 'Add friend' ? <AiOutlineUserAdd /> :
-												buttonText === 'Blocked' ? <BiBlock /> :
+											boxShadow={buttonText === 'Add friend' || 
+													buttonText === 'Edit profile' ? true : false}
+											onClick={buttonText === 'Edit profile' ? redirectToEdit : relationshipUpdate}
+											theme={buttonText === 'Add friend' || 
+													buttonText === 'Edit profile' ? 'light' : 'dark'}
+											icon={buttonText === ('Add friend') ? <AiOutlineUserAdd /> :
+													buttonText === 'Edit profile' ? <BiEdit /> :
+													buttonText === 'Blocked' ? <BiBlock /> :
 													buttonText === 'Friend' ? <BiCheck /> :
-														null}
+												null}
 										/>
 									</div>
 								</div>
