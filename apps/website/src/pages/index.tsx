@@ -33,8 +33,10 @@ export default function Home(props: any) {
 						theme='light'
 						boxShadow
 					/>
-					<Leaderboard data={props.data} />
-					<Friendlist />
+					<div className={homepageStyle.info_container}>
+						<Leaderboard data={props.data} />
+						<Friendlist />
+					</div>
 				</main>
 			</div>
 		</>
