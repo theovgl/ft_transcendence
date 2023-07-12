@@ -6,6 +6,7 @@ import Head from 'next/head';
 import Button from '@/components/Button/Button';
 import { useRouter } from 'next/router';
 import { useUser } from '@/utils/hooks/useUser';
+import Friendlist from '@/components/Friendlist/Friendlist';
 
 export default function Home(props: any) {
 	const router = useRouter();
@@ -33,6 +34,7 @@ export default function Home(props: any) {
 						boxShadow
 					/>
 					<Leaderboard data={props.data} />
+					<Friendlist />
 				</main>
 			</div>
 		</>
