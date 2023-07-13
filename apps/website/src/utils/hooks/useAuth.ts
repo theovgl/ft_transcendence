@@ -1,10 +1,8 @@
-//apps/website/src/utils/hooks/useAuth.ts
 import { io, Socket } from 'socket.io-client';
-import { useEffect, useState, useRef, use } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { User, useUser } from './useUser';
 import { Cookies } from 'react-cookie';
 
-// This react hook will be responsible for checking if the user is logged in or not.
 export const useAuth = () => {
 	const { addUser, removeUser, user } = useUser();
 	const jwtCookie = new Cookies('jwt');
@@ -19,16 +17,10 @@ export const useAuth = () => {
 			setIsAuthenticated(true);
 			socketRef.current?.emit('addConnectedUser', user?.name);
 			socketRef.current?.connect();
-		} else {
+		} else
 			setIsAuthenticated(false);
-			if (socketRef.current)
-				socketRef.current.emit('removeConnectedUser', user?.name);
-			console.log('userrrrr', user?.name);
-				socketRef.current?.disconnect();
-		}
 	}, [user]);
 
-	// login
 	const login = (newUser: User) => {
 		addUser(newUser);
 	};
@@ -36,7 +28,6 @@ export const useAuth = () => {
 	const logout = () => {
 		if (socketRef.current) {
 			socketRef.current.emit('removeConnectedUser', user?.name);
-			console.log('userrrrr', user?.name);
 			socketRef.current?.disconnect();
 		}
 		removeUser();
