@@ -4,7 +4,7 @@ import ModalLink from './ModalLink/ModalLink';
 import {
 	BiSolidChat,
 	BiSolidExit,
-	BiSolidGroup,
+	BiSolidHome,
 	BiSolidPencil,
 	BiSolidUser
 } from 'react-icons/bi';
@@ -53,6 +53,12 @@ export default function SettingsModal(props: SettingsModalProps) {
 						${isModalOpen ? '' : style.hidden}
 					`}
 				>
+					<ModalLink 
+						title='Home'
+						href='/'
+						icon={ <BiSolidHome /> }
+						onClick={() => setIsModalOpen(false)}
+					/>
 					<ModalLink
 						title='Your profile'
 						href={'/user/' + user?.name}
@@ -61,14 +67,8 @@ export default function SettingsModal(props: SettingsModalProps) {
 					/>
 					<ModalLink
 						title='Edit your profile'
-						href='/edit'
+						href='/user/edit'
 						icon={ <BiSolidPencil /> }
-						onClick={() => setIsModalOpen(false)}
-					/>
-					<ModalLink
-						title='Your friends'
-						href='/'
-						icon={ <BiSolidGroup /> }
 						onClick={() => setIsModalOpen(false)}
 					/>
 					<ModalLink
