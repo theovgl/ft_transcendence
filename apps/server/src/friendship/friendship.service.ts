@@ -1,6 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
+type FriendEntity = {
+	name: string;
+};
+
 @Injectable()
 export class FriendshipService {
 
@@ -201,9 +205,10 @@ export class FriendshipService {
 		return;
 	}
 
-	async handleGetFriendList(requesterName: string) {
+	async handleGetFriendList(requesterName: string): Promise<FriendEntity[]> {
 		if (!requesterName)
 			return null;
+
 		const friendList = await this.prisma.friendship.findMany({
 			where: {
 				OR: [
@@ -220,12 +225,39 @@ export class FriendshipService {
 				],
 				status: 'ACCEPTED',
 			},
+			select: {
+				requester: {
+					select: {
+						name: true,
+					}
+				},
+				addressee: {
+					select: {
+						name: true,
+					}
+				},
+			}
 		});
-		console.log(friendList);
-		return friendList;
+
+		const friends: FriendEntity[] = [];
+
+		friendList.forEach(friendship => {
+			if (friendship.addressee.name != requesterName) {
+				const friend: FriendEntity = {
+					name: friendship.addressee.name,
+				};
+				friends.push(friend);
+			} else if (friendship.requester.name != requesterName) {
+				const friend: FriendEntity = {
+					name: friendship.addressee.name,
+				};
+				friends.push(friend);
+			}
+		});
+		return friends;
 	}
 
-	async handleGetBlockedList(requesterName: string) {
+	async handleGetBlockedList(requesterName: string): Promise<FriendEntity[]> {
 		if (!requesterName)
 			return null;
 		const blockedList = await this.prisma.friendship.findMany({
@@ -235,9 +267,36 @@ export class FriendshipService {
 				},
 				status: 'BLOCKED',
 			},
+			select: {
+				requester: {
+					select: {
+						name: true,
+					}
+				},
+				addressee: {
+					select: {
+						name: true,
+					}
+				},
+			}
 		});
-		console.log(blockedList);
-		return blockedList;
+
+		const formatedBlockedList: FriendEntity[] = [];
+
+		blockedList.forEach(blockedUser => {
+			if (blockedUser.addressee.name != requesterName) {
+				const relation: FriendEntity = {
+					name: blockedUser.addressee.name,
+				};
+				formatedBlockedList.push(relation);
+			} else if (blockedUser.requester.name != requesterName) {
+				const relation: FriendEntity = {
+					name: blockedUser.addressee.name,
+				};
+				formatedBlockedList.push(relation);
+			}
+		});
+		return formatedBlockedList;
 	}
 
 	async handleGetSentRequestList(requesterName: string) {
@@ -251,13 +310,13 @@ export class FriendshipService {
 				status: 'PENDING',
 			},
 		});
-		console.log(sentRequestList);
 		return sentRequestList;
 	}
 
-	async handleGetReceivedRequestList(requesterName: string) {
+	async handleGetReceivedRequestList(requesterName: string): Promise<FriendEntity[]> {
 		if (!requesterName)
 			return null;
+
 		const receivedRequestList = await this.prisma.friendship.findMany({
 			where: {
 				addressee: {
@@ -265,9 +324,24 @@ export class FriendshipService {
 				},
 				status: 'PENDING',
 			},
+			select: {
+				requester: {
+					select: {
+						name: true,
+					}
+				},
+			}
 		});
-		console.log(receivedRequestList);
-		return receivedRequestList;
+
+		const formatedRequestList: FriendEntity[] = [];
+
+		receivedRequestList.forEach(request => {
+			const relation: FriendEntity = {
+				name: request.requester.name,
+			};
+			formatedRequestList.push(relation);
+		});
+		return formatedRequestList;
 	}
 
 	async handleGetRelationship(requesterName: string, addresseeName: string) {
