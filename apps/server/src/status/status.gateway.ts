@@ -7,6 +7,7 @@ import {
   } from '@nestjs/websockets';
   import { Logger } from '@nestjs/common';
   import { Server, Socket } from 'socket.io';
+import { emit } from 'process';
 
   @WebSocketGateway({ cors: { origin: '*', credentials: true }, })
   export class StatusGateway {
@@ -22,11 +23,11 @@ import {
 		this.server.emit('statusUpdate', payload);
 	}
 	
-	@SubscribeMessage('userConnected')
-	handleUserConnected(@MessageBody() data: string, @ConnectedSocket() client: Socket): string {
-		console.log('Connected data', data);
-		this.onlineUsers.set(client.id, data);
-		console.log('onlineUsers console', this.onlineUsers);
+	@SubscribeMessage('addConnectedUser')
+	async handleUserConnected(@MessageBody() data: string, @ConnectedSocket() client: Socket): Promise<string> {
+		const setMap = await this.onlineUsers.set(client.id, data);
+		this.server.emit('mapUpdated', this.onlineUsers.get(client.id));
+		console.log('onlineUsers add', this.onlineUsers);
 		return data;
 	}
 
@@ -39,10 +40,27 @@ import {
 	// 	}
 	// 	return false;
 	// }
+	// @SubscribeMessage('isUpdated')
+	// handleIsUpdated(@MessageBody() data: any): boolean {
+	// 	const name = this.onlineUsers.get(data);
+	// 	for (let value of this.onlineUsers.values()) {
+	// 		if (value === name) {
+	// 			return true;
+	// 		}
+	// 	return false;
+	// }
+	// }
+
 
 	@SubscribeMessage('isConnected')
 	handleCheckUserStatus(@MessageBody() data: any): boolean {
-    return this.onlineUsers.has(data);
+		console.log('onlineUsers when checking for', data, this.onlineUsers);
+		for (let value of this.onlineUsers.values()) {
+			if (value === data) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	handleInit() {
@@ -54,9 +72,13 @@ import {
 		// this.onlineUsers.set(client.id, client.currentUser);
 	}
 
-	handleDisconnect(client: any) {
+	async handleDisconnect(client: any) {
+		const username = this.onlineUsers.get(client.id);
 		this.logger.log(`Client disconnected: ${client.id}`);
-		this.onlineUsers.delete(client.id);
-		console.log('onlineUsers console updated', this.onlineUsers);
+		console.log('get client id', username);
+		if (username)
+			await this.server.emit('mapUpdated', username);
+		await this.onlineUsers.delete(client.id);
+		console.log('onlineUsers delete', this.onlineUsers);
 	}
   }  
