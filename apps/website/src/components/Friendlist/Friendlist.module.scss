@@ -63,3 +63,21 @@
 		}
 	}
 }
+
+.section_container {
+	display: flex;
+	flex-direction: column;
+}
+
+.section_title {
+	font-family: $font-family;
+	font-weight: 600;
+	padding: 12px 20px;
+	margin: 0;
+	background-color: #eeeae4;
+	color: $black-color;
+}
+
+.section_container :nth-child(even) {
+	background-color: $off-white-color;
+}
