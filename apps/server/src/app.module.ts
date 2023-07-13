@@ -8,12 +8,13 @@ import { MulterModule } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { LeaderboardModule } from './leaderboard/leaderboard.module';
 import { GameModule } from './game/game.module';
+import { StatusModule } from './status/status.module';
 
 @Module({
 	imports: [AuthModule, UserModule, PrismaModule, GameModule, FriendshipModule, MulterModule.register({
 		storage: memoryStorage()
 	}),
-	UserModule, PrismaModule, LeaderboardModule,
+	UserModule, PrismaModule, LeaderboardModule, StatusModule,
 	ConfigModule.forRoot({
 		isGlobal: true
 	}),],
