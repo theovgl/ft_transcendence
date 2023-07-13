@@ -5,12 +5,14 @@ import Navbar from '@/components/Navbar';
 import Head from 'next/head';
 import Button from '@/components/Button/Button';
 import { useRouter } from 'next/router';
+import Friendlist, { FriendListType } from '@/components/Friendlist/Friendlist';
+import { useEffect, useState } from 'react';
 import { useUser } from '@/utils/hooks/useUser';
-import Friendlist from '@/components/Friendlist/Friendlist';
 
 export default function Home(props: any) {
 	const router = useRouter();
-	const { user } = useUser();
+	const {user} = useUser(); 
+	const [friendListData, setFriendListData] = useState<FriendListType | null>(null);
 
 	const onButtonClick = () => {
 		router.push({
@@ -18,6 +20,34 @@ export default function Home(props: any) {
 			query: {premade: true, premadeId: "20305", premadeMode: "Normal", userId: user?.name}
 		});
 	};
+
+	useEffect(() => {
+		if (!user) return;
+
+		const fetchRelationList = async () => {
+			try {
+				await fetch(
+					`http://localhost:4000/friendship/getRelationshipList?requesterName=${user?.name}`,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+					})
+					.then(async (response) => {
+						const data: FriendListType = await response.json();
+						return data;
+					})
+					.then((data: FriendListType) => {
+						setFriendListData(data);
+					});
+			} catch (error) {
+				console.error('Error while fetching user friendlist: ', error);
+			}
+		};
+		
+		fetchRelationList();
+	}, [user]);
 
 	return (
 		<>
@@ -35,7 +65,7 @@ export default function Home(props: any) {
 					/>
 					<div className={homepageStyle.info_container}>
 						<Leaderboard data={props.data} />
-						<Friendlist />
+						<Friendlist data={friendListData} />
 					</div>
 				</main>
 			</div>
