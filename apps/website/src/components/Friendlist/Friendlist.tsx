@@ -28,8 +28,6 @@ export default function Friendlist(props: Props) {
 		setFriends(data.friendship);
 		setBlocked(data.blocked);
 		setRequested(data.request);
-
-		console.log(friends, blocked, requested);
 	});
 
 	return (
