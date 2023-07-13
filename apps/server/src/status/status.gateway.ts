@@ -31,7 +31,17 @@ import { emit } from 'process';
 		return data;
 	}
 
-	// @SubscribeMessage('isConnected')
+	@SubscribeMessage('removeConnectedUser')
+	async handleUserDisconnected(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
+		this.onlineUsers.forEach((value:string, key: string)=> {
+			if (value === data) {
+				console.log('value', value, 'key', key);
+				this.onlineUsers.delete(key);
+				this.server.emit('mapUpdated', data);
+			}
+		});
+	}
+
 	// handleUserDisconnected(@MessageBody() data: string, @ConnectedSocket() client: Socket): boolean {
 	// 	for (let value of this.onlineUsers.values()) {
 	// 		if (value === data) {
@@ -55,11 +65,13 @@ import { emit } from 'process';
 	@SubscribeMessage('isConnected')
 	handleCheckUserStatus(@MessageBody() data: any): boolean {
 		console.log('onlineUsers when checking for', data, this.onlineUsers);
-		for (let value of this.onlineUsers.values()) {
+		for (const value of this.onlineUsers.values()) {
 			if (value === data) {
+				console.log('value', value, 'data', data);
 				return true;
 			}
 		}
+		console.log('false data', data);
 		return false;
 	}
 
@@ -81,4 +93,4 @@ import { emit } from 'process';
 		await this.onlineUsers.delete(client.id);
 		console.log('onlineUsers delete', this.onlineUsers);
 	}
-  }  
+  } 
