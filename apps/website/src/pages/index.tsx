@@ -10,7 +10,10 @@ export default function Home(props: any) {
 	const router = useRouter();
 
 	const onButtonClick = () => {
-		router.push('/game');
+		router.push({
+			pathname: '/game',
+			query: {premade: true, premadeId: "20305", premadeMode: "Normal", userId: ""}
+		});
 	};
 
 	return (

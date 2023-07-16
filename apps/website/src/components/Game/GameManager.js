@@ -40,13 +40,13 @@ const GameManager =  React.forwardRef((props, ref) =>  {
         else if (ref.current && !ref.current.innerText.includes("Click to play"))
         {
             intervalId = setInterval(() => {
-                if (props.scoreRight.current.innerText === "10")
+                if (props.scoreRight.current && props.scoreRight.current.innerText === "10")
                     ref.current.innerText = "J2 wins ! \n Click to quit"
-                else if (props.scoreLeft.current.innerText === "10")
+                else if (props.scoreLeft.current && props.scoreLeft.current.innerText === "10")
                     ref.current.innerText = "J1 wins ! \n Click to quit"
                 else if (forfeit)
                   ref.current.innerText = "You win ! \n Click to quit"
-                else
+                else if (ref.current.innerText)
                     ref.current.innerText = ""
             }, 10);
         }

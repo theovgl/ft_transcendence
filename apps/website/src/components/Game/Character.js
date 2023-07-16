@@ -183,7 +183,7 @@ const Character = React.forwardRef((props, ref) => {
 
     return (
       <CharacterDiv ref={ref} x={percentagePos.x} y={percentagePos.y} height={props.height}>
-        <CharacterImg src={birdImg}></CharacterImg>
+        <CharacterImg src={birdImg.src}></CharacterImg>
       </CharacterDiv>
     );
   });

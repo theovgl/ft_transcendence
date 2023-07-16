@@ -15,7 +15,7 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @WebSocketServer()
     server: Server;
     playersId: Map<Socket, string> = new Map();
-    clientList: Map<Socket, string> = new Map();
+    clientModeList: Map<Socket, string> = new Map();
 
     constructor (private matchmakingService: MatchmakingService){}
 
@@ -24,25 +24,36 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
     //connexion
     handleConnection(client: Socket){
-       console.log(`Client Connected: ${client.id}`);
+       console.log(`Socket Connected: ${client.id}`);
         let userId: string = Array.isArray(client.handshake.query.userId)
                     ? client.handshake.query.userId[0]
                     : client.handshake.query.userId.toString();
         let mode: string = Array.isArray(client.handshake.query.mode)
                     ? client.handshake.query.mode[0]
                     : client.handshake.query.mode.toString();
-
-        this.clientList.set(client, mode);
-        console.log(`Client Connected: ${client.handshake.query.userId}`);
-        this.playersId.set(client, userId)
-        this.matchmakingService.addPlayer(client, mode, userId)
-        client.emit('searching');
+        let premade: string = Array.isArray(client.handshake.query.premade)
+                    ? client.handshake.query.premade[0]
+                    : client.handshake.query.premade.toString();
+        console.log(`User Connected: ${client.handshake.query.userId}`);
+        if (premade != "") {
+            console.log("premade with: " + premade);
+            //ajouter au pool de premades
+            //la pool à une id
+            this.matchmakingService.addPremadePlayer(client, mode, userId, premade, this.server)
+        }
+        else {
+            this.clientModeList.set(client, mode);
+            this.playersId.set(client, userId)
+            this.matchmakingService.addPlayer(client, mode, userId)
+        }
+       
+        client.emit('searching');           
     }
 
     handleDisconnect(client: Socket){
-        console.log(`Client Disconnected: ${client.id}`);
-        this.matchmakingService.removePlayer(client, this.clientList.get(client), this.playersId.get(client))
-        this.clientList.delete(client);
+        console.log(`Socket Disconnected: ${client.id}`);
+        this.matchmakingService.removePlayer(client, this.clientModeList.get(client), this.playersId.get(client))
+        this.clientModeList.delete(client);
         this.playersId.delete(client);
         this.matchmakingService.deleteBallService(client)
     }

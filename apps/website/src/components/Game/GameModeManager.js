@@ -2,6 +2,8 @@ import styled from 'styled-components'
 import GameBox from './GameBox';
 import MultiplayerManager from './MultiplayerManager';
 import { useEffect, useState } from 'react';
+import { useLayoutEffect } from 'react';
+import { useRouter } from 'next/router';
 
 const LOCAL_OPPONENT_POS_X = 860;
 const LOCAL_OPPONENT_POS_Y = 200;
@@ -12,16 +14,19 @@ const OPPONENTMODE = 1;
 const GameModeManager = (props) => {
     const [clicked, setClicked] = useState(false);
     const [mode, setMode] = useState("");
-
     const onClickButton = (button) => {
         setClicked(() =>{return true});
         setMode(button);
     }
-    
-    useEffect(() =>{
-        console.log("Render GameModeManager");
+    const router = useRouter();
 
-    });
+    useEffect(() => {
+        if (router.query.premade === 'true') {
+          setClicked(true);
+          console.log(router.query);
+          setMode(router.query.premadeMode);
+        }
+    }, [router.query.premade, router.query.premadeMode]);
 
     const handleQuit = () => {
         console.log("Quit");
@@ -34,9 +39,9 @@ const GameModeManager = (props) => {
             <ButtonSpecial onClick={() => onClickButton("Special")} disabled={clicked}>Special</ButtonSpecial>
             <ButtonOnline onClick={() => onClickButton("Online")} disabled={clicked}>Online</ButtonOnline>
         { clicked ?
-            (mode === "Special" ?
-            <MultiplayerManager height={props.height} width={props.width} quitEvent={handleQuit} mode={"Special"}></MultiplayerManager>
-            : <MultiplayerManager height={props.height} width={props.width} quitEvent={handleQuit} mode={"Normal"}></MultiplayerManager>)
+            (mode === "Special"?
+            <MultiplayerManager height={props.height} width={props.width} quitEvent={handleQuit} mode={"Special"} premadeId={router.query.premadeId}></MultiplayerManager>
+            : <MultiplayerManager height={props.height} width={props.width} quitEvent={handleQuit} mode={"Normal"} premadeId={router.query.premadeId}></MultiplayerManager>)
             : ""
         }
         </GameModeManagerDiv>

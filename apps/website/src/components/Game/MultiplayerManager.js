@@ -28,7 +28,8 @@ const MultiplayerManager = (props) => {
         const socket=io.connect("ws://localhost:4000", {
             query: {
                 userId: infos.userId,
-                mode: props.mode
+                mode: props.mode,
+                premade: props.premadeId
             }
           })
           socketRef.current = socket;
@@ -60,15 +61,6 @@ const MultiplayerManager = (props) => {
             }));
         })
 
-        // socket.on('game-start-p2', () => {
-        //   console.log("match found !");
-        //   setInfos(prevInfos => ({
-        //       ...prevInfos,
-        //       matchFound: true,
-        //       rightPlayer: PLAYERMODE,
-        //       leftPlayer: ONLINEMODE
-        //     }));
-        // })
         socket.on('connect_error', (error) => {
             console.error('Failed to connect to socket.io server', error);
         });
@@ -80,11 +72,6 @@ const MultiplayerManager = (props) => {
               opponentY: data.y,
            });
         });
-        
-        // Emit a 'playerMoved' event
-        // const handleMove = (x, y) => {
-        //    socket.emit('playerMoved', { x, y });
-        // }
         
         // Clean up the event listeners when the component unmounts
         return () => {
@@ -109,21 +96,5 @@ const MultiplayerManager = (props) => {
         )
       );
 }
-
-
  
 export default MultiplayerManager;
-
-
-/* MISC
-
-        //DEFAULT TESTING: NEED TO BE REMOVED
-        socket.on('game-start', () => {
-            console.log("match found !");
-            setInfos(prevInfos => ({
-                ...prevInfos,
-                matchFound: true
-              }));
-        })
-
-*/

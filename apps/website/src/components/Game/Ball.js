@@ -59,6 +59,7 @@ const Ball = (props) => {
 
     // Ball movement online mode
     useEffect(() => {
+      console.log("effect");
       if (props.socket !== null) {
         props.socket.on('ball-moved', (pos) => {
           setPercentagePos({
@@ -74,6 +75,14 @@ const Ball = (props) => {
           const currValue = parseInt(props.scoreLeft.current.innerText);
           props.scoreLeft.current.innerText = currValue + 1 < 10 ? '0' + (currValue + 1) : currValue + 1;
         })
+      }
+      return () => {
+        if (props.socket  !== null)
+        {
+          props.socket.off('ball-moved');
+          props.socket.off('goal-scored-j2');
+          props.socket.off('goal-scored-j1');
+        }
       }
     }, [props.socket, props.scoreRight, props.scoreLeft])
 
@@ -206,7 +215,7 @@ const Ball = (props) => {
 
     return (
       <BallDiv ref={ballRef} x={percentagePos.x} y={percentagePos.y}>
-        <BallDivImg src={ballImg}></BallDivImg>
+        <BallDivImg src={ballImg.src}></BallDivImg>
         </BallDiv>
     );
   };

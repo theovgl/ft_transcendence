@@ -68,7 +68,7 @@ const Collectible = (props) => {
     return (
         <CollectibleDiv ref={collectibleRef} x={percentagePos.x} y={percentagePos.y}
           opacity={activated ? 1 : 0}>
-          <CollectibleDivImg src={collectibleImg}></CollectibleDivImg>
+          <CollectibleDivImg src={collectibleImg.src}></CollectibleDivImg>
           </CollectibleDiv>
     );
 }
