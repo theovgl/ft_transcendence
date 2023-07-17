@@ -34,7 +34,10 @@ export class MatchmakingService {
     }
   }
 
-  
+  public removePremadePlayer(roomId: string){
+    this.premadePlayers.delete(roomId);
+  }
+
   //first premade user connect 
   //create a room and add player to it
   public addPremadePlayer(player: Socket, mode: string, id: string, roomId: string, server: Server)

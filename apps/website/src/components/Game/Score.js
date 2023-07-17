@@ -13,13 +13,6 @@ const ScoreDiv = styled.div`
   left: ${(props) => props.left}%;
   top: 5;
   color: white;
-  @font-face {
-    font-family: 'Keania One';
-    src: url('../font/KeaniaOne-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  };
-  font-family: 'Keania One', sans-serif;
   font-size: 7vw;
   position: absolute;
 `;

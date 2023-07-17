@@ -15,6 +15,7 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @WebSocketServer()
     server: Server;
     playersId: Map<Socket, string> = new Map();
+    RoomsId: Map<Socket, string> = new Map();
     clientModeList: Map<Socket, string> = new Map();
 
     constructor (private matchmakingService: MatchmakingService){}
@@ -35,10 +36,11 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
                     ? client.handshake.query.premade[0]
                     : client.handshake.query.premade.toString();
         console.log(`User Connected: ${client.handshake.query.userId}`);
-        if (premade != "") {
+        if (premade !== "" && premade !== undefined) {
             console.log("premade with: " + premade);
             //ajouter au pool de premades
             //la pool à une id
+            this.RoomsId.set(client, premade);
             this.matchmakingService.addPremadePlayer(client, mode, userId, premade, this.server)
         }
         else {
@@ -53,6 +55,8 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
     handleDisconnect(client: Socket){
         console.log(`Socket Disconnected: ${client.id}`);
         this.matchmakingService.removePlayer(client, this.clientModeList.get(client), this.playersId.get(client))
+        this.matchmakingService.removePremadePlayer(this.RoomsId.get(client));
+        this.RoomsId.delete(client);
         this.clientModeList.delete(client);
         this.playersId.delete(client);
         this.matchmakingService.deleteBallService(client)

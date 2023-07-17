@@ -17,6 +17,8 @@ CREATE TABLE "User" (
     "losses" INTEGER NOT NULL DEFAULT 0,
     "level" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "role" "Role" NOT NULL DEFAULT 'USER',
+    "twoFAEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "twoFASecret" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );

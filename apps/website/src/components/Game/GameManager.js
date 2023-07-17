@@ -20,7 +20,7 @@ const GameManager =  React.forwardRef((props, ref) =>  {
       {
         props.socket.on('forfeit', () => {
           setForfeit(true);
-          // props.socket.disconnect();
+          props.socket.disconnect();
         })
       }
     }, [forfeit, props.socket])
@@ -46,7 +46,7 @@ const GameManager =  React.forwardRef((props, ref) =>  {
                     ref.current.innerText = "J1 wins ! \n Click to quit"
                 else if (forfeit)
                   ref.current.innerText = "You win ! \n Click to quit"
-                else if (ref.current.innerText)
+                else if (ref.current && ref.current.innerText)
                     ref.current.innerText = ""
             }, 10);
         }
@@ -77,7 +77,6 @@ const GameManagerDiv = styled.div`
   color: red;
   text-shadow: 2px 0 #fff, -2px 0 #fff, 0 2px #fff, 0 -2px #fff,
                1px 1px #fff, -1px -1px #fff, 1px -1px #fff, -1px 1px #fff;
-  font-family: 'Keania One', sans-serif;
   font-size: 10vw;
   position: absolute;
 `;
