@@ -39,7 +39,8 @@ export class UserService {
 				profilePicPath: true,
 				wins: true,
 				losses: true,
-				level: true
+				level: true,
+				twoFAEnabled: true,
 			}
 		});
 

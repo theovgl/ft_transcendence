@@ -1,4 +1,8 @@
 .profilePic {
     border-radius: 100%;
+}
+
+.profilePic_stroke {
+    @extend .profilePic;
     border: solid black 5px;
 }

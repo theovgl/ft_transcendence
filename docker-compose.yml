@@ -32,7 +32,7 @@ services:
     image: postgres:13
     container_name: postgres
     ports:
-      - 5435:5432
+      - 5432:5432
     env_file: ./apps/server/.env
     networks:
       - transcendence

@@ -4,10 +4,10 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	height: 70px;
+	height: 65px;
 	background-color: $black-color;
 	color: $white-font-color;
-	padding: 15px 15px 15px 40px;
+	padding: 15px 30px 15px 35px;
 	margin: 8px;
 	border-radius: 40px;
 	box-sizing: border-box;
@@ -35,10 +35,9 @@
 	gap: 10px;
 }
 
-.links_container {
+.profilePicButton {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	margin-right: 30px;
-	gap: 15px
+	cursor: pointer;
 }

@@ -1,14 +1,20 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Res, UseGuards } from '@nestjs/common';
 import { FriendshipService } from './friendship.service';
+import { Response } from 'express';
+import { JwtGuard } from '../auth/guard';
 
 @Controller('friendship')
 export class FriendshipController {
 	constructor(private friendshipService: FriendshipService) {}
-
+	
+	@UseGuards(JwtGuard)
 	@Get('add')
-	addFriend(@Query() qry) {
-		this.friendshipService.handleAddFriend(qry.requesterName, qry.addresseeName);
-		return;
+	async addFriend(@Query() qry, @Res() response: Response) {
+		const ret = await this.friendshipService.handleAddFriend(qry.requesterName, qry.addresseeName);
+		response
+			.header('content-type', 'plain/text')
+			.send(ret)
+			.status(200);
 	}
 
 	@Get('remove')
@@ -69,5 +75,11 @@ export class FriendshipController {
 			sentRequestList: this.friendshipService.handleGetSentRequestList(qry.requesterName),
 			receivedRequestList: this.friendshipService.handleGetReceivedRequestList(qry.requesterName),
 		};
+	}
+
+	@Get('getRelationship')
+	async getRelationship(@Query() qry) {
+		const status = await this.friendshipService.handleGetRelationship(qry.requesterName, qry.addresseeName);
+		return status;
 	}
 }

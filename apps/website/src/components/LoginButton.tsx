@@ -1,11 +1,6 @@
 import styles from '@/styles/components/LoginButton.module.scss';
 import Link from 'next/link';
 
-enum ButtonThemes {
-	dark = 'dark',
-	light = 'light'
-}
-
 export interface ILoggingButton
 {
 	theme: string

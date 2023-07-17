@@ -3,7 +3,7 @@ import styles from './Button.module.scss';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 	text: string,
-	icon?: React.ReactElement,
+	icon?: React.ReactElement | null,
 	boxShadow?: boolean,
 	theme?: string,
 }
