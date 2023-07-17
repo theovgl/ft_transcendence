@@ -130,9 +130,9 @@ export class BallService {
 
   private updateGameResult()
   {
-    if (this.scoreLeft > this.scoreRight)
+    if (this.winnerId != "" && this.scoreLeft > this.scoreRight)
       this.winnerId = this.pOneId;
-    else
+    else if (this.winnerId != "")
       this.winnerId = this.pTwoId;
     this.updateHistory(this.pOneId);
     this.updateHistory(this.pTwoId);
@@ -143,8 +143,18 @@ export class BallService {
     clearInterval(this.collectibleInterval);
   }
 
-  public  forfeit()
+  public  forfeit(player: Socket)
   {
+    if (player === this.pOneSocket)
+    {
+      console.log("winner right");
+      this.winnerId = this.pTwoId;
+    }
+    else
+    {
+      console.log("winner left");
+      this.winnerId = this.pOneId;
+    }
     this.updateGameResult();
     this.unsetBallLoop();
     this.forfeited = true;
@@ -164,13 +174,6 @@ export class BallService {
       ballRect.y < characterRect.y + characterRect.height)
       return (true)
     return (false)
-
-    // if (ballRect.x + BALL_RADIUS > characterRect.x &&
-    //   ballRect.x - BALL_RADIUS < characterRect.x + characterRect.width &&
-    //   ballRect.y + BALL_RADIUS > characterRect.y &&
-    //   ballRect.y - BALL_RADIUS < characterRect.y + characterRect.height)
-    //   return (true)
-    // return (false)
   }
 
   //update la position de la balle en fonction de sa trajectoire
