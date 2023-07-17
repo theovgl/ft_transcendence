@@ -40,18 +40,15 @@ export default function Profile() {
 		else if (response === 'RECEIVED')
 			setButtonText('Accept request');
 		else if (response === 'EDIT') {
-			console.log('edit');
 			setButtonText('Edit profile');
 		}
 		else {
-			console.log('empty');
 			setButtonText('Add friend');
 		}
 		setStatus(response);
 	}
 
 	function toggleBlockStatus() {
-	console.log('toggleBlockStatus');
 		setIsBlocked(!isBlocked);
 		updateButtonState(status);
 	}
@@ -63,7 +60,6 @@ export default function Profile() {
 
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 		const updateBlockStatus = async () => {
-		console.log('updateBlockStatus');
 			try {
 				const statusResponse = await fetch(
 					`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
@@ -94,7 +90,6 @@ export default function Profile() {
 	}
 	
 	async function relationshipUpdate() {
-console.log('relationshipUpdate');
 		let route = 'add';
 		if (status === 'ACCEPTED')
 			route = 'remove';
@@ -119,7 +114,6 @@ console.log('relationshipUpdate');
 		let responseText = await response.text();
 		if (encodeURIComponent(jwtPayload.username) === router.query.username)
 			responseText = 'EDIT';
-		console.log('responseText', responseText);
 		setStatus(responseText);
 	}
 
@@ -130,7 +124,6 @@ console.log('relationshipUpdate');
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 
 		const fetchUserInfo = async () => {
-		console.log('fetchUserInfo');
 		try {
 				await fetch(
 					`http://localhost:4000/users/${router.query.username}`, {
