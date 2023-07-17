@@ -21,11 +21,9 @@ const MultiplayerManager = (props) => {
 
     const socketRef = useRef(null);
 
-    // const socket = io('ws://localhost:8000');
-
     useEffect(() => {
         
-        const socket=io.connect("ws://localhost:4000", {
+        const socket=io.connect(`ws://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000`, {
             query: {
                 userId: infos.userId,
                 mode: props.mode,
