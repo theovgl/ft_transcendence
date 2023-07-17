@@ -249,7 +249,7 @@ export class FriendshipService {
 				friends.push(friend);
 			} else if (friendship.requester.name != requesterName) {
 				const friend: FriendEntity = {
-					name: friendship.addressee.name,
+					name: friendship.requester.name,
 				};
 				friends.push(friend);
 			}
