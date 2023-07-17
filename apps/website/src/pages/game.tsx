@@ -10,7 +10,6 @@ const GAME_WIDTH = 991;
 const GAME_HEIGHT = 678;
 
 export default function Game(props: any) {
-
   return (
     <>
       <Navbar />

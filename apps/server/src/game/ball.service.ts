@@ -36,10 +36,15 @@ export class BallService {
   private scoreRight = 0;
   private pOneSocket;
   private pTwoSocket;
+  private pOneId: string;
+  private pTwoId: string;
   private percentagePos: {x: number, y: number} = {x: 0, y: 0};
   private forfeited = false;
   private winnerId: string = "";
-  private prisma: PrismaService;
+
+  constructor(
+		private prisma: PrismaService,
+	) {}
 
   public async setBallLoop(server, playerOne, playerTwo, room, ms, mode="Normal") {
 
@@ -48,7 +53,8 @@ export class BallService {
     
     this.pOneSocket = playerOne.socket;
     this.pTwoSocket = playerTwo.socket;
-
+    this.pOneId = playerOne.id;
+    this.pTwoId = playerTwo.id;
     playerOne.socket.on('player-moved', (data) => {
       this.leftPlayer.x = (data.pos.x / 100) * GAME_WIDTH;
       this.leftPlayer.y = (data.pos.y / 100) * GAME_HEIGHT;
@@ -91,16 +97,7 @@ export class BallService {
           server.to(room).emit("ball-moved", this.percentagePos);
           if (this.scoreLeft >= 10 || this.scoreRight >= 10)
           {
-            if (this.scoreLeft >= 10)
-              this.winnerId = playerOne.id;
-            else
-              this.winnerId = playerTwo.id
             this.unsetBallLoop();
-            //TODO UNCOMMENT AFTER MERGE
-            // this.updateHistory(playerOne.id);
-            // this.updateHistory(playerTwo.id);
-            //Update la Bdd avec le resultat du match et le score
-            //prisma.create new MatchResult(result, scorej1, scorej2) where userId = socket.userId
           }
         }, ms);
       }, 3000);
@@ -108,28 +105,36 @@ export class BallService {
 
   }
 
-  //TODO UNCOMMENT AFTER MERGE
-  // private async updateHistory(userid: string)
-  // {
-  //   const user = await this.prisma.user.findUnique({
-  //     where: {
-  //       username: userid
-  //     }
-  //   })
-  //   await this.prisma.game.create({
-  //     data: {
-  //       scorePlayerOne: this.scoreLeft,
-  //       scorePlayerTwo: this.scoreRight,
-  //       winnerId: this.winnerId
-  //     },
-  //     include: {
-  //       user: true
-  //     }
-  //   })
-  // }
+  private async updateHistory(userid: string)
+  {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        name: userid
+      }
+    })
+    await this.prisma.game.create({
+      data: {
+        scorePlayerOne: this.scoreLeft.toString(),
+        scorePlayerTwo: this.scoreRight.toString(),
+        winnerId: this.winnerId,
+        userIdLeft: this.pOneId,
+        userIdRight: this.pTwoId,
+        userId: user.id
+      },
+      include: {
+        user: true
+      }
+    })
+  }
 
   //désactiver la boucle lorsque la partie est terminée
   public unsetBallLoop() {
+    if (this.scoreLeft > this.scoreRight)
+      this.winnerId = this.pOneId;
+    else
+      this.winnerId = this.pTwoId;
+    this.updateHistory(this.pOneId);
+    this.updateHistory(this.pTwoId);
     clearInterval(this.interval);
     clearInterval(this.collectibleInterval);
   }
