@@ -37,3 +37,6 @@ wip
 
 # Env files
 .env
+
+# Prisma
+prisma/migrations

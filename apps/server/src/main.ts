@@ -12,7 +12,7 @@ async function bootstrap() {
 	app.use(cors(
 		{
 			origin: [
-				'http://localhost:3000',
+				`http://${process.env.IP_ADDRESS}:3000`,
 			],
 			credentials: true,
 		}

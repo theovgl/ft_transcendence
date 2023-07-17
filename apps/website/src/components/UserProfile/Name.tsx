@@ -47,7 +47,7 @@ export default function Name({ FirstName,
 		const updateBlockStatus = async () => {
 			try {
 				const statusResponse = await fetch(
-					`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
+					`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
 						jwtPayload.username
 					)}&addresseeName=${router.query.username}`,
 					{
@@ -76,7 +76,7 @@ export default function Name({ FirstName,
 
 		try {
 			const response = await fetch(
-				`http://localhost:4000/friendship/${blockString}?requesterName=${encodeURIComponent(
+				`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/friendship/${blockString}?requesterName=${encodeURIComponent(
 					jwtPayload.username
 				)}&addresseeName=${router.query.username}`,
 				{

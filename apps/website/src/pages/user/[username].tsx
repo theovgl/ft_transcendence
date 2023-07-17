@@ -62,7 +62,7 @@ export default function Profile() {
 		const updateBlockStatus = async () => {
 			try {
 				const statusResponse = await fetch(
-					`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
+					`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
 						jwtPayload.username
 					)}&addresseeName=${router.query.username}`,
 					{
@@ -102,7 +102,7 @@ export default function Profile() {
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 
 		const response = await fetch(
-			`http://localhost:4000/friendship/${route}?requesterName=${encodeURIComponent(
+			`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/friendship/${route}?requesterName=${encodeURIComponent(
 				jwtPayload.username
 			)}&addresseeName=${router.query.username}`, {
 				method: 'GET',
@@ -126,7 +126,7 @@ export default function Profile() {
 		const fetchUserInfo = async () => {
 		try {
 				await fetch(
-					`http://localhost:4000/users/${router.query.username}`, {
+					`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/${router.query.username}`, {
 						method: 'GET',
 						headers: {
 							'Content-Type': 'application/json',
