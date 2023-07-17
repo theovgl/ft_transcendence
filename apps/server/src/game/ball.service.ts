@@ -97,6 +97,7 @@ export class BallService {
           server.to(room).emit("ball-moved", this.percentagePos);
           if (this.scoreLeft >= 10 || this.scoreRight >= 10)
           {
+            this.updateGameResult();
             this.unsetBallLoop();
           }
         }, ms);
@@ -127,20 +128,24 @@ export class BallService {
     })
   }
 
-  //désactiver la boucle lorsque la partie est terminée
-  public unsetBallLoop() {
+  private updateGameResult()
+  {
     if (this.scoreLeft > this.scoreRight)
       this.winnerId = this.pOneId;
     else
       this.winnerId = this.pTwoId;
     this.updateHistory(this.pOneId);
     this.updateHistory(this.pTwoId);
+  }
+  //désactiver la boucle lorsque la partie est terminée
+  public unsetBallLoop() {
     clearInterval(this.interval);
     clearInterval(this.collectibleInterval);
   }
 
   public  forfeit()
   {
+    this.updateGameResult();
     this.unsetBallLoop();
     this.forfeited = true;
     this.pOneSocket.emit('forfeit');
