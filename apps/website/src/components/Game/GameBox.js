@@ -6,7 +6,7 @@ import Character from './Character.js';
 import GameManager from './GameManager';
 import Collectible from './Collectible';
 
-const BASE_HEIGHT = 40;
+const BASE_HEIGHT = 10;
 
 const GameBox = (props) => {
     const playerRef = useRef(null);
