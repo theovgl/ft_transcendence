@@ -36,7 +36,7 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
                     ? client.handshake.query.premade[0]
                     : client.handshake.query.premade.toString();
         console.log(`User Connected: ${client.handshake.query.userId}`);
-        if (premade !== "" && premade !== undefined) {
+        if (premade !== "" && typeof premade !== 'undefined') {
             console.log("premade with: " + premade);
             //ajouter au pool de premades
             //la pool à une id

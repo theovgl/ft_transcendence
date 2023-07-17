@@ -20,26 +20,29 @@ const GameManager =  React.forwardRef((props, ref) =>  {
       {
         props.socket.on('forfeit', () => {
           setForfeit(true);
+          setTimer(0);
           props.socket.disconnect();
         })
       }
     }, [forfeit, props.socket])
+    
     useEffect(() => {
         let intervalId;
         if (timer > 0)
         {
-            if (props.socket === null)
-            {
-              intervalId = setInterval(() => {
-                setTimer(timer - 1);
-              }, 1000);
-            }
-            if (ref.current)
-                ref.current.innerText = "Ready \n\t " + timer
+          if (props.socket === null)
+          {
+            intervalId = setInterval(() => {
+              setTimer(timer - 1);
+            }, 1000);
+          }
+          if (ref.current)
+              ref.current.innerText = "Ready \n\t " + timer
+          return () => clearInterval(intervalId);
         }
         else if (ref.current && !ref.current.innerText.includes("Click to play"))
         {
-            intervalId = setInterval(() => {
+            const score_intervalId = setInterval(() => {
                 if (props.scoreRight.current && props.scoreRight.current.innerText === "10")
                     ref.current.innerText = "J2 wins ! \n Click to quit"
                 else if (props.scoreLeft.current && props.scoreLeft.current.innerText === "10")
@@ -49,8 +52,8 @@ const GameManager =  React.forwardRef((props, ref) =>  {
                 else if (ref.current && ref.current.innerText)
                     ref.current.innerText = ""
             }, 10);
+            return () => clearInterval(score_intervalId);
         }
-        return () => clearInterval(intervalId);
       }, [timer, ref, props.scoreLeft, props.scoreRight, forfeit, props.socket]);
 
       const HandleReplay = () => { 
