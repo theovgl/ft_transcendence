@@ -11,8 +11,16 @@ import Statistics from '@/components/UserProfile/Statistics';
 import Match from '@/components/UserProfile/Match';
 import { useCookies } from 'react-cookie';
 import type { UserInfos } from 'global';
+import jwtDecode from 'jwt-decode';
 import Head from 'next/head';
-import { useUser } from '@/utils/hooks/useUser';
+
+type jwtType = {
+	userId: number;
+	email: string;
+	username: string;
+	iat: number;
+	exp: number;
+}
 
 export default function Profile() {
 	const router = useRouter();
@@ -21,7 +29,6 @@ export default function Profile() {
 	const [buttonText, setButtonText] = useState<string>('');
 	const [status, setStatus] = useState<string>('');
 	const [isBlocked, setIsBlocked] = useState(false);
-	const { user } = useUser();
 
 	function updateButtonState(response: string) {
 		if (response === 'ACCEPTED')
@@ -32,10 +39,12 @@ export default function Profile() {
 			setButtonText('Blocked');
 		else if (response === 'RECEIVED')
 			setButtonText('Accept request');
-		else if (response === 'EDIT')
+		else if (response === 'EDIT') {
 			setButtonText('Edit profile');
-		else
+		}
+		else {
 			setButtonText('Add friend');
+		}
 		setStatus(response);
 	}
 
@@ -44,15 +53,17 @@ export default function Profile() {
 		updateButtonState(status);
 	}
 
+
 	// This useEffect is used to update the button text when the user changes as blocked or unblocked
 	useEffect(() => {
 		if (!router.isReady) return;
 
+		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 		const updateBlockStatus = async () => {
 			try {
 				const statusResponse = await fetch(
 					`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
-						user!.name
+						jwtPayload.username
 					)}&addresseeName=${router.query.username}`,
 					{
 						method: 'GET',
@@ -88,10 +99,11 @@ export default function Profile() {
 			route = 'unblock';
 			toggleBlockStatus();
 		}
+		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 
 		const response = await fetch(
 			`http://localhost:4000/friendship/${route}?requesterName=${encodeURIComponent(
-				user!.name
+				jwtPayload.username
 			)}&addresseeName=${router.query.username}`, {
 				method: 'GET',
 				headers: {
@@ -100,7 +112,7 @@ export default function Profile() {
 				},
 			});
 		let responseText = await response.text();
-		if (encodeURIComponent(user!.name) === router.query.username)
+		if (encodeURIComponent(jwtPayload.username) === router.query.username)
 			responseText = 'EDIT';
 		setStatus(responseText);
 	}
@@ -108,6 +120,8 @@ export default function Profile() {
 	// Verify if the user exists and setUserInfo. Fetch the relationship status between the user and the profile owner and set the button text
 	useEffect(() => {
 		if (!router.isReady) return;
+
+		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 
 		const fetchUserInfo = async () => {
 		try {
@@ -133,7 +147,7 @@ export default function Profile() {
 						setUserInfo(response);
 					});
 				const statusResponse = await fetch(`http://localhost:4000/friendship/getRelationship?requesterName=${encodeURIComponent(
-					user!.name
+					jwtPayload.username
 				)}&addresseeName=${router.query.username}`, {
 					method: 'GET',
 					headers: {
@@ -151,7 +165,7 @@ export default function Profile() {
 					buttonText = 'Blocked';
 				else if (status === 'RECEIVED')
 					buttonText = 'Accept request';
-				else if (user?.name === router.query.username) {
+				else if (encodeURIComponent(jwtPayload.username) === router.query.username) {
 					status = 'EDIT';
 					buttonText = 'Edit profile';
 				}
