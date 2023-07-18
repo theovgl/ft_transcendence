@@ -122,6 +122,52 @@ export class ChatService implements OnModuleInit {
 	// return { msg: 'New message created'};
   }
 
+//	CreateDM(client: socket, payload: string)
+//	create room name
+//  createroom(roomname)
+//	joinroo
+
+//if no user delete the room (in app.gateway)
+//listen to an Event leaveRoom(in app.gateway)
+
+//leaveRoom(client: socket)
+//delete from the users array in room entry
+//emit to leave the room in front-end
+
+//	deleteRoom(roomName)
+// find room
+// delete room
+
+//add room status in Room model in prisma schema
+//add behaviours depending on status in loadRoom
+
+//add password in Room model
+//add pssword behaviour in loadRoom
+
+//Checkpassword(payload)
+//Modifypassword(payload)
+//Deletepassword(payload)
+
+//blocked messages behaviour will be on front end
+
+//Owner
+//add owner in Room model
+//add admin which is an array of users in Room model
+//if owner quits, the next admin become owner
+//if no other admin, make the next user an owner and admin
+
+//Kick
+//Use the leaveRoom function
+
+//Ban
+//Same as Kick + ajouter au tableau Banned users
+//add a banned users array in Room model
+//add a check in loadRoom to prevent bannedusers to join
+
+//Mute
+//Add a muted users array in Room model
+//Prevent muted users to storeMessage
+
   getHello(): string {
     return 'Hello World!';
   }
