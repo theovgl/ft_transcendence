@@ -23,6 +23,8 @@ model User {
   friendRequest  Friendship[] @relation("addressee")
   twoFAEnabled   Boolean @default(false)
   twoFASecret    String?
+  games Game[]
+  @@map("Users")
   messages       Message[]
   talks         Talk[]
 }
@@ -60,6 +62,20 @@ model Friendship {
   addresseeId Int
   status      FriendshipStatus @default(PENDING)
   @@id([requesterId, addresseeId])
+}
+
+model Game {
+  id                 Int @id @default(autoincrement())
+
+  scorePlayerOne     String
+  scorePlayerTwo     String
+  winnerId           String
+  userIdLeft         String
+  userIdRight        String
+  userId             Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("Games")
 }
 
 enum FriendshipStatus {

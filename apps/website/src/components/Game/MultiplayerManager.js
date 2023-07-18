@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import GameBox from './GameBox';
 import io from 'socket.io-client'
 import WaitingBox from './WaitingBox'
+import { useUser } from '@/utils/hooks/useUser';
 
 const STARTPOS_Y = 200;
 const STARTPOS_X = 860;
@@ -9,10 +10,11 @@ const ONLINEMODE = 0;
 const PLAYERMODE = 2;
 
 const MultiplayerManager = (props) => {
+
     const [infos, setInfos] = useState({
         opponentX: STARTPOS_X,
         opponentY: STARTPOS_Y,
-        userId: Math.floor(Math.random() * 9999) + 1,
+        userId: props.userId,
         matchFound: false,
         rightPlayer: ONLINEMODE,
         leftPlayer: PLAYERMODE,

@@ -40,8 +40,8 @@ const GameModeManager = (props) => {
             <ButtonOnline onClick={() => onClickButton("Online")} disabled={clicked}>Online</ButtonOnline>
         { clicked ?
             (mode === "Special"?
-            <MultiplayerManager height={props.height} width={props.width} quitEvent={handleQuit} mode={"Special"} premadeId={router.query.premadeId}></MultiplayerManager>
-            : <MultiplayerManager height={props.height} width={props.width} quitEvent={handleQuit} mode={"Normal"} premadeId={router.query.premadeId}></MultiplayerManager>)
+            <MultiplayerManager height={props.height} width={props.width} quitEvent={handleQuit} mode={"Special"} userId={router.query.userId} premadeId={router.query.premadeId}></MultiplayerManager>
+            : <MultiplayerManager height={props.height} width={props.width} quitEvent={handleQuit} mode={"Normal"} userId={router.query.userId} premadeId={router.query.premadeId}></MultiplayerManager>)
             : ""
         }
         </GameModeManagerDiv>

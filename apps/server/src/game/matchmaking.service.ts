@@ -1,12 +1,19 @@
 import { Server, Socket } from 'socket.io';
 import { Injectable } from "@nestjs/common";
 import { BallService } from './ball.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 const ONLINEMODE = 0;
 const PLAYERMODE = 2;
 
 @Injectable()
 export class MatchmakingService {
+  
+  
+  constructor(
+		private prisma: PrismaService,
+	) {}
+
   private waitingPlayers = new Map<string, Socket>();
   private waitingPlayerSpecial = new Map<string, Socket>();
   private premadePlayers = new Map<string, [string, Socket]>();
@@ -67,7 +74,7 @@ export class MatchmakingService {
       playerOne.socket.emit('game-start', PLAYERMODE, ONLINEMODE);
       playerTwo.socket.emit('game-start', ONLINEMODE, PLAYERMODE);
       //launch the game
-      const newBallService = new BallService();
+      const newBallService = new BallService(this.prisma);
       this.ballServices.add(newBallService);
       newBallService.setBallLoop(server, playerOne, playerTwo, room, 1, mode);
       //remove the player
@@ -93,7 +100,7 @@ export class MatchmakingService {
       if (ballService.containSocket(socket))
       {
         console.log("delete ballservice");
-        ballService.forfeit();
+        ballService.forfeit(socket);
         this.ballServices.delete(ballService)
         return ;
       }
@@ -128,7 +135,7 @@ export class MatchmakingService {
       playerOne.socket.emit('game-start', PLAYERMODE, ONLINEMODE);
       playerTwo.socket.emit('game-start', ONLINEMODE, PLAYERMODE);
   
-      const newBallService = new BallService();
+      const newBallService = new BallService(this.prisma);
       this.ballServices.add(newBallService);
       newBallService.setBallLoop(server, playerOne, playerTwo, room, 1, mode);
     }

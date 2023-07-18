@@ -5,16 +5,16 @@ import Navbar from '@/components/Navbar';
 import Head from 'next/head';
 import Button from '@/components/Button/Button';
 import { useRouter } from 'next/router';
-import { useAuth } from '@/utils/hooks/useAuth';
+import { useUser } from '@/utils/hooks/useUser';
 
 export default function Home(props: any) {
 	const router = useRouter();
-	const socket = useAuth();
-	
+	const { user } = useUser();
+
 	const onButtonClick = () => {
 		router.push({
 			pathname: '/game',
-			query: {premade: true, premadeId: "20305", premadeMode: "Normal", userId: "", sock: socket} 
+			query: {premade: true, premadeId: "20305", premadeMode: "Normal", userId: user?.name}
 		});
 	};
 
