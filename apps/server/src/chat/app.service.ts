@@ -100,20 +100,25 @@ export class ChatService implements OnModuleInit {
 		}
 	})
 
-	console.log(author)
-	console.log(room)
-	const message = await this.prisma.message.create({
-	  data: {
-		content: payload.message,
-		authorId: author.id,
-		roomId: room.id,
-	  },
-	  include: {
-		author: true,
-		room: true,
-	},
-	});
-	return message;
+	if (!author || !room)
+	{
+		console.log("author or room not found");
+	}
+	else {
+		const message = await this.prisma.message.create({
+		data: {
+			content: payload.message,
+			authorId: author.id,
+			roomId: room.id,
+		},
+		include: {
+			author: true,
+			room: true,
+		},
+		});
+		return message;
+	}
+
 	// return { msg: 'New message created'};
   }
 

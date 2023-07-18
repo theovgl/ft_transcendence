@@ -24,15 +24,33 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.matchmakingService.startMatchmaking(this.server);
     }
     //connexion
-    handleConnection(client: Socket){
-       console.log(`Socket Connected: ${client.id}`);
-        let userId: string = Array.isArray(client.handshake.query.userId)
+    handleConnection(client: Socket){}
+
+    handleDisconnect(client: Socket){}
+
+    @SubscribeMessage('quit')
+    handleQuit(@MessageBody() data: string, @ConnectedSocket() client: Socket){
+        console.log(`Socket Disconnected: ${client.id}`);
+        this.matchmakingService.removePlayer(client, this.clientModeList.get(client), this.playersId.get(client))
+        this.matchmakingService.removePremadePlayer(this.RoomsId.get(client));
+        this.RoomsId.delete(client);
+        this.clientModeList.delete(client);
+        this.playersId.delete(client);
+        this.matchmakingService.deleteBallService(client)
+    }
+
+    //matchmaking even
+    @SubscribeMessage('matchmaking')
+    startMathmaking(@MessageBody() data: string, @ConnectedSocket() client: Socket)
+    {
+        console.log(`Socket Connected: ${client.id}`);
+        const userId: string = Array.isArray(client.handshake.query.userId)
                     ? client.handshake.query.userId[0]
                     : client.handshake.query.userId.toString();
-        let mode: string = Array.isArray(client.handshake.query.mode)
+        const mode: string = Array.isArray(client.handshake.query.mode)
                     ? client.handshake.query.mode[0]
                     : client.handshake.query.mode.toString();
-        let premade: string = Array.isArray(client.handshake.query.premade)
+        const premade: string = Array.isArray(client.handshake.query.premade)
                     ? client.handshake.query.premade[0]
                     : client.handshake.query.premade.toString();
         console.log(`User Connected: ${client.handshake.query.userId}`);
@@ -49,19 +67,8 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
             this.matchmakingService.addPlayer(client, mode, userId)
         }
        
-        client.emit('searching');           
-    }
-
-    handleDisconnect(client: Socket){
-        console.log(`Socket Disconnected: ${client.id}`);
-        this.matchmakingService.removePlayer(client, this.clientModeList.get(client), this.playersId.get(client))
-        this.matchmakingService.removePremadePlayer(this.RoomsId.get(client));
-        this.RoomsId.delete(client);
-        this.clientModeList.delete(client);
-        this.playersId.delete(client);
-        this.matchmakingService.deleteBallService(client)
-    }
-
+        client.emit('searching');
+    }   
     //multiplayer event
     @SubscribeMessage('multiplayer')
     handleMatchmaking(@MessageBody() data: string, @ConnectedSocket() client: Socket){

@@ -36,7 +36,7 @@ const MultiplayerManager = (props) => {
         
         
         window.addEventListener('beforeunload', () => {
-            socket.disconnect();
+            socket.emit('quit');
           });
         
         // Listen to the 'connect' event
@@ -76,11 +76,11 @@ const MultiplayerManager = (props) => {
         // Clean up the event listeners when the component unmounts
         return () => {
             window.removeEventListener('beforeunload', () => {
-                socket.disconnect();
+                socket.emit('quit');
               });
            socket.off('connect');
            socket.off('opponentMoved');
-           socket.disconnect();
+           //socket.emit('quit');
         };
      }, [infos.userId]);
 
