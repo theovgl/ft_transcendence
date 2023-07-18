@@ -5,7 +5,7 @@ import PrivateRoute from '@/components/privateRoute';
 
 export default function App({ Component, pageProps }: AppProps) {
 
-	const protectedRoutes = ['/user/[username]', '/game', '/chat'];
+	const protectedRoutes = ['/user/[username]', '/game', '/chat', '/'];
 	return (
 		<AuthProvider>
 			<PrivateRoute protectedRoutes={protectedRoutes}>
