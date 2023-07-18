@@ -14,7 +14,7 @@ import {Message} from './app.interface';
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 
-@WebSocketGateway({cors: {origin: ['https://hoppscotch.io', 'http://localhost:3000', 'http://localhost:4000']}})
+@WebSocketGateway({cors: {origin: ['https://hoppscotch.io', `http://${process.env.IP_ADDRESS}:3000`, `http://${process.env.IP_ADDRESS}:4000`]}})
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(private readonly chatService: ChatService) {}
  @WebSocketServer() server: Server;
@@ -51,13 +51,13 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
  }
 
  handleConnection(client: Socket, ...args: any[]) {
-	setTimeout(() => {
-		this.chatService.userConnection(client, 'General');		
-	}, 150);
-	// client.emit('userConnected')
-	// Put user in General chat
-	// Get messages from General
-	// Emit the messages
-  this.logger.log(`Client connected: ${client.id}`);
+// 	setTimeout(() => {
+// 		this.chatService.userConnection(client, 'General');		
+// 	}, 150);
+// 	// client.emit('userConnected')
+// 	// Put user in General chat
+// 	// Get messages from General
+// 	// Emit the messages
+//   this.logger.log(`Client connected: ${client.id}`);
  }
 }

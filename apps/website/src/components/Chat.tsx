@@ -36,7 +36,7 @@ interface SocketData {
 
 
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
-socket = io( "http://localhost:4000" );
+socket = io( `http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000` );
 
 export default function Chat()
 {
