@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { MessageDto } from './dto';
 import { Socket } from 'socket.io';
 import { Message } from './app.interface';

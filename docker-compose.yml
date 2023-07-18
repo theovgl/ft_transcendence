@@ -5,10 +5,9 @@ volumes:
   uploads:
 
 networks:
-  backend:
+  transcendence:
 
 services:
-# FRONTEND
   front:
     container_name: frontend
     build:
@@ -20,9 +19,12 @@ services:
       NODE_ENV: development
     volumes:
       - ./apps/website:/app
+      - uploads:/app/uploads
     ports:
       - "3000:3000"
     restart: unless-stopped
+    networks:
+      - transcendence
     depends_on:
       - backend
 
@@ -30,33 +32,30 @@ services:
     image: postgres:13
     container_name: postgres
     ports:
-      - 5435:5432
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: nest
+      - 5432:5432
+    env_file: ./apps/server/.env
     networks:
-      - backend
+      - transcendence
 
   backend:
     build:
       context: ./apps/server/
       target: dev
     container_name: backend
-    command: npm run start:dev
+    stdin_open: true
+    tty: true
+    command: sh -c "npx prisma migrate dev --name migration && npm run start:dev"
     entrypoint: ./docker-entrypoint.sh
-    environment:
-      - POSTGRES_PASSWORD=123
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=nest
+    env_file: ./apps/server/.env
     volumes:
       - ./apps/server:/app
+      - uploads:/app/uploads
     ports:
       - "4000:4000"
       - "5555:5555"
     restart: unless-stopped
     networks:
-      - backend
+      - transcendence
     depends_on:
       - database
 

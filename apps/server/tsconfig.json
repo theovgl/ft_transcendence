@@ -11,8 +11,9 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@nestjs/*": ["node_modules/@nestjs/*"]
-    },  
+      "@nestjs/*": ["node_modules/@nestjs/*"],
+      "*": ["types/*.d.ts"]
+    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,

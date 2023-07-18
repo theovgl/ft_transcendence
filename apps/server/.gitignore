@@ -17,6 +17,7 @@ lerna-debug.log*
 # Tests
 /coverage
 /.nyc_output
+wip
 
 # IDEs and editors
 /.idea
@@ -36,3 +37,6 @@ lerna-debug.log*
 
 # Env files
 .env
+
+# Prisma
+prisma/migrations

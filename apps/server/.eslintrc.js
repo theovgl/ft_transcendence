@@ -25,8 +25,9 @@ module.exports = {
 		'brace-style': [ 'error', '1tbs' ],
 		'quotes': [ 'error', 'single' ],
 		'linebreak-style': [ 'error', 'unix' ],
-		'arrow-body-style': ['error', 'always'],
 		'curly': ['error', 'multi-or-nest'],
 		'no-multiple-empty-lines': ['error', { max: 1 }],
+		"keyword-spacing": ["error", { "after": true, "before": true }],
+
 	},
 };

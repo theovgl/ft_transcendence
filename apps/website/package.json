@@ -12,14 +12,21 @@
     "@types/node": "18.15.11",
     "@types/react": "18.0.35",
     "@types/react-dom": "18.0.11",
-    "socket.io-client": "",
-    "socket.io": "",
+    "socket.io": "^4.7.1",
     "eslint": "8.38.0",
     "eslint-config-next": "13.3.0",
+    "jwt-decode": "^3.1.2",
     "next": "13.3.0",
+    "normalize.css": "^8.0.1",
     "react": "18.2.0",
+    "react-cookie": "^4.1.1",
     "react-dom": "18.2.0",
-    "socket.io-client": "^4.6.1",
-    "typescript": "5.0.4"
+    "react-hook-form": "^7.44.3",
+    "react-icons": "^4.8.0",
+    "sass": "^1.62.1",
+    "socket.io-client": "^4.7.1",
+    "styled-components": "^6.0.3",
+    "typescript": "5.0.4",
+    "universal-cookie": "^4.0.4"
   }
 }
