@@ -1,38 +1,101 @@
-import LabeledInput from './LabeledInput';
 import styles from './EditUserForm.module.scss';
 import React from 'react';
-import { useForm, SubmitHandler, ValidationRule } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import Button from '../Button/Button';
-import { BiSave } from 'react-icons/bi';
-
-const emailRegex: ValidationRule<RegExp> = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g;
+import { BiPencil, BiSave } from 'react-icons/bi';
+import FormLabel from './FormLabel';
+import { useUser } from '@/utils/hooks/useUser';
+import jwtDecode from 'jwt-decode';
+import { useCookies } from 'react-cookie';
 
 interface IFormValues {
-	'Email': string;
-	'First Name': string;
-	'Last Name': string;
+	'Nickname': string;
+	'ProfilePic': FileList;
+}
+
+type jwtType = {
+	userId: number;
+	email: string;
+	username: string;
+	iat: number;
+	exp: number;
 }
 
 export default function EditUserForm() {
-	const { register, handleSubmit } = useForm<IFormValues>();
+	const [cookies] = useCookies();
+	const { user } = useUser();
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm<IFormValues>();
 
-	const onSubmit: SubmitHandler<IFormValues> = data => (
-		console.log(data)
-	);
+	// const onSubmit: SubmitHandler<IFormValues> = (data: any) => {
+	// 	if (!data) return;
+
+	// 	if (data.Nickname) {
+	// 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
+	// 		const lowerNickname = data.Nickname.toLowerCase();
+	// 		console.log('nickname', lowerNickname);
+	// 		console.log('payload', jwtPayload);
+
+	// 		try {
+	// 			fetch(`http://localhost:4000/users/edit?requesterName=${encodeURIComponent(
+	// 				jwtPayload.username
+	// 			)}`, {
+	// 				method: 'POST',
+	// 				headers: {
+	// 					'Content-Type': 'application/json',
+	// 					Authorization: 'Bearer ' + cookies['jwt'],
+	// 				},
+	// 			});
+	// 		} catch (error) {
+	// 			console.error(error);
+	// 		}
+	// 	}
+	// };
 
 	return (
 		<form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
 			<div className={styles.formSection}>
-				<LabeledInput label='First Name' register={register} required/>
-				<LabeledInput label='Last Name' register={register} required/>
+				<FormLabel content='Profile picture '/>
+				<input
+					className={styles.inputFile}
+					type="file"
+					id="picture"
+					accept='image/png, image/jpeg'
+					{...register('ProfilePic')}
+				/>
+				<label
+					className={styles.inputLabel}
+					htmlFor="picture"
+					style={{
+						backgroundImage: `
+							url(${user ? user.profilePic : '/default_profil_picture.jpg'})
+						`,
+						backgroundPosition: 'center',
+						backgroundSize: 'cover',
+						position: 'relative',
+					}}
+				>
+					<BiPencil className={styles.inputIcon} />
+				</label>
 			</div>
 			<div className={styles.formSection}>
-				<LabeledInput
-					label='Email'
-					register={register}
-					pattern={emailRegex}
-					required
-				/>
+				<FormLabel content='Change nickname' />
+				<div className={styles.labeledInput_container}>
+					<input
+						className={styles.input}
+						type='text'
+						placeholder='Change nickname'
+						{...register('Nickname', {
+							maxLength: {
+								value: 32,
+								message: 'Nickname cannot be longer than 32 characters'
+							}
+						})}
+					/>
+				</div>
 			</div>
 			<Button
 				text='Save changes'
