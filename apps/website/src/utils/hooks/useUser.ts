@@ -23,7 +23,7 @@ export const useUser = () => {
 			if (user)
 				setUser(user);
 		}
-	}, []);
+	}, [getItem('user')]);
 
 	const addUser = (user: User) => {
 		setUser(user);

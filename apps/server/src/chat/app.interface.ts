@@ -16,6 +16,7 @@ export interface ClientToServerEvents {
 	hello: () => void;
 	msgToServer: (msg: Message) => void;
 	ChangeRoomfromClient: (payload: string) => void;
+	UserConnection: (payload: string) => void;
 }
 
 export interface InterServerEvents {
