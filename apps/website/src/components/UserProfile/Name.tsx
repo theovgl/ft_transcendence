@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { BiBlock } from 'react-icons/bi';
+import UserStatus from '@/components/UserStatus';
 
 interface IName {
 	FirstName: string;
@@ -112,6 +113,7 @@ export default function Name({ FirstName,
 				</span>
 			</p>
 			<p className={styles.username}>{'@' + Username}</p>
+			<UserStatus currentUser={Username} />
 		</div>
 	);
 }

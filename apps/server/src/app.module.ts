@@ -11,12 +11,13 @@ import { GameModule } from './game/game.module';
 import { ChatController } from './chat/app.controller';
 import { ChatService } from './chat/app.service';
 import { ChatGateway } from './chat/app.gateway';
+import { StatusModule } from './status/status.module';
 
 @Module({
 	imports: [AuthModule, UserModule, PrismaModule, GameModule, FriendshipModule, MulterModule.register({
 		storage: memoryStorage()
 	}),
-	UserModule, PrismaModule, LeaderboardModule,
+	UserModule, PrismaModule, LeaderboardModule, StatusModule,
 	ConfigModule.forRoot({
 		isGlobal: true
 	}),],
