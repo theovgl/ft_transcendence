@@ -3,8 +3,6 @@ import GameModeManager from "../components/Game/GameModeManager";
 import FieldImg from '../components/Game/img/Field.png';
 import React from 'react';
 import Navbar from '@/components/Navbar';
-import { useRouter } from 'next/router';
-import MultiplayerManager from '@/components/Game/MultiplayerManager';
 
 const GAME_WIDTH = 991;
 const GAME_HEIGHT = 678;

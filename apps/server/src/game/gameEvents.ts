@@ -41,19 +41,19 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     //matchmaking even
     @SubscribeMessage('matchmaking')
-    startMathmaking(@MessageBody() data: string, @ConnectedSocket() client: Socket)
+    startMathmaking(@MessageBody() data, @ConnectedSocket() client: Socket)
     {
         console.log(`Socket Connected: ${client.id}`);
-        const userId: string = Array.isArray(client.handshake.query.userId)
-                    ? client.handshake.query.userId[0]
-                    : client.handshake.query.userId.toString();
-        const mode: string = Array.isArray(client.handshake.query.mode)
-                    ? client.handshake.query.mode[0]
-                    : client.handshake.query.mode.toString();
-        const premade: string = Array.isArray(client.handshake.query.premade)
-                    ? client.handshake.query.premade[0]
-                    : client.handshake.query.premade.toString();
-        console.log(`User Connected: ${client.handshake.query.userId}`);
+        const userId: string = Array.isArray(data.query.userId)
+                    ? data.query.userId[0]
+                    : data.query.userId.toString();
+        const mode: string = Array.isArray(data.query.mode)
+                    ? data.query.mode[0]
+                    : data.query.mode.toString();
+        const premade: string = Array.isArray(data.query.premade)
+                    ? data.query.premade[0]
+                    : data.query.premade.toString();
+        console.log(`User Connected: ${data.query.userId}`);
         if (premade !== "" && typeof premade !== 'undefined') {
             console.log("premade with: " + premade);
             //ajouter au pool de premades
@@ -65,21 +65,7 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
             this.clientModeList.set(client, mode);
             this.playersId.set(client, userId)
             this.matchmakingService.addPlayer(client, mode, userId)
-        }
-       
+        } 
         client.emit('searching');
-    }   
-    //multiplayer event
-    @SubscribeMessage('multiplayer')
-    handleMatchmaking(@MessageBody() data: string, @ConnectedSocket() client: Socket){
-
     }
-
-    //message event
-    @SubscribeMessage('message')
-    handleMessage(@MessageBody() data: string, @ConnectedSocket() client: Socket){
-        console.log("message received : " + data)
-        this.server.emit('chat', client.id, data);
-    }
-
 }

@@ -3,6 +3,7 @@ import GameBox from './GameBox';
 import io from 'socket.io-client'
 import WaitingBox from './WaitingBox'
 import { useUser } from '@/utils/hooks/useUser';
+import { useAuth } from '@/utils/hooks/useAuth';
 
 const STARTPOS_Y = 200;
 const STARTPOS_X = 860;
@@ -20,18 +21,19 @@ const MultiplayerManager = (props) => {
         leftPlayer: PLAYERMODE,
         connected: false
     })
-
+    const UseAuth = useAuth();
     const socketRef = useRef(null);
 
     useEffect(() => {
         
-        const socket=io.connect(`ws://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000`, {
-            query: {
-                userId: infos.userId,
-                mode: props.mode,
-                premade: props.premadeId
-            }
-          })
+        const socket = UseAuth.socket;
+        // io.connect(`ws://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000`, {
+        //     query: {
+        //         userId: infos.userId,
+        //         mode: props.mode,
+        //         premade: props.premadeId
+        //     }
+        //   })
           socketRef.current = socket;
         
         
@@ -42,7 +44,13 @@ const MultiplayerManager = (props) => {
         // Listen to the 'connect' event
         socket.on('connect', () => {
             console.log('Connected to socket.io server');
-           // console.log('User Id :' + infos.userId);
+            socket.emit('matchmaking', {
+              query: {
+                userId: infos.userId,
+                mode: props.mode,
+                premade: props.premadeId
+              }
+            });
             setInfos(prevInfos => ({
               ...prevInfos,
               connected: true,
@@ -80,7 +88,7 @@ const MultiplayerManager = (props) => {
               });
            socket.off('connect');
            socket.off('opponentMoved');
-           //socket.emit('quit');
+           socket.emit('quit');
         };
      }, [infos.userId]);
 

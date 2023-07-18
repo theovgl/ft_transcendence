@@ -4,6 +4,8 @@ import Contact from "@/components/Contact.tsx";
 import { io, Socket } from "socket.io-client";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/router';
+import { useUser } from "@/utils/hooks/useUser";
+import { useAuth } from "@/utils/hooks/useAuth";
 
 
 type Message = {
@@ -35,19 +37,21 @@ interface SocketData {
 }
 
 
-let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
-socket = io( `http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000` );
+// let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+// socket = io( `http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000` );
 
 export default function Chat()
 {
+  const { user } = useUser();
+  const { socket } = useAuth();
   const [username, setUsername] = useState("");
-  const [chosenUsername, setChosenUsername] = useState("mtogbe");
+  const [chosenUsername, setChosenUsername] = useState("");
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [rooms, setRooms] = useState<Array<String>>([]);
   const [room, setRoom] = useState("General");
 
-	let [tabList, setTablist] = useState([	
+  let [tabList, setTablist] = useState([	
 					{
 						label:"General",
 						active:true,
@@ -61,13 +65,21 @@ export default function Chat()
 	]);
 
 	useEffect(() => {
-		socketInitializer();
+		if (user)
+		{
+			setChosenUsername(user.name);
+			if (socket)
+			{
+				socketInitializer();
+				socket.emit("UserConnection");
+			}
+		}
 		
 		// socket.emit('ChangeRoomFromClient', room);
 		return () => {
 			socket.off('msgToClient');
 		  };
-  	}, [room]);
+  	}, [room, user, socket]);
 
 	const socketInitializer = async () => {
     socket.on("msgToClient", (msg: Message) => {

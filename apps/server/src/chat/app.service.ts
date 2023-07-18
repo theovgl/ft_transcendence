@@ -66,7 +66,6 @@ export class ChatService implements OnModuleInit {
 				channel: message.room.name,
 				message: message.content
 			};
-			console.log("oui message");
 			client.emit('msgToClient', msg);
 		});
 	}
@@ -89,6 +88,7 @@ export class ChatService implements OnModuleInit {
 
   async storeMessage(payload) {
 	console.log("channel name : " + payload.channel);
+	console.log("author name: " + payload.author);
 	const author = await this.prisma.user.findUnique({
 		where: {
 			name: payload.author,

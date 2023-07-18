@@ -29,9 +29,7 @@ const GameModeManager = (props) => {
     }, [router.query.premade, router.query.premadeMode]);
 
     const handleQuit = () => {
-        console.log("Quit");
-        setClicked(() => {return false});
-        setMode("");
+       router.push('/');
     }
 
     return (
