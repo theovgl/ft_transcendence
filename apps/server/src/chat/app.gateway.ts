@@ -42,9 +42,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
  }
 
  @SubscribeMessage('UserConnection')
- handleUserConnection(client: Socket){
+ handleUserConnection(client: Socket, payload: string){
 	setTimeout(() => {
-		this.chatService.userConnection(client, 'General');		
+		this.chatService.userConnection(client, 'General', payload);		
 	}, 150);
 	// client.emit('userConnected')
 	// Put user in General chat
@@ -60,6 +60,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
  handleDisconnect(client: Socket) {
   this.logger.log(`Client disconnected: ${client.id}`);
+  this.chatService.userDisconnection(client)
  }
 
  handleConnection(client: Socket, ...args: any[]) {

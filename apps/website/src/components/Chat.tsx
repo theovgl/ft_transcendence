@@ -71,18 +71,18 @@ export default function Chat()
 			if (socket)
 			{
 				socketInitializer();
-				socket.emit("UserConnection");
+				socket.emit("UserConnection", user.name);
 			}
 		}
-		
 		// socket.emit('ChangeRoomFromClient', room);
 		return () => {
 			socket.off('msgToClient');
-		  };
-  	}, [room, user, socket]);
+		};
+  	}, [user, socket]);
 
 	const socketInitializer = async () => {
-    socket.on("msgToClient", (msg: Message) => {
+		socket.off('msgToClient');
+		socket.on("msgToClient", (msg: Message) => {
 		if (msg.channel === room)
 		{
 			setMessages((currentMsg) => [

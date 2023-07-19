@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService, User, Room } from '../prisma/prisma.service';
 import { MessageDto } from './dto';
 import { Socket } from 'socket.io';
 import { Message } from './app.interface';
@@ -8,6 +8,7 @@ import { Message } from './app.interface';
 export class ChatService implements OnModuleInit {
   constructor(private prisma: PrismaService) {}
 
+  private clientList: Map<Socket, string> = new Map<Socket, string>()
   private currentRoomName = "";
   
   async onModuleInit()
@@ -39,6 +40,7 @@ export class ChatService implements OnModuleInit {
 		console.log("client leaving : " + this.currentRoomName);
 		console.log("client joining : " + room);
 	}
+	this.addUserToRoom(client, room)
 	client.leave(this.currentRoomName);
 	client.join(room);
 	this.currentRoomName = room;
@@ -77,28 +79,77 @@ export class ChatService implements OnModuleInit {
 	this.loadRoom(client, room);
   }
 
-  public async userConnection(client: Socket, room: string)
+  public async userConnection(client: Socket, room: string, payload: string)
   {
-	this.loadRoom(client, room)
+	this.clientList.set(client, payload);
+	this.loadRoom(client, room);
 	// await this.prisma.user.update({
 	// 	where: {
 	// 	},
 	// })
   }
 
+  public async userDisconnection(client: Socket)
+  {
+	this.clientList.delete(client)
+  }
+
+  async addUserToRoom(client: Socket, roomName: string) {
+	const user = await this.findUser(this.clientList.get(client));
+	const room = await this.findRoom(roomName);
+	
+	if (user && room)
+	{
+		if (
+		await this.prisma.talk.findUnique({
+			where: {
+				userId_roomId: {
+				  userId: user.id,
+				  roomId: room.id,
+				},
+			}
+		})
+		)
+			return ;
+		await this.prisma.talk.create({
+			data: {
+				userId: user.id,
+				roomId: room.id
+			}
+		})
+	}
+
+  }
+
+  async deleteUserFromRoom() {
+
+  }
+
+  async findUser(userName: string): Promise<User | null>
+  {
+	return (await this.prisma.user.findUnique({
+		where: {
+			name: userName,
+		}
+	}))
+  }
+
+  async	findRoom(roomName: string): Promise<Room | null>
+  {
+	return ( await this.prisma.room.findUnique({
+		where: {
+			name: roomName,
+		}
+	}))
+  }
+
   async storeMessage(payload) {
 	console.log("channel name : " + payload.channel);
 	console.log("author name: " + payload.author);
-	const author = await this.prisma.user.findUnique({
-		where: {
-			name: payload.author,
-		}
-	})
-	const room = await this.prisma.room.findUnique({
-		where: {
-			name: payload.channel,
-		}
-	})
+	
+	const author = await this.findUser(payload.author);
+
+	const room = await this.findRoom(payload.channel);
 
 	if (!author || !room)
 	{
@@ -122,11 +173,16 @@ export class ChatService implements OnModuleInit {
 	// return { msg: 'New message created'};
   }
 
-//	CreateDM(client: socket, payload: string)
+//	CreateDM(client: socket, payload: string + socket de l'autre user)
 //	create room name
 //  createroom(roomname)
-//	joinroo
+//	joinroom
 
+  public async createDm(client: Socket, payload)
+  {
+	this.createRoom(payload.roomName);
+	this.loadRoom(client, payload.roomName)
+  }
 //if no user delete the room (in app.gateway)
 //listen to an Event leaveRoom(in app.gateway)
 
