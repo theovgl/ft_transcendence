@@ -1,11 +1,12 @@
 import styles from './EditUserForm.module.scss';
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Button from '../Button/Button';
 import { BiPencil, BiSave } from 'react-icons/bi';
 import FormLabel from './FormLabel';
 import { useUser } from '@/utils/hooks/useUser';
 import { useCookies } from 'react-cookie';
+import { useRouter } from 'next/router';
 
 interface IFormValues {
 	'Nickname': string;
@@ -13,15 +14,16 @@ interface IFormValues {
 }
 
 export default function EditUserForm() {
+	const router = useRouter();
 	const [cookies] = useCookies();
 	const { user, editUser } = useUser();
-	const [hasChanged, setHasChanged] = useState(false);
 
 	const {
 		register,
 		setError,
 		handleSubmit,
-		formState: { errors },
+		formState,
+		formState: { errors, isSubmitSuccessful },
 	} = useForm<IFormValues>();
 
 	const saveNewDisplayName = (newDisplayName: string) => {
@@ -54,7 +56,6 @@ export default function EditUserForm() {
 			
 			saveNewDisplayName(lowerCaseName);
 		} catch (e: any) {
-			console.log(e.message);
 			if (e.message === 'Conflict') {
 				setError('Nickname', {
 					type: 'server',
@@ -85,10 +86,8 @@ export default function EditUserForm() {
 			});
 			if (response.ok) {
 				const responseJSON = await response.json();
-				console.log(responseJSON.imageID);
 				saveNewProfilPic(responseJSON.imageID);
 			}
-			console.log(response);
 		} catch (error) {
 			console.error(error);
 		}
@@ -98,20 +97,19 @@ export default function EditUserForm() {
 	const onSubmit: SubmitHandler<IFormValues> = async (data: any) => {
 		if (!data) return;
 
-		if (data.Nickname)
-			submitDisplayName(data.Nickname);
-
 		if (data.ProfilePic.length === 1)
-			submitProfilePic(data.ProfilePic);
+			await submitProfilePic(data.ProfilePic);
+		if (data.Nickname)
+			await submitDisplayName(data.Nickname);
 	};
 
-	const onChange = () => {
-		setHasChanged(true);
-		console.log('hasChanged ?', hasChanged);
-	};
+	useEffect(() => {
+		if (isSubmitSuccessful)
+			router.push(`/user/${user?.name}`);
+	}, [formState]);
 
 	return (
-		<form id='editForm' className={styles.formContainer} onChange={onChange} onSubmit={handleSubmit(onSubmit)}>
+		<form id='editForm' className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
 			<div className={styles.formSection}>
 				<FormLabel content='Profile picture '/>
 				<input
@@ -145,7 +143,7 @@ export default function EditUserForm() {
 							${errors.Nickname ? styles.input_error : ''}
 						`}
 						type='text'
-						placeholder='Change nickname'
+						placeholder={user?.displayName}
 						{...register('Nickname', {
 							maxLength: {
 								value: 32,
