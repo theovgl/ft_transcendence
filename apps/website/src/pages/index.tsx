@@ -27,7 +27,7 @@ export default function Home(props: any) {
 		const fetchRelationList = async () => {
 			try {
 				await fetch(
-					`http://localhost:4000/friendship/getRelationshipList?requesterName=${user?.name}`,
+					`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/friendship/getRelationshipList?requesterName=${user?.name}`,
 					{
 						method: 'GET',
 						headers: {

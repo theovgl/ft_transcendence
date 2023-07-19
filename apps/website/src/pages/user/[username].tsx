@@ -39,12 +39,11 @@ export default function Profile() {
 			setButtonText('Blocked');
 		else if (response === 'RECEIVED')
 			setButtonText('Accept request');
-		else if (response === 'EDIT') {
+		else if (response === 'EDIT') 
 			setButtonText('Edit profile');
-		}
-		else {
+		 else 
 			setButtonText('Add friend');
-		}
+		
 		setStatus(response);
 	}
 
@@ -52,7 +51,6 @@ export default function Profile() {
 		setIsBlocked(!isBlocked);
 		updateButtonState(status);
 	}
-
 
 	// This useEffect is used to update the button text when the user changes as blocked or unblocked
 	useEffect(() => {
@@ -124,7 +122,7 @@ export default function Profile() {
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 
 		const fetchUserInfo = async () => {
-		try {
+			try {
 				await fetch(
 					`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/${router.query.username}`, {
 						method: 'GET',
@@ -220,10 +218,10 @@ export default function Profile() {
 											theme={buttonText === 'Add friend' || 
 													buttonText === 'Edit profile' ? 'light' : 'dark'}
 											icon={buttonText === ('Add friend') ? <AiOutlineUserAdd /> :
-													buttonText === 'Edit profile' ? <BiEdit /> :
+												buttonText === 'Edit profile' ? <BiEdit /> :
 													buttonText === 'Blocked' ? <BiBlock /> :
-													buttonText === 'Friend' ? <BiCheck /> :
-												null}
+														buttonText === 'Friend' ? <BiCheck /> :
+															null}
 										/>
 									</div>
 								</div>
