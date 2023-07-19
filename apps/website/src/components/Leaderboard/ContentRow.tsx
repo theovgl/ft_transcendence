@@ -1,4 +1,4 @@
-import styles from '@/styles/components/Leaderboard.module.scss';
+import styles from './Leaderboard.module.scss';
 
 export interface IContentRow {
 	username: string;

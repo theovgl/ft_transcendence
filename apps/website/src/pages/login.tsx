@@ -7,9 +7,7 @@ export default function LoginPage() {
 	const router = useRouter();
 	
 	function onSubmit() {
-		const ip = process.env.NEXT_PUBLIC_IP_ADDRESS;
-		console.log('ip :', ip);
-		router.push(`http://${ip}:4000/auth/42/login`);
+		router.push(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/auth/42/login`);
 	}
 
 	return (
