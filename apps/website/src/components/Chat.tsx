@@ -2,7 +2,7 @@ import chatStyle from "@/styles/chat.module.css";
 import Tab from "@/components/Tab.tsx";
 import Contact from "@/components/Contact.tsx";
 import { io, Socket } from "socket.io-client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/router';
 import { useUser } from "@/utils/hooks/useUser";
 import { useAuth } from "@/utils/hooks/useAuth";
@@ -50,7 +50,6 @@ export default function Chat()
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [rooms, setRooms] = useState<Array<String>>([]);
   const [room, setRoom] = useState("General");
-
   let [tabList, setTablist] = useState([	
 					{
 						label:"General",
@@ -63,6 +62,12 @@ export default function Chat()
 						onClick: () => handleTabClick("Contact 1")
 					}
 	]);
+
+	const roomRef = useRef(room);
+
+	useEffect(() => {
+		roomRef.current = room;
+	}, [room]);
 
 	useEffect(() => {
 		if (user)
@@ -80,18 +85,19 @@ export default function Chat()
 		};
   	}, [user, socket]);
 
-	const socketInitializer = async () => {
-		socket.off('msgToClient');
+	  const socketInitializer = async () => {
 		socket.on("msgToClient", (msg: Message) => {
-		if (msg.channel === room)
-		{
-			setMessages((currentMsg) => [
+		  setMessages((currentMsg) => {
+			if (msg.channel === roomRef.current) {
+			  return [
 				...currentMsg,
-				{ author: msg.author, message: msg.message, channel: room },
-			  ]);
-		}
-    });
-	};
+				{ author: msg.author, message: msg.message, channel: roomRef.current },
+			  ];
+			}
+			return currentMsg;
+		  });
+		});
+	  };
 
 	const sendMessage = async () => {
 		socket.emit("msgToServer", { author: chosenUsername, message: message, channel: room });
@@ -102,6 +108,7 @@ export default function Chat()
 	};	
 
 	const changeRoom = async (newRoom: string) => {
+		console.log("newroom is : " + newRoom);
 		setRoom(newRoom);
 		setMessages([]);
 		socket.emit("ChangeRoomFromClient", newRoom);
