@@ -68,12 +68,17 @@ export class FriendshipController {
 	}
 
 	@Get('getRelationshipList')
-	getRelationshipList(@Query() qry) {
+	async getRelationshipList(@Query() qry) {
+		const [friendship, blocked, request] = await Promise.all([
+			await this.friendshipService.handleGetFriendList(qry.requesterName),
+			await this.friendshipService.handleGetBlockedList(qry.requesterName),
+			await this.friendshipService.handleGetReceivedRequestList(qry.requesterName)
+		]);
+
 		return {
-			friendList: this.friendshipService.handleGetFriendList(qry.requesterName),
-			blockedList: this.friendshipService.handleGetBlockedList(qry.requesterName),
-			sentRequestList: this.friendshipService.handleGetSentRequestList(qry.requesterName),
-			receivedRequestList: this.friendshipService.handleGetReceivedRequestList(qry.requesterName),
+			friendship,
+			blocked,
+			request
 		};
 	}
 

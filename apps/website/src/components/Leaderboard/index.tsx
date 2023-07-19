@@ -1,4 +1,4 @@
-import styles from '@/styles/components/Leaderboard.module.scss';
+import styles from './Leaderboard.module.scss';
 import ContentRow from './ContentRow';
 import { BiMedal } from 'react-icons/bi';
 
