@@ -45,6 +45,7 @@ export class UserService {
 			select: {
 				id: true,
 				name: true,
+				displayName: true,
 				firstName: true,
 				lastName: true,
 				profilePicPath: true,

@@ -27,14 +27,41 @@ export class AuthService {
 			if (!response || !response.ok)
 				throw new Error('Failed to fetch user info');
 
-			const data = await response.json();
+			const ft_data = await response.json();
+
+			const foundWithName = await this.prisma.user.findUnique({
+				where: {
+					name: ft_data.login
+				}
+			});
+
+			const foundWithDisplayName = await this.prisma.user.findUnique({
+				where: {
+					displayName: ft_data.login
+				}
+			});
+
+			if (foundWithName) {
+				const newUser: FortyTwoUser = {
+					userId: ft_data.id,
+					username: ft_data.login,
+					displayname: foundWithName.displayName,
+					email: ft_data.email,
+					firstName: ft_data.first_name,
+					lastName: ft_data.last_name,
+					picture: foundWithName.profilePicPath,
+				};
+				return newUser;
+			}
+
 			const newUser: FortyTwoUser = {
-				userId: data.id,
-				username: data.login,
-				email: data.email,
-				firstName: data.first_name,
-				lastName: data.last_name,
-				picture: data.image.link,
+				userId: ft_data.id,
+				username: ft_data.login,
+				displayname: foundWithDisplayName ? ft_data.login + (Math.floor(Math.random() * 9999)).toString() : ft_data.login,
+				email: ft_data.email,
+				firstName: ft_data.first_name,
+				lastName: ft_data.last_name,
+				picture: ft_data.image.link,
 			};
 
 			return newUser;
@@ -73,7 +100,7 @@ export class AuthService {
 	
 	async handleCallback(response: any): Promise<any> {
 		const user: FortyTwoUser = await this.getUserInfo(response.access_token);
-		const token = await this.signToken(user.userId, user.username, user.username, user.email, user.picture);
+		const token = await this.signToken(user.userId, user.username, user.displayname, user.email, user.picture);
 
 		await this.prisma.user.upsert({
 			where: { email: user.email },
@@ -82,7 +109,7 @@ export class AuthService {
 				firstName: user.firstName,
 				lastName: user.lastName,
 				name: user.username,
-				displayName: user.username,
+				displayName: user.displayname,
 				profilePicPath: user.picture,
 				jwt: token,
 			},
