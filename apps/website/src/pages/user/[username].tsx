@@ -193,7 +193,7 @@ export default function Profile() {
 	return (
 		<>
 			<Head>
-				<title>Profile - {userInfo?.name}</title>
+				<title>Profile - {userInfo?.displayName}</title>
 			</Head>
 			<Navbar />
 			<main className={styles.main}>
@@ -210,7 +210,7 @@ export default function Profile() {
 											currentUser={username}
 										/>
 										<Name
-											Username={userInfo.name}
+											Username={userInfo.displayName}
 											FirstName={userInfo.firstName}
 											LastName={userInfo.lastName}
 											initialIsBlocked={isBlocked}
