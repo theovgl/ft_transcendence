@@ -68,7 +68,7 @@ export default function ProfilePic({ path, size, stroke, currentUser }: Props) {
 				}`
 			}
 			alt='Profile picture of the user'
-			src={path ? path : '/default_profil_picture.jpg'}
+			src={path ? path : '/images/default_profil_picture.jpg'}
 			width={size}
 			height={size}
 		/>

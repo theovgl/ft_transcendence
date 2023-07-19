@@ -19,7 +19,7 @@ services:
       NODE_ENV: development
     volumes:
       - ./apps/website:/app
-      - uploads:/app/uploads
+      - uploads:/app/public/images
     ports:
       - "3000:3000"
     restart: unless-stopped
