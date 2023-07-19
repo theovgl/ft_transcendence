@@ -73,7 +73,7 @@ export class AuthService {
 	
 	async handleCallback(response: any): Promise<any> {
 		const user: FortyTwoUser = await this.getUserInfo(response.access_token);
-		const token = await this.signToken(user.userId, user.username, user.email, user.picture);
+		const token = await this.signToken(user.userId, user.username, user.username, user.email, user.picture);
 
 		await this.prisma.user.upsert({
 			where: { email: user.email },
@@ -82,6 +82,7 @@ export class AuthService {
 				firstName: user.firstName,
 				lastName: user.lastName,
 				name: user.username,
+				displayName: user.username,
 				profilePicPath: user.picture,
 				jwt: token,
 			},
@@ -92,12 +93,13 @@ export class AuthService {
 		return token;
 	}
 
-	async signToken(userId: number, username: string, email: string, profilePic: string): Promise<string> {
+	async signToken(userId: number, username: string, displayName: string, email: string, profilePic: string): Promise<string> {
 		const payload = {
 			userId,
 			email,
 			profilePic,
-			username
+			username,
+			displayName,
 		};
 		const secret = this.config.get('JWT_SECRET');
 		const token = await this.jwt.sign(payload, {
@@ -127,6 +129,7 @@ export class AuthService {
 					id: user.userId,
 					email: user.email,
 					name: user.username,
+					displayName: user.username,
 					firstName: user.firstName,
 					lastName: user.lastName,
 					profilePicPath: user.picture,
