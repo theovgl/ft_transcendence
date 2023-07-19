@@ -1,11 +1,11 @@
 import chatStyle from "@/styles/chat.module.css";
 import Tab from "@/components/Tab.tsx";
 import Contact from "@/components/Contact.tsx";
-import { io, Socket } from "socket.io-client";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/router';
 import { useUser } from "@/utils/hooks/useUser";
 import { useAuth } from "@/utils/hooks/useAuth";
+import { io, Socket } from "socket.io-client";
 
 
 type Message = {
@@ -37,13 +37,13 @@ interface SocketData {
 }
 
 
-// let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
-// socket = io( `http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000` );
+let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
+socket = io( `http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000` );
 
 export default function Chat()
 {
   const { user } = useUser();
-  const { socket } = useAuth();
+//   const { socket } = useAuth();
   const [username, setUsername] = useState("");
   const [chosenUsername, setChosenUsername] = useState("");
   const [message, setMessage] = useState("");
