@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 
 export interface User {
-  id: string;
-  name: string;
-  email: string;
+	id: string;
+	name: string;
+	displayName: string;
+	email: string;
 	profilePic: string;
-  authToken: string;
+	authToken: string;
 }
 
 // This hook will store the user in our context and localStorage.
 export const useUser = () => {
-	const [user, setUser] = useState<User | null>(null);
+	const [ user, setUser ] = useState<User | null>(null);
 	const { setItem, getItem, removeItem } = useLocalStorage();
 
 	useEffect(() => {
@@ -34,5 +35,14 @@ export const useUser = () => {
 		setUser(null);
 		removeItem('user');
 	};
-	return { user, addUser, removeUser };
+
+	const editUser = (updatedUser: Partial<User>) => {
+		if (!user) return;
+	
+		const newUser = { ...user, ...updatedUser };
+		setUser(newUser);
+		setItem('user', JSON.stringify(newUser));
+	};
+
+	return { user, addUser, removeUser, editUser };
 };
