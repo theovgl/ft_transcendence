@@ -43,7 +43,7 @@ export default function SettingsModal(props: SettingsModalProps) {
 							path={user?.profilePic}
 							size={30} stroke={false} currentUser={user?.name}
 						/>
-						<p className={style.modal_username}>{user?.name}</p>
+						<p className={style.modal_username}>{user?.displayName}</p>
 					</div>
 					<RxCross2 onClick={() => setIsModalOpen(!isModalOpen)} />
 				</div>

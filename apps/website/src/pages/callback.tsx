@@ -17,6 +17,7 @@ export default function CallbackPage() {
 		auth?.login({
 			id: decodedPayload.userId,
 			name: decodedPayload.username,
+			displayName: decodedPayload.displayName,
 			email: decodedPayload.email,
 			profilePic: decodedPayload.profilePic,
 			authToken: decodedPayload.authToken,
