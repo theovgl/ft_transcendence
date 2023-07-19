@@ -93,8 +93,8 @@ export default function Profile() {
 		router.push({
 			pathname: '/chat',
 			query: {
-				requesterName: `${router.query.username}`,
-				addresseeName: encodeURIComponent(jwtPayload.username),
+				addresseeName: `${router.query.username}`,
+				requesterName: encodeURIComponent(jwtPayload.username),
 			}
 		})
 	}
