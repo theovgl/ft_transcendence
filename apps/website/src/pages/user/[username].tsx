@@ -86,6 +86,18 @@ export default function Profile() {
 	function redirectToEdit() {
 		router.push('/user/edit');
 	}
+
+	function startDm() {
+		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
+
+		router.push({
+			pathname: '/chat',
+			query: {
+				requesterName: `${router.query.username}`,
+				addresseeName: encodeURIComponent(jwtPayload.username),
+			}
+		})
+	}
 	
 	async function relationshipUpdate() {
 		let route = 'add';
@@ -209,6 +221,7 @@ export default function Profile() {
 											theme='light'
 											boxShadow
 											icon={<BiMessageAltDetail />}
+											onClick={startDm}
 										/>
 										<Button
 											text={buttonText}
