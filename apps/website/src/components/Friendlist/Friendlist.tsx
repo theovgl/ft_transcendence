@@ -5,6 +5,7 @@ import FriendEntity from './FriendEntity';
 
 type FriendEntityType = {
 	name: string;
+	profilePicPath: string;
 }
 
 export type FriendListType = {
@@ -25,6 +26,7 @@ export default function Friendlist(props: Props) {
 
 	useEffect(() => {
 		if (!data) return;
+		console.log(data);
 		setFriends(data.friendship);
 		setBlocked(data.blocked);
 		setRequested(data.request);
@@ -65,6 +67,7 @@ export default function Friendlist(props: Props) {
 										<FriendEntity
 											key={request.name}
 											name={request.name}
+											profilePicPath={request.profilePicPath}
 										/>
 									))}
 								</div>
@@ -77,6 +80,7 @@ export default function Friendlist(props: Props) {
 										<FriendEntity
 											key={friend.name}
 											name={friend.name}
+											profilePicPath={friend.profilePicPath}
 										/>
 									))}
 								</div>
@@ -89,6 +93,7 @@ export default function Friendlist(props: Props) {
 										<FriendEntity
 											key={blocked.name}
 											name={blocked.name}
+											profilePicPath={blocked.profilePicPath}
 										/>
 									))}
 								</div>

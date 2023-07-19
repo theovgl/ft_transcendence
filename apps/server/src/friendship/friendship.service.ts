@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 
 type FriendEntity = {
 	name: string;
+	profilePicPath: string;
 };
 
 @Injectable()
@@ -229,11 +230,13 @@ export class FriendshipService {
 				requester: {
 					select: {
 						name: true,
+						profilePicPath: true,
 					}
 				},
 				addressee: {
 					select: {
 						name: true,
+						profilePicPath: true,
 					}
 				},
 			}
@@ -245,11 +248,13 @@ export class FriendshipService {
 			if (friendship.addressee.name != requesterName) {
 				const friend: FriendEntity = {
 					name: friendship.addressee.name,
+					profilePicPath: friendship.addressee.profilePicPath,
 				};
 				friends.push(friend);
 			} else if (friendship.requester.name != requesterName) {
 				const friend: FriendEntity = {
 					name: friendship.requester.name,
+					profilePicPath: friendship.requester.profilePicPath,
 				};
 				friends.push(friend);
 			}
@@ -271,11 +276,13 @@ export class FriendshipService {
 				requester: {
 					select: {
 						name: true,
+						profilePicPath: true,
 					}
 				},
 				addressee: {
 					select: {
 						name: true,
+						profilePicPath: true,
 					}
 				},
 			}
@@ -287,11 +294,13 @@ export class FriendshipService {
 			if (blockedUser.addressee.name != requesterName) {
 				const relation: FriendEntity = {
 					name: blockedUser.addressee.name,
+					profilePicPath: blockedUser.addressee.profilePicPath,
 				};
 				formatedBlockedList.push(relation);
 			} else if (blockedUser.requester.name != requesterName) {
 				const relation: FriendEntity = {
-					name: blockedUser.addressee.name,
+					name: blockedUser.requester.name,
+					profilePicPath: blockedUser.requester.profilePicPath,
 				};
 				formatedBlockedList.push(relation);
 			}
@@ -328,6 +337,7 @@ export class FriendshipService {
 				requester: {
 					select: {
 						name: true,
+						profilePicPath: true,
 					}
 				},
 			}
@@ -338,6 +348,7 @@ export class FriendshipService {
 		receivedRequestList.forEach(request => {
 			const relation: FriendEntity = {
 				name: request.requester.name,
+				profilePicPath: request.requester.profilePicPath,
 			};
 			formatedRequestList.push(relation);
 		});
