@@ -2,17 +2,19 @@
 
 .friendEntity {
 	width: 100%;
-	padding: 15px	20px;
-  box-sizing: border-box;
-  border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
+	padding: 10px 20px;
+	box-sizing: border-box;
+	border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
 }
 
 .friendEntity_name {
+	display: flex;
+	align-items: center;
+	gap: 10px;
 	margin:	0px;
 	color: $black-color;
 	text-decoration: none;
 	position: relative;
-	display: inline-block;
 
   &:hover {
     text-decoration: underline;
