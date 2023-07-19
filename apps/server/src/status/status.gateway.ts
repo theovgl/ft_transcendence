@@ -7,6 +7,7 @@ export class StatusGateway {
 @WebSocketServer() server: Server;
 private logger = new Logger('StatusGateway');
 private onlineUsers: Map<string, string> = new Map();
+private onlineUsersInGame: Map<string, string> = new Map();
 	
 	@SubscribeMessage('addConnectedUser')
 async handleUserConnected(@MessageBody() data: string, @ConnectedSocket() client: Socket): Promise<string> {
@@ -24,9 +25,36 @@ async handleUserConnected(@MessageBody() data: string, @ConnectedSocket() client
 			}
 		});
 	}
+	
+	@SubscribeMessage('inGame')
+	async handleInGame(@ConnectedSocket() client: Socket) {
+		const username = this.onlineUsers.get(client.id);
+		if (username)
+		{
+			this.onlineUsersInGame.set(client.id, username);
+			this.server.emit('isInGame', username);
+		}
+	}
+
+	
+	@SubscribeMessage('quitGame')
+	async handleQuitGame(@ConnectedSocket() client: Socket) {
+		const username = this.onlineUsers.get(client.id);
+		if (username)
+		{
+			this.onlineUsersInGame.delete(client.id);
+			this.server.emit('quitInGame', { username: username, status: 'Online'});
+		}
+	}
 
 	@SubscribeMessage('isConnected')
 	handleCheckUserStatus(@MessageBody() data: any): boolean {
+		for (const value of this.onlineUsersInGame.values()) {
+			if (value === data)
+			{
+				this.server.emit('isInGame', data);
+			}
+		}
 		for (const value of this.onlineUsers.values()) {
 			if (value === data)
 				return true;

@@ -21,28 +21,30 @@ const MultiplayerManager = (props) => {
         leftPlayer: PLAYERMODE,
         connected: false
     })
-    const UseAuth = useAuth();
+    // const UseAuth = useAuth();
     const socketRef = useRef(null);
 
     useEffect(() => {
         
-        const socket = UseAuth.socket;
-        // io.connect(`ws://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000`, {
-        //     query: {
-        //         userId: infos.userId,
-        //         mode: props.mode,
-        //         premade: props.premadeId
-        //     }
-        //   })
+        const socket = io.connect(`ws://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000`, {
+            query: {
+                userId: infos.userId,
+                mode: props.mode,
+                premade: props.premadeId
+            }
+          })
           socketRef.current = socket;
         
         
         window.addEventListener('beforeunload', () => {
             socket.emit('quit');
+            socket.emit('quitGame');
           });
         
         // Listen to the 'connect' event
         socket.on('connect', () => {
+            socket.emit('addConnectedUser', infos.userId);
+            socket.emit('inGame');
             console.log('Connected to socket.io server');
             socket.emit('matchmaking', {
               query: {
@@ -84,11 +86,13 @@ const MultiplayerManager = (props) => {
         // Clean up the event listeners when the component unmounts
         return () => {
             window.removeEventListener('beforeunload', () => {
-                socket.emit('quit');
+            socket.emit('quitGame');
+            socket.emit('quit');
               });
            socket.off('connect');
            socket.off('opponentMoved');
-           socket.emit('quit');
+            socket.emit('quitGame');
+            socket.emit('quit');
         };
      }, [infos.userId]);
 

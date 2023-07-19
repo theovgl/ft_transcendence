@@ -23,6 +23,7 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
     afterInit(server: any) {
         this.matchmakingService.startMatchmaking(this.server);
     }
+
     //connexion
     handleConnection(client: Socket){}
 
@@ -67,5 +68,6 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
             this.matchmakingService.addPlayer(client, mode, userId)
         } 
         client.emit('searching');
+
     }
 }
