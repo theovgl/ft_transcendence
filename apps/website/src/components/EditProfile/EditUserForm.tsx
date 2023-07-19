@@ -1,11 +1,10 @@
 import styles from './EditUserForm.module.scss';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Button from '../Button/Button';
 import { BiPencil, BiSave } from 'react-icons/bi';
 import FormLabel from './FormLabel';
 import { useUser } from '@/utils/hooks/useUser';
-import jwtDecode from 'jwt-decode';
 import { useCookies } from 'react-cookie';
 
 interface IFormValues {
@@ -13,57 +12,113 @@ interface IFormValues {
 	'ProfilePic': FileList;
 }
 
-type jwtType = {
-	userId: number;
-	email: string;
-	username: string;
-	iat: number;
-	exp: number;
-}
-
 export default function EditUserForm() {
 	const [cookies] = useCookies();
-	const { user } = useUser();
+	const { user, editUser } = useUser();
+	const [hasChanged, setHasChanged] = useState(false);
+
 	const {
 		register,
+		setError,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<IFormValues>();
 
-	// const onSubmit: SubmitHandler<IFormValues> = (data: any) => {
-	// 	if (!data) return;
+	const saveNewDisplayName = (newDisplayName: string) => {
+		editUser({ displayName: newDisplayName});
+	};
 
-	// 	if (data.Nickname) {
-	// 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
-	// 		const lowerNickname = data.Nickname.toLowerCase();
-	// 		console.log('nickname', lowerNickname);
-	// 		console.log('payload', jwtPayload);
+	const saveNewProfilPic = (newPath: string) => {
+		editUser({ profilePic: `/images/profile-pictures/${newPath}` });
+	};
 
-	// 		try {
-	// 			fetch(`http://localhost:4000/users/edit?requesterName=${encodeURIComponent(
-	// 				jwtPayload.username
-	// 			)}`, {
-	// 				method: 'POST',
-	// 				headers: {
-	// 					'Content-Type': 'application/json',
-	// 					Authorization: 'Bearer ' + cookies['jwt'],
-	// 				},
-	// 			});
-	// 		} catch (error) {
-	// 			console.error(error);
-	// 		}
-	// 	}
-	// };
+	const submitDisplayName = async (newDisplayName: string) => {
+		const lowerCaseName = newDisplayName.toLowerCase();
+		const body = {
+			newDisplayName: lowerCaseName,
+		};
+	
+		try {
+			const response = await fetch(`http://localhost:4000/users/edit?user=${encodeURIComponent(
+					user!.name
+			)}`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: 'Bearer ' + cookies['jwt'],
+				},
+				body: JSON.stringify(body)
+			});
+			if (!response.ok)
+				throw new Error(response.statusText);
+			
+			saveNewDisplayName(lowerCaseName);
+		} catch (e: any) {
+			console.log(e.message);
+			if (e.message === 'Conflict') {
+				setError('Nickname', {
+					type: 'server',
+					message: 'Display name already in use',
+				});
+			} else {
+				setError('Nickname', {
+					type: 'server',
+					message: 'Something went wrong while setting the displayname',
+				});
+			}
+		}
+	};
+
+	const submitProfilePic = async (data: any) => {
+		const formData = new FormData();
+		formData.append('profile-picture', data[0]);
+
+		try {
+			const response = await fetch(`http://localhost:4000/users/profile-picture?user=${encodeURIComponent(
+				user!.name
+			)}`, {
+				method: 'PATCH',
+				body: formData,
+				headers: {
+					Authorization: 'Bearer ' + cookies['jwt'],
+				},
+			});
+			if (response.ok) {
+				const responseJSON = await response.json();
+				console.log(responseJSON.imageID);
+				saveNewProfilPic(responseJSON.imageID);
+			}
+			console.log(response);
+		} catch (error) {
+			console.error(error);
+		}
+
+	};
+
+	const onSubmit: SubmitHandler<IFormValues> = async (data: any) => {
+		if (!data) return;
+
+		if (data.Nickname)
+			submitDisplayName(data.Nickname);
+
+		if (data.ProfilePic.length === 1)
+			submitProfilePic(data.ProfilePic);
+	};
+
+	const onChange = () => {
+		setHasChanged(true);
+		console.log('hasChanged ?', hasChanged);
+	};
 
 	return (
-		<form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
+		<form id='editForm' className={styles.formContainer} onChange={onChange} onSubmit={handleSubmit(onSubmit)}>
 			<div className={styles.formSection}>
 				<FormLabel content='Profile picture '/>
 				<input
 					className={styles.inputFile}
 					type="file"
 					id="picture"
-					accept='image/png, image/jpeg'
+					accept='image/png, image/jpeg, image/webp'
 					{...register('ProfilePic')}
 				/>
 				<label
@@ -71,7 +126,7 @@ export default function EditUserForm() {
 					htmlFor="picture"
 					style={{
 						backgroundImage: `
-							url(${user ? user.profilePic : '/default_profil_picture.jpg'})
+							url(${user ? user.profilePic : '/images/default_profil_picture.jpg'})
 						`,
 						backgroundPosition: 'center',
 						backgroundSize: 'cover',
@@ -85,16 +140,27 @@ export default function EditUserForm() {
 				<FormLabel content='Change nickname' />
 				<div className={styles.labeledInput_container}>
 					<input
-						className={styles.input}
+						className={`
+							${styles.input}
+							${errors.Nickname ? styles.input_error : ''}
+						`}
 						type='text'
 						placeholder='Change nickname'
 						{...register('Nickname', {
 							maxLength: {
 								value: 32,
-								message: 'Nickname cannot be longer than 32 characters'
+								message: 'Display name cannot be longer than 32 characters'
+							},
+							pattern: {
+								value: /^[a-zA-Z0-9_]*$/,
+								message: 'Invalid Input. Only use a-z, A-Z, 0-9, and _.'
 							}
 						})}
 					/>
+					<span className={`
+							${errors.Nickname ? styles.error_message : styles.error_message_invisible}
+						`}
+					>{errors.Nickname && errors.Nickname.message}</span>
 				</div>
 			</div>
 			<Button
@@ -102,7 +168,7 @@ export default function EditUserForm() {
 				type='submit' 
 				theme='light'
 				icon={<BiSave />}
-				boxShadow 
+				boxShadow
 			/>
 		</form>
 	);

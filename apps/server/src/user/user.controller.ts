@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Query, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { GetUser } from '../auth/decorator';
 import { User } from '@prisma/client';
@@ -30,26 +30,26 @@ export class UserController {
 		return user;
 	}
 
-	@Patch()
-	editUser(
-		@GetUser('id') userId: number,
+	@Patch('edit')
+	async edit(
+		@Query() query,
 		@Body() dto: EditUserDto,
 	) {
-		return this.userService.editUser(userId, dto);
+		return await this.userService.editUser(query.user, dto);
 	}
 
-	@Post('profile-picture')
+	@Patch('profile-picture')
 	@UseInterceptors(FileInterceptor('profile-picture'))
-	async uploadProfilePicture(@UploadedFile() image: Express.Multer.File) {
+	async uploadProfilePicture(@Res() res, @Query() query,  @Body() body, @UploadedFile() image: Express.Multer.File) {
 		if (!image || !image.buffer)
 			throw new BadRequestException('Invalid file');
 
-		await this.userService.uploadProfilePicture(1, image.buffer);
-		return { message: 'Profile picture uploaded successfully' };
+		const result = await this.userService.uploadProfilePicture(query.user, image.buffer);
+		res.json({ imageID : result });
 	}
 
 	@Get('profile-picture/:imageName')
-	downloadProfilePicture(@Param('imageName') imageName: string, @Res() res): Observable<Object> {
+	downloadProfilePicture(@Param('imageName') imageName: string, @Res() res): Observable<object> {
 		return of(res.sendFile(process.env.UPLOADS_DESTINATION + '/profile-pictures/' + imageName));
 	}
 }
