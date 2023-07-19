@@ -7,6 +7,7 @@ export const useAuth = () => {
 	const { addUser, removeUser, user } = useUser();
 	const jwtCookie = new Cookies('jwt');
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
 	const socketRef = useRef<Socket | null>(null);
 
 	if (!socketRef.current)
@@ -19,6 +20,7 @@ export const useAuth = () => {
 			socketRef.current?.connect();
 		} else
 			setIsAuthenticated(false);
+		setIsLoading(false);
 	}, [user]);
 
 	const login = (newUser: User) => {
@@ -34,5 +36,5 @@ export const useAuth = () => {
 		jwtCookie.remove('jwt');
 	};
 
-	return { login, logout, user, isAuthenticated, socket: socketRef.current };
+	return { login, logout, isLoading, setIsLoading, user, isAuthenticated, socket: socketRef.current };
 };

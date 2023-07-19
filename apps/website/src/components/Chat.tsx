@@ -25,6 +25,7 @@ interface ClientToServerEvents {
 	hello: () => void;
 	msgToServer: (msg: Message) => void;
 	ChangeRoomFromClient: (payload: string) => void;
+	UserConnection: (payload: string) => void;
 }
 
 interface InterServerEvents {

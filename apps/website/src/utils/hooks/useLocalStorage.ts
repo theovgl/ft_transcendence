@@ -5,7 +5,9 @@ export const useLocalStorage = () => {
 	};
 
 	const getItem = (key: string) => {
-		return localStorage.getItem(key);
+		if (typeof localStorage != 'undefined')
+			return localStorage.getItem(key);
+		return null;
 	};
 
 	const removeItem = (key: string) => {
