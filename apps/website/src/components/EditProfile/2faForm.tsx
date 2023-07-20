@@ -37,33 +37,34 @@ export default function TwoFaForm() {
 		const body = {
 			twoFactorAuthenticationCode: code,
 		};
-		fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/auth/2fa/${endpoint}`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: 'Bearer ' + cookies['jwt'],
-			},
-			body: JSON.stringify(body)
-		}).then((res) => {
-			if (res.ok) 
+		try {
+			const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/auth/2fa/${endpoint}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: 'Bearer ' + cookies['jwt'],
+				},
+				body: JSON.stringify(body)
+			});
+			if (response.ok) 
 				return true;
 			else 
-				throw new Error(res.statusText);
-				
-		}).catch((e) => {
+				throw new Error(response.statusText);
+		} catch (e: any) {
 			if (e.message === 'Unauthorized') {
 				setError('tfaCode', {
 					type: 'server',
 					message: 'Invalid code',
 				});
+				return false;
 			} else {
 				setError('tfaCode', {
 					type: 'server',
 					message: 'Something went wrong while setting 2FA',
 				});
+				return false;
 			}
-		});
-		return false;
+		}
 	};
 
 	const getQRCode = async () => {
