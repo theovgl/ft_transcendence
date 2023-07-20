@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocalStorage } from './useLocalStorage';
 
 export interface User {
@@ -20,7 +20,6 @@ export const useUser = () => {
 
 		if (userItem) {
 			const user: User | null = JSON.parse(userItem);
-			
 			if (user)
 				setUser(user);
 		}
@@ -38,7 +37,7 @@ export const useUser = () => {
 
 	const editUser = (updatedUser: Partial<User>) => {
 		if (!user) return;
-	
+
 		const newUser = { ...user, ...updatedUser };
 		setUser(newUser);
 		setItem('user', JSON.stringify(newUser));

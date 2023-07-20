@@ -37,30 +37,32 @@ export class AuthController {
 		}
 	}
 
-	@Post('2fa/generate')
+	@Get('2fa/generate')
 	@UseGuards(JwtGuard)
 	async register(@Res() res, @Req() req) {
 		const user = jwt_decode(req.headers.authorization);
-	  const { otpauthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
-  
-	  return res.json(
+		const { otpauthUrl } = await this.authService.generateTwoFactorAuthenticationSecret(user);
+
+		return res.json(
 			await this.authService.generateQrCodeDataURL(otpauthUrl),
-	  );
+		);
 	}
 
 	@Post('2fa/turn-on')
 	@UseGuards(JwtGuard)
 	async turnOnTwoFactorAuthentication(@Req() req, @Body() body) {
 		const user = jwt_decode(req.headers.authorization);
+		console.log(body);
 		const isCodeValid = await this.authService.isTwoFactorAuthenticationCodeValid(
-		  body.twoFactorAuthenticationCode,
-		  user,
+			body.twoFactorAuthenticationCode,
+			user,
 		);
+		console.log(isCodeValid, body.twoFactorAuthenticationCode);
 		if (!isCodeValid)
 			throw new UnauthorizedException('Wrong authentication code');
 
-	  await this.authService.turnOnTwoFactorAuthentication(user);
-	  return await this.authService.loginWith2fa(user);
+		await this.authService.turnOnTwoFactorAuthentication(user);
+		return await this.authService.loginWith2fa(user);
 	}
 
 	@Post('2fa/turn-off')
@@ -68,8 +70,8 @@ export class AuthController {
 	async turnOffTwoFactorAuthentication(@Req() req, @Body() body) {
 		const user = jwt_decode(req.headers.authorization);
 		const isCodeValid = await this.authService.isTwoFactorAuthenticationCodeValid(
-		  body.twoFactorAuthenticationCode,
-		  user,
+			body.twoFactorAuthenticationCode,
+			user,
 		);
 		if (!isCodeValid)
 			throw new UnauthorizedException('Wrong authentication code');
@@ -91,7 +93,7 @@ export class AuthController {
 		if (!isCodeValid)
 			throw new UnauthorizedException('Wrong authentication code');
 
-    	return await this.authService.loginWith2fa(user);
+		return await this.authService.loginWith2fa(user);
 	}
 
 	@UseGuards(JwtGuard)

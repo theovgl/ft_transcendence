@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Get, Param, Patch, Query, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Query, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { JwtGuard } from '../auth/guard';
 import { GetUser } from '../auth/decorator';
 import { User } from '@prisma/client';
@@ -6,6 +6,7 @@ import { EditUserDto } from './dto';
 import { UserService } from './user.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Observable, of } from 'rxjs';
+import jwtDecode from 'jwt-decode';
 
 @UseGuards(JwtGuard)
 @Controller('users')
@@ -20,14 +21,6 @@ export class UserController {
 	@Get(':username')
 	findOneByUsername(@Param('username') username: string) {
 		return this.userService.findOneByUsername(username);
-	}
-
-	@Get('me')
-	getMe(@GetUser() user: User, @GetUser('email') email: string){
-		console.log({
-			email,
-		});
-		return user;
 	}
 
 	@Patch('edit')

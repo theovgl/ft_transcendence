@@ -91,7 +91,7 @@ export class AuthService {
 				throw new Error('Failed to exchange code for token');
 
 			const responseData = await response.json();
-		    return responseData;
+			return responseData;
 		} catch (error) {
 			console.error('Error: ', error);
 			throw error;
@@ -181,13 +181,13 @@ export class AuthService {
 		const otpauthUrl = authenticator.keyuri(user.email, 'ft_transcendence', secret);
 		await this.setTwoFactorAuthenticationSecret(secret, user.id, user.email);
 		return {secret, otpauthUrl};
-	  }
+	}
 
-	  async generateQrCodeDataURL(otpAuthUrl: string) {
+	async generateQrCodeDataURL(otpAuthUrl: string) {
 		return toDataURL(otpAuthUrl);
-	  }
+	}
 
-	  async setTwoFactorAuthenticationSecret(secret: string, userId: number, email: string) {
+	async setTwoFactorAuthenticationSecret(secret: string, userId: number, email: string) {
 		try {
 			return await this.prisma.user.update({
 				where: {
@@ -198,13 +198,13 @@ export class AuthService {
 					twoFASecret: secret,
 				},
 			});
-	  } catch (e) {
+		} catch (e) {
 			console.error('Error when setting 2FA secret:', e);
 			throw (new InternalServerErrorException('Failed to set two factor authentication secret'));
 		}
 	}			
 
-	  async turnOnTwoFactorAuthentication(jwtDecoded: any) {
+	async turnOnTwoFactorAuthentication(jwtDecoded: any) {
 		await this.prisma.user.update({
 			where: {
 				email: jwtDecoded.email,
@@ -213,9 +213,9 @@ export class AuthService {
 				twoFAEnabled: true
 			},
 		});
-	  }
+	}
 
-	  async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, jwtDecoded: any): Promise<boolean> {
+	async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, jwtDecoded: any): Promise<boolean> {
 		const user = await this.prisma.user.findUnique({ where: { email: jwtDecoded.email } });
 		const isCodeValid = authenticator.verify({
 			token: twoFactorAuthenticationCode,
@@ -223,9 +223,9 @@ export class AuthService {
 		});
 
 		return isCodeValid;
-	  }
+	}
 
-	  async turnOffTwoFactorAuthentication(jwtDecoded: any) {
+	async turnOffTwoFactorAuthentication(jwtDecoded: any) {
 		await this.prisma.user.update({
 			where: {
 				email: jwtDecoded.email,
@@ -237,7 +237,7 @@ export class AuthService {
 		});
 	}
 
-	  async loginWith2fa(jwtDecoded: any) {
+	async loginWith2fa(jwtDecoded: any) {
 		const user = await this.prisma.user.findUnique({ where: { email: jwtDecoded.email } });
 		const payload = {
 			userId: user.id,
@@ -248,8 +248,8 @@ export class AuthService {
 		};
 	
 		return {
-		  email: payload.email,
-		  access_token: this.jwt.sign(payload),
+			email: payload.email,
+			access_token: this.jwt.sign(payload),
 		};
-	  }
+	}
 }

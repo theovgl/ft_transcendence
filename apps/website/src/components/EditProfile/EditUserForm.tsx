@@ -1,12 +1,11 @@
 import styles from './EditUserForm.module.scss';
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Button from '../Button/Button';
 import { BiPencil, BiSave } from 'react-icons/bi';
 import FormLabel from './FormLabel';
 import { useUser } from '@/utils/hooks/useUser';
 import { useCookies } from 'react-cookie';
-import { useRouter } from 'next/router';
 
 interface IFormValues {
 	'Nickname': string;
@@ -14,7 +13,6 @@ interface IFormValues {
 }
 
 export default function EditUserForm() {
-	const router = useRouter();
 	const [cookies] = useCookies();
 	const { user, editUser } = useUser();
 
@@ -22,8 +20,7 @@ export default function EditUserForm() {
 		register,
 		setError,
 		handleSubmit,
-		formState,
-		formState: { errors, isSubmitSuccessful },
+		formState: { errors, isSubmitSuccessful, isLoading },
 	} = useForm<IFormValues>();
 
 	const saveNewDisplayName = (newDisplayName: string) => {
@@ -42,7 +39,7 @@ export default function EditUserForm() {
 	
 		try {
 			const response = await fetch(`http://localhost:4000/users/edit?user=${encodeURIComponent(
-					user!.name
+				user!.name
 			)}`, {
 				method: 'PATCH',
 				headers: {
@@ -102,11 +99,6 @@ export default function EditUserForm() {
 		if (data.Nickname)
 			await submitDisplayName(data.Nickname);
 	};
-
-	useEffect(() => {
-		if (isSubmitSuccessful)
-			router.push(`/user/${user?.name}`);
-	}, [formState]);
 
 	return (
 		<form id='editForm' className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
