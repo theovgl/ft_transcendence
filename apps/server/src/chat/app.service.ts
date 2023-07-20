@@ -123,6 +123,7 @@ export class ChatService implements OnModuleInit {
 	
 	if (user && room)
 	{
+		client.emit('loadRoom', room.name);
 		if (
 		await this.prisma.talk.findUnique({
 			where: {
