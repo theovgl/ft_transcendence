@@ -10,6 +10,8 @@ export interface ServerToClientEvents {
 	basicEmit: (a: number, b: string, c: Buffer) => void;
 	withAck: (d: string, callback: (e: number) => void) => void;
 	msgToClient: (msg: Message) => void;
+	loadRoom: (payload: string) => void;
+
 }
 
 export interface ClientToServerEvents {

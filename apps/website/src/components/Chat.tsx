@@ -19,6 +19,7 @@ interface ServerToClientEvents {
   basicEmit: (a: number, b: string, c: Buffer) => void;
   withAck: (d: string, callback: (e: number) => void) => void;
 	msgToClient: (msg: Message) => void;
+	loadRoom: (payload: string) => void;
 }
 
 interface ClientToServerEvents {
@@ -37,6 +38,11 @@ interface SocketData {
   age: number;
 }
 
+type TabItem = {
+	label: string;
+	active: boolean;
+	onClick: (label: string) => boolean; // Adjust the type of onClick accordingly
+};
 
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 socket = io( `http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000` );
@@ -51,20 +57,20 @@ export default function Chat()
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [rooms, setRooms] = useState<Array<String>>([]);
   const [room, setRoom] = useState("General");
-  let [tabList, setTablist] = useState([	
-					{
-						label:"General",
-						active:true,
-						onClick: () => handleTabClick("General")
-					},
-					{
-						label:"Contact 1",
-						active:false,
-						onClick: () => handleTabClick("Contact 1")
-					}
+  let 	[tabList, setTablist] = useState<TabItem[]>([	
+					// {
+					// 	label:"General",
+					// 	active:true,
+					// 	onClick: () => handleTabClick("General")
+					// },
 	]);
 
 	const roomRef = useRef(room);
+	const tablistRef = useRef(tabList);
+
+	useEffect(() => {
+		tablistRef.current = tabList;
+	}, [tabList])
 
 	useEffect(() => {
 		roomRef.current = room;
@@ -78,6 +84,17 @@ export default function Chat()
 			{
 				socketInitializer();
 				socket.emit("UserConnection", user.name);
+				socket.on("loadRoom", (payload: string) => {
+					setTablist((currenTablist: TabItem[]) => {
+						const isLabelAlreadyExists = tablistRef.current.some((tab: any) => tab.label === payload);
+						if (isLabelAlreadyExists)
+							return [...currenTablist];
+						else
+							return [...currenTablist,
+								{ label: payload, active: tablistRef.current.length === 0 ? true : false, onClick: () => handleTabClick(payload) }
+							]
+					})
+				})
 			}
 		}
 		// socket.emit('ChangeRoomFromClient', room);

@@ -44,7 +44,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
  @SubscribeMessage('UserConnection')
  handleUserConnection(client: Socket, payload: string){
 	setTimeout(() => {
-		this.chatService.userConnection(client, 'General', payload);		
+		this.chatService.userConnection(client, 'General', payload);
 	}, 150);
 	// client.emit('userConnected')
 	// Put user in General chat

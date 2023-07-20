@@ -79,10 +79,33 @@ export class ChatService implements OnModuleInit {
 	this.loadRoom(client, room);
   }
 
+  async loadRoomlist(client: Socket)
+  {
+	const user = await this.findUser(this.clientList.get(client));
+	const talks = await this.prisma.talk.findMany({
+		where: {
+			userId: user.id,
+		},
+		include: {
+			room: true,
+		},
+	})
+
+	talks.forEach((talk) => {
+		console.log('add Room: ' + talk.room.name + ' to user: ' + user.name);
+		client.emit('loadRoom', talk.room.name);
+	});
+	//get roomlist 
+	//send room one by one
+  }
+
   public async userConnection(client: Socket, room: string, payload: string)
   {
+	await this.createRoom(room); 
 	this.clientList.set(client, payload);
-	this.loadRoom(client, room);
+	await this.addUserToRoom(client, room);
+	await this.loadRoomlist(client)
+	await this.loadRoom(client, room);
 	// await this.prisma.user.update({
 	// 	where: {
 	// 	},
@@ -133,6 +156,14 @@ export class ChatService implements OnModuleInit {
 		}
 	}))
   }
+//   async findTalks(userName: string): Promise<T | null>
+//   {
+// 	return (await this.prisma.user.findUnique({
+// 		where: {
+// 			name: userName,
+// 		}
+// 	}))
+//   }
 
   async	findRoom(roomName: string): Promise<Room | null>
   {
