@@ -87,7 +87,7 @@ export default function Profile() {
 		router.push('/user/edit');
 	}
 
-	function startDm() {
+	const startDm = () => {
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 
 		router.push({
