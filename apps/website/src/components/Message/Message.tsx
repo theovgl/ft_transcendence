@@ -39,6 +39,7 @@ export default function Message({content, username }: MessageProps) {
 					path={profilePic}
 					size={35}
 					stroke={false}
+					currentUser={username}
 				/>
 			</Link>
 			<div className={styles.message_container}>

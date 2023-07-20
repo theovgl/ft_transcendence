@@ -10,6 +10,7 @@ import { Injectable } from "@nestjs/common";
 	  origin: ['https://hoppscotch.io', `http://${process.env.IP_ADDRESS}:3000`, `http://${process.env.IP_ADDRESS}:4000`],
 	  methods: ['GET', 'POST'],
 	  credentials: true,
+	  transport: ['websocket', 'polling'],
 	  allowedHeaders: ['Authorization', 'Content-Type'],
 	  exposedHeaders: ['Authorization'],
 	  allowEIO3: true,
