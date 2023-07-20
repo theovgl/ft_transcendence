@@ -6,6 +6,9 @@ import { useRouter } from 'next/router';
 import { useUser } from "@/utils/hooks/useUser";
 import { useAuth } from "@/utils/hooks/useAuth";
 import { io, Socket } from "socket.io-client";
+import Message from '@/components/Message/Message.tsx';
+import { UserInfos } from "global";
+import { useCookies } from 'react-cookie';
 
 
 type Message = {
@@ -37,7 +40,6 @@ interface SocketData {
   age: number;
 }
 
-
 let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
 socket = io( `http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000` );
 
@@ -51,6 +53,11 @@ export default function Chat()
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [rooms, setRooms] = useState<Array<String>>([]);
   const [room, setRoom] = useState("General");
+  const router = useRouter();
+  const [cookies] = useCookies();
+  const [author, setAuthor] = useState(Object)
+
+  const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
   let [tabList, setTablist] = useState([	
 					{
 						label:"General",
@@ -76,7 +83,7 @@ export default function Chat()
 			setChosenUsername(user.name);
 			if (socket)
 			{
-				socketInitializer();
+				setAuthor(socketInitializer());
 				socket.emit("UserConnection", user.name);
 			}
 		}
@@ -84,7 +91,7 @@ export default function Chat()
 		return () => {
 			socket.off('msgToClient');
 		};
-  	}, [user, socket]);
+  	}, [user, socket,]);
 
 	  const socketInitializer = async () => {
 		socket.on("msgToClient", (msg: Message) => {
@@ -158,22 +165,24 @@ export default function Chat()
 					<Contact name="TheRealObama" picture="temp" content="offline" context="presentation"/>
 				</div>
 				<div className={chatStyle.main}>
-				{
-					messages.map((msg, i) =>
-					{
-						return (
-							<Contact name="M.Obama" picture="temp" content={msg.message} context="message" key={i}/>
-						);
-					})
-				}
-				</div>
-				<input type="text" className={chatStyle.input}
-				        placeholder="New message..."
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyUp={handleKeypress}
-				>
-				</input>
-		</div>
-	);
+        {
+          messages.map((msg, i) => (
+            <Message
+              key={i}
+              content={msg.message}
+              username={msg.author}
+            />
+          ))
+        }
+      </div>
+      <input
+        type="text"
+        className={chatStyle.input}
+        placeholder="New message..."
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        onKeyUp={handleKeypress}
+      />
+    </div>
+  );
 }
