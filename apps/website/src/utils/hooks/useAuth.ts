@@ -9,10 +9,7 @@ export const useAuth = () => {
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
-		if (user !== null)
-			setIsAuthenticated(true);
-		else
-			setIsAuthenticated(false);
+		setIsAuthenticated(user ? true : false);
 		setIsLoading(false);
 	}, [user]);
 
