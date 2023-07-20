@@ -21,7 +21,7 @@ export default function Navbar() {
 						className={navbarStyle.profilePicButton}
 						onClick={() => setIsModalOpen(true)}
 					>
-						<ProfilePic path={user?.profilePic} stroke={false} size={35}/>
+						<ProfilePic path={user?.profilePic} stroke={false} size={35} currentUser={user?.name}/>
 					</div>
 				) : (
 					<div className={navbarStyle.button_container}>

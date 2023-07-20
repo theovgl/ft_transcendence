@@ -22,6 +22,7 @@ export default function FriendEntity({name, profilePicPath}: Props) {
 					path={profilePicPath}
 					size={35}
 					stroke={false}
+					currentUser={name}
 				/>
 				{name}
 			</Link>

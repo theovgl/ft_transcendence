@@ -29,6 +29,7 @@ export default function Profile() {
 	const [buttonText, setButtonText] = useState<string>('');
 	const [status, setStatus] = useState<string>('');
 	const [isBlocked, setIsBlocked] = useState(false);
+	const username = router.query.username as string;
 
 	function updateButtonState(response: string) {
 		if (response === 'ACCEPTED')
@@ -187,7 +188,7 @@ export default function Profile() {
 		updateButtonState(status);
 		fetchUserInfo();
 	}, [router.isReady, router.query.username, router, cookies, status]);
-		
+
 	return (
 		<>
 			<Head>
@@ -205,6 +206,7 @@ export default function Profile() {
 											path={userInfo.profilePicPath}
 											size={90}
 											stroke
+											currentUser={username}
 										/>
 										<Name
 											Username={userInfo.name}
