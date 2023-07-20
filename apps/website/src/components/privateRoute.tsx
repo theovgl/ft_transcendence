@@ -18,7 +18,7 @@ export default function PrivateRoute({ protectedRoutes, children }: PrivateRoute
             router.push('/login');
         }
 		setIsLoading(false);
-    }, [isAuthenticated, pathIsProtected, router]);
+    }, []);
 
     if ((isLoading || !isAuthenticated) && pathIsProtected) {
         return <LoadingPage />;
