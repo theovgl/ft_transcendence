@@ -89,6 +89,7 @@ model AdminTalk {
 
   @@id([userId, roomId])
 }
+
 model Friendship {
   requester   User             @relation("requester", fields: [requesterId], references: [id])
   requesterId Int
