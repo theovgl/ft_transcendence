@@ -1,6 +1,6 @@
 import 'normalize.css';
 import homepageStyle from '@/styles/homepage.module.scss';
-import Leaderboard from '@/components/Leaderboard/';
+import Leaderboard from '@/components/Leaderboard/index';
 import Navbar from '@/components/Navbar';
 import Head from 'next/head';
 import Button from '@/components/Button/Button';
