@@ -2,7 +2,17 @@ import { ConnectedSocket, MessageBody,SubscribeMessage, WebSocketGateway, WebSoc
 import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 
-@WebSocketGateway({ cors: { origin: '*', credentials: true }, })
+@WebSocketGateway({
+	cors: {
+	  origin: ['https://hoppscotch.io', `http://${process.env.IP_ADDRESS}:3000`, `http://${process.env.IP_ADDRESS}:4000`],
+	  methods: ['GET', 'POST'],
+	  credentials: true,
+	  allowedHeaders: ['Authorization', 'Content-Type'],
+	  exposedHeaders: ['Authorization'],
+	  allowEIO3: true,
+	  allowEIO4: true,
+	},
+})
 export class StatusGateway {
 @WebSocketServer() server: Server;
 private logger = new Logger('StatusGateway');
@@ -42,7 +52,11 @@ async handleUserConnected(@MessageBody() data: string, @ConnectedSocket() client
 		const username = this.onlineUsers.get(client.id);
 		if (username)
 		{
-			this.onlineUsersInGame.delete(client.id);
+			this.onlineUsersInGame.forEach((value:string, key: string)=> {
+				if (value === username) {
+					this.onlineUsersInGame.delete(key);
+				}
+			});
 			this.server.emit('quitInGame', { username: username, status: 'Online'});
 		}
 	}
@@ -60,6 +74,10 @@ async handleUserConnected(@MessageBody() data: string, @ConnectedSocket() client
 				return true;
 		}
 		return false;
+	}
+
+	handleConnection(client: any, ...args: any[]) {
+		this.logger.log(`Client connected: ${client.id}`);
 	}
 
 	async handleDisconnect(client: any) {

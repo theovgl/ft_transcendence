@@ -3,13 +3,18 @@ import { Server, Socket } from 'socket.io';
 import { OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { MatchmakingService } from './matchmaking.service'
 import { Injectable } from "@nestjs/common";
-import { Client } from "socket.io/dist/client";
 
 @Injectable()
 @WebSocketGateway({
-    cors: {
-        origin: '*',
-    },
+	cors: {
+	  origin: ['https://hoppscotch.io', `http://${process.env.IP_ADDRESS}:3000`, `http://${process.env.IP_ADDRESS}:4000`],
+	  methods: ['GET', 'POST'],
+	  credentials: true,
+	  allowedHeaders: ['Authorization', 'Content-Type'],
+	  exposedHeaders: ['Authorization'],
+	  allowEIO3: true,
+	  allowEIO4: true,
+	},
 })
 export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect{
     @WebSocketServer()

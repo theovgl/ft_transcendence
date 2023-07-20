@@ -175,7 +175,7 @@ export default function Profile() {
 		updateButtonState(status);
 		fetchUserInfo();
 	}, [router.isReady, router.query.username, router, cookies, status]);
-		
+
 	return (
 		<>
 			<Head>
@@ -193,6 +193,7 @@ export default function Profile() {
 											path={userInfo.profilePicPath}
 											size={90}
 											stroke
+											currentUser={router.query.username} // Need to check if it's the user profile name and not current user
 										/>
 										<Name
 											Username={userInfo.name}

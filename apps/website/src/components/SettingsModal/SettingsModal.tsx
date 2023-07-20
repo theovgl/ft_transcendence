@@ -41,7 +41,7 @@ export default function SettingsModal(props: SettingsModalProps) {
 					<div className={style.modal_userInfo}>
 						<ProfilePic
 							path={user?.profilePic}
-							size={30} stroke={false}
+							size={30} stroke={false} currentUser={user?.name}
 						/>
 						<p className={style.modal_username}>{user?.name}</p>
 					</div>
