@@ -1,0 +1,30 @@
+@import '../../styles/library';
+
+.message {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	font-family: $font-family;
+	padding: 10px 20px;
+	box-sizing: border-box;
+	border-bottom: 1px solid rgba($color: #000000, $alpha: 0.1);
+	gap: 10px;
+}
+
+.message_profilePic {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.message_username {
+	font-weight: 600;
+}
+
+.message_content {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	color: $black-color;
+	margin: 0 10px;
+}
