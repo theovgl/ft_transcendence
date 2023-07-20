@@ -1,6 +1,7 @@
 type FortyTwoUser = {
 	userId: number;
 	username: string;
+	displayname: string;
 	firstName: string;
 	lastName: string;
 	email: string;

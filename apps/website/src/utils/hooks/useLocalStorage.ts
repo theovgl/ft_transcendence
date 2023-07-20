@@ -5,7 +5,7 @@ export const useLocalStorage = () => {
 	};
 
 	const getItem = (key: string) => {
-		if (typeof localStorage != 'undefined')
+		if (typeof localStorage !== 'undefined')
 			return localStorage.getItem(key);
 		return null;
 	};

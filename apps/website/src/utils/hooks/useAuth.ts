@@ -14,7 +14,7 @@ export const useAuth = () => {
 		socketRef.current = io(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000`);
 
 	useEffect(() => {
-		if (user !== null) {
+		if (user) {
 			setIsAuthenticated(true);
 			socketRef.current?.emit('addConnectedUser', user?.name);
 			socketRef.current?.connect();

@@ -36,6 +36,7 @@ export default function Message({content, username }: MessageProps) {
 				className={styles.message_profilePic}
 			>
 				<ProfilePic
+					currentUser={username}
 					path={profilePic}
 					size={35}
 					stroke={false}

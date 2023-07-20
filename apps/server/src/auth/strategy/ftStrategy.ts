@@ -23,6 +23,7 @@ export class ftStrategy extends PassportStrategy(Strategy) {
 			const user = {
 				userId: profile.id,
 				username: profile.username,
+				displayname: profile.displayName,
 				email: profile.emails[0].value,
 				firstName: profile.name.givenName,
 				lastName: profile.name.familyName,
