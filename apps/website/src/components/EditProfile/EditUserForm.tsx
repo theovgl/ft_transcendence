@@ -1,5 +1,5 @@
 import styles from './EditUserForm.module.scss';
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import Button from '../Button/Button';
 import { BiPencil, BiSave } from 'react-icons/bi';
@@ -20,7 +20,7 @@ export default function EditUserForm() {
 		register,
 		setError,
 		handleSubmit,
-		formState: { errors, isSubmitSuccessful, isLoading },
+		formState: { errors },
 	} = useForm<IFormValues>();
 
 	const saveNewDisplayName = (newDisplayName: string) => {
