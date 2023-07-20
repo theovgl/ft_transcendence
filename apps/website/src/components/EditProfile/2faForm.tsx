@@ -22,6 +22,7 @@ export default function TwoFaForm() {
 		register,
 		watch,
 		reset,
+		setError,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<IFormValues>({
@@ -36,22 +37,32 @@ export default function TwoFaForm() {
 		const body = {
 			twoFactorAuthenticationCode: code,
 		};
-		try {
-			const response = await fetch(`http://localhost:4000/auth/2fa/${endpoint}`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: 'Bearer ' + cookies['jwt'],
-				},
-				body: JSON.stringify(body)
-			});
-	
-			if (response.ok)
+		fetch(`http://localhost:4000/auth/2fa/${endpoint}`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: 'Bearer ' + cookies['jwt'],
+			},
+			body: JSON.stringify(body)
+		}).then((res) => {
+			if (res.ok) 
 				return true;
-		} catch (e) {
-			console.error(e);
-			return false;
-		}
+			else 
+				throw new Error(res.statusText);
+				
+		}).catch((e) => {
+			if (e.message === 'Unauthorized') {
+				setError('tfaCode', {
+					type: 'server',
+					message: 'Invalid code',
+				});
+			} else {
+				setError('tfaCode', {
+					type: 'server',
+					message: 'Something went wrong while setting 2FA',
+				});
+			}
+		});
 		return false;
 	};
 
@@ -124,7 +135,10 @@ export default function TwoFaForm() {
 	}
 
 	return (
-		<form id='2faForm' className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
+		<form id='2faForm'
+			className={styles.formContainer}
+			onSubmit={handleSubmit(onSubmit)}
+		>
 			<div className={styles.formSection}>
 				<div className={styles.formSection}>
 					<FormLabel content='Two factor authentication' />
@@ -141,24 +155,31 @@ export default function TwoFaForm() {
 						/>}
 				</div>
 				{isPromptDisplayed &&
-					<input
-						className={`
+					<div className={styles.labeledInput_container}>
+						<input
+							className={`
 							${styles.input}
 							${errors.tfaCode ? styles.input_error : ''}
 						`}
-						type='text'
-						placeholder='2FA Code'
-						{...register('tfaCode', {
-							maxLength: {
-								value: 6,
-								message: 'Code should be 6 numbers'
-							},
-							pattern: {
-								value: /^[0-9]*$/,
-								message: 'Invalid Input. Only use numbers (0-9)'
-							}
-						})}
-					/>
+							type='text'
+							placeholder='2FA Code'
+							{...register('tfaCode', {
+								maxLength: {
+									value: 6,
+									message: 'Code should be 6 numbers'
+								},
+								pattern: {
+									value: /^[0-9]*$/,
+									message: 'Invalid Input. Only use numbers (0-9)'
+								}
+							})}
+						/>
+						<span className={
+							errors.tfaCode ?
+								styles.error_message : styles.error_message_invisible
+						}
+						>{errors.tfaCode && errors.tfaCode.message}</span>
+					</div>
 				}
 			</div>
 		</form>
