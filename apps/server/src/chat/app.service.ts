@@ -40,7 +40,7 @@ export class ChatService implements OnModuleInit {
 		console.log("client leaving : " + this.currentRoomName);
 		console.log("client joining : " + room);
 	}
-	this.addUserToRoom(client, room)
+	this.addUserToRoom(this.clientList.get(client), room)
 	client.leave(this.currentRoomName);
 	client.join(room);
 	this.currentRoomName = room;
@@ -135,7 +135,7 @@ export class ChatService implements OnModuleInit {
 				},
 			}
 		})
-		)
+		
 			return ;
 		await this.prisma.talk.create({
 			data: {
@@ -228,14 +228,14 @@ public async leaveRoom(client: Socket, roomName: string){
 	const user = await this.findUser(this.clientList.get((client)));
 	const room = await this.findRoom(roomName);
 	
-	if (user && room){
-		await this.prisma.talk.delete({
-			where: {
-				userId: user.id,
-				roomId: room.id
-			}
-		})
-	}
+	// if (user && room){
+	// 	await this.prisma.talk.delete({
+	// 		where: {
+	// 			userId: user.id,
+	// 			roomId: room.id
+	// 		}
+	// 	})
+	// }
 	client.emit('leaveRoom', roomName);
 	//remove User from Room
 }
