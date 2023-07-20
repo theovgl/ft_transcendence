@@ -7,29 +7,32 @@ import { useCookies } from 'react-cookie';
 import { useUser } from '@/utils/hooks/useUser';
 
 interface IFormValues {
-	'tfa': Boolean;
+	'checkbox': Boolean;
 	'tfaCode': string;
 }
 
 export default function TwoFaForm() {
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [is2faEnable, setIs2faEnable] = useState<boolean>(false);
 	const [qrCode, setQrCode] = useState<string | null>(null);
 	const [isPromptDisplayed, setIsPromptDisplayed] = useState<boolean>(false);
 	const [cookies] = useCookies();
 	const { user } = useUser();
-
-	const tfaFieldValue = is2faEnable;
-
 	const {
 		register,
 		watch,
+		reset,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<IFormValues>({ defaultValues: { tfa: tfaFieldValue}});
+	} = useForm<IFormValues>({
+		defaultValues: { checkbox: is2faEnable}
+	});
 
-	const checkboxValue = watch('tfa', is2faEnable);
+	const checkboxValue = watch('checkbox');
 
-	const toggleTwoFactorAuthentication = async (code: number, endpoint: string): Promise<boolean> => {
+	const toggleTwoFactorAuthentication = async (
+		code: number, endpoint: string
+	): Promise<boolean> => {
 		const body = {
 			twoFactorAuthenticationCode: code,
 		};
@@ -84,21 +87,24 @@ export default function TwoFaForm() {
 	useEffect(() => {
 		if (!user) return;
 		const fetchUserInfos = async () => {
-			const response = await fetch(`http://localhost:4000/users/${user?.name}`, {
+			fetch(`http://localhost:4000/users/${user?.name}`, {
 				method: 'GET',
 				headers: {
 					Authorization: 'Bearer ' + cookies['jwt'],
 				},
+			}).then((res) => {
+				return res.json();
+			}).then((res) => {
+				setIs2faEnable(res.twoFAEnabled);
+				reset({ checkbox: res.twoFAEnabled});
+				setIsPromptDisplayed(false);
+				setQrCode(null);
+				setIsLoading(false);
 			});
-			const responseJSON = await response.json();
-
-			setIs2faEnable(responseJSON.twoFAEnable);
-			setIsPromptDisplayed(false);
-			setQrCode(null);
 		};
 
 		fetchUserInfos();
-	}, [user]);
+	}, [user, reset]);
 
 	const onSubmit = async (data: any) => {
 		const isSuccess = await toggleTwoFactorAuthentication(
@@ -111,14 +117,20 @@ export default function TwoFaForm() {
 		}
 	};
 
+	if (isLoading) {
+		return (
+			<p>Loading...</p>
+		);
+	}
+
 	return (
 		<form id='2faForm' className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
 			<div className={styles.formSection}>
 				<div className={styles.formSection}>
 					<FormLabel content='Two factor authentication' />
 					<input type="checkbox"
-						id="2fa"
-						{...register('tfa')}
+						id="checkbox"
+						{...register('checkbox')}
 					/>
 					{(qrCode !== null && !is2faEnable && checkboxValue) && 
 						<Image
