@@ -103,7 +103,7 @@ export class ChatService implements OnModuleInit {
   {
 	await this.createRoom(room); 
 	this.clientList.set(client, payload);
-	await this.addUserToRoom(client, room);
+	await this.addUserToRoom(this.clientList.get(client), room);
 	await this.loadRoomlist(client)
 	await this.loadRoom(client, room);
 	// await this.prisma.user.update({
@@ -117,14 +117,16 @@ export class ChatService implements OnModuleInit {
 	this.clientList.delete(client)
   }
 
-  async addUserToRoom(client: Socket, roomName: string) {
-	const user = await this.findUser(this.clientList.get(client));
+  async addUserToRoom(clientName: string, roomName: string) {
+	const user = await this.findUser(clientName);
 	const room = await this.findRoom(roomName);
 	
 	if (user && room)
 	{
-		client.emit('loadRoom', room.name);
-		if (
+		for (const [client, userId] of this.clientList) {
+			if (userId === clientName)
+				client.emit('loadRoom', room.name);
+		}
 		await this.prisma.talk.findUnique({
 			where: {
 				userId_roomId: {
@@ -212,17 +214,35 @@ export class ChatService implements OnModuleInit {
 
   public async createDm(client: Socket, payload)
   {
-	this.createRoom(payload.roomName);
+	const username = this.clientList.get(client);
+	const roomName = [username, payload].sort().join('');
+	console.log('create Dm: ' + roomName);
+	this.createRoom(roomName);
+	this.addUserToRoom(this.clientList.get(client), roomName);
+	this.addUserToRoom(payload, roomName);
 	this.loadRoom(client, payload.roomName)
   }
-//if no user delete the room (in app.gateway)
+
 //listen to an Event leaveRoom(in app.gateway)
+public async leaveRoom(client: Socket, roomName: string){
+	const user = await this.findUser(this.clientList.get((client)));
+	const room = await this.findRoom(roomName);
+	
+	if (user && room){
+		await this.prisma.talk.delete({
+			where: {
+				userId: user.id,
+				roomId: room.id
+			}
+		})
+	}
+	client.emit('leaveRoom', roomName);
+	//remove User from Room
+}
 
-//leaveRoom(client: socket)
-//delete from the users array in room entry
-//emit to leave the room in front-end
-
-//	deleteRoom(roomName)
+// OPTIONAL
+// if no user delete the room (in app.gateway)
+// 	deleteRoom(roomName)
 // find room
 // delete room
 
@@ -240,7 +260,6 @@ export class ChatService implements OnModuleInit {
 
 //Owner
 //add owner in Room model
-//add admin which is an array of users in Room model
 //if owner quits, the next admin become owner
 //if no other admin, make the next user an owner and admin
 
@@ -249,11 +268,9 @@ export class ChatService implements OnModuleInit {
 
 //Ban
 //Same as Kick + ajouter au tableau Banned users
-//add a banned users array in Room model
 //add a check in loadRoom to prevent bannedusers to join
 
 //Mute
-//Add a muted users array in Room model
 //Prevent muted users to storeMessage
 
   getHello(): string {

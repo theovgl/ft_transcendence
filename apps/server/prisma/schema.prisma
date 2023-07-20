@@ -27,12 +27,18 @@ model User {
   @@map("Users")
   messages       Message[]
   talks         Talk[]
+  bannedTalks   BannedTalk[]
+  mutedTalks    MutedTalk[]
+  adminTalks    AdminTalk[]
 }
 
 model Room {
   id       String    @id @default(uuid())
   name     String		@unique
   users    Talk[]
+  bannedUsers BannedTalk[]
+  mutedUsers MutedTalk[]
+  adminUsers AdminTalk[]
   messages Message[]
 }
 
@@ -55,6 +61,34 @@ model Talk {
   @@id([userId, roomId])
 }
 
+model BannedTalk {
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int
+  room   Room   @relation(fields: [roomId], references: [id])
+  roomId String
+
+  @@id([userId, roomId])
+}
+
+
+model MutedTalk {
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int
+  room   Room   @relation(fields: [roomId], references: [id])
+  roomId String
+
+  @@id([userId, roomId])
+}
+
+
+model AdminTalk {
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int
+  room   Room   @relation(fields: [roomId], references: [id])
+  roomId String
+
+  @@id([userId, roomId])
+}
 model Friendship {
   requester   User             @relation("requester", fields: [requesterId], references: [id])
   requesterId Int

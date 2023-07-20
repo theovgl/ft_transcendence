@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import Ball from './Ball';
-import Score from './Score';
+import Ball from './Ball.js';
+import Score from './Score.js';
 import Character from './Character.js';
-import GameManager from './GameManager';
-import Collectible from './Collectible';
+import GameManager from './GameManager.js';
+import Collectible from './Collectible.js';
 
 const BASE_HEIGHT = 10;
 
