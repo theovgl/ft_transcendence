@@ -79,10 +79,11 @@ export default function Chat()
 		roomRef.current = room;
 	}, [room]);
 	
-	useEffect(() => {
-		function startDm() {
+	function startDm() {
 		socket.emit('startDm', `${router.query.requesterName}`, `${router.query.addresseeName}`);
-		}
+	}
+
+	useEffect(() => {
 		startDm();
 	}, [router.query.requesterName, router.query.addresseeName]);
 	
