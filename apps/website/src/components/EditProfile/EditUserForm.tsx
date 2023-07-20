@@ -38,7 +38,7 @@ export default function EditUserForm() {
 		};
 	
 		try {
-			const response = await fetch(`http://localhost:4000/users/edit?user=${encodeURIComponent(
+			const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/edit?user=${encodeURIComponent(
 				user!.name
 			)}`, {
 				method: 'PATCH',
@@ -72,7 +72,7 @@ export default function EditUserForm() {
 		formData.append('profile-picture', data[0]);
 
 		try {
-			const response = await fetch(`http://localhost:4000/users/profile-picture?user=${encodeURIComponent(
+			const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/profile-picture?user=${encodeURIComponent(
 				user!.name
 			)}`, {
 				method: 'PATCH',
@@ -116,7 +116,7 @@ export default function EditUserForm() {
 					htmlFor="picture"
 					style={{
 						backgroundImage: `
-							url(${user ? user.profilePic : '/images/default_profil_picture.jpg'})
+							url(${user ? user.profilePic : ''})
 						`,
 						backgroundPosition: 'center',
 						backgroundSize: 'cover',

@@ -37,7 +37,7 @@ export default function TwoFaForm() {
 		const body = {
 			twoFactorAuthenticationCode: code,
 		};
-		fetch(`http://localhost:4000/auth/2fa/${endpoint}`, {
+		fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/auth/2fa/${endpoint}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ export default function TwoFaForm() {
 	};
 
 	const getQRCode = async () => {
-		const response = await fetch('http://localhost:4000/auth/2fa/generate',
+		const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/auth/2fa/generate`,
 			{
 				method: 'GET',
 				headers: {
@@ -98,7 +98,7 @@ export default function TwoFaForm() {
 	useEffect(() => {
 		if (!user) return;
 		const fetchUserInfos = async () => {
-			fetch(`http://localhost:4000/users/${user?.name}`, {
+			fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/${user?.name}`, {
 				method: 'GET',
 				headers: {
 					Authorization: 'Bearer ' + cookies['jwt'],
