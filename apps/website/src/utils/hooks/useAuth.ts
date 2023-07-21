@@ -10,9 +10,6 @@ export const useAuth = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const socketRef = useRef<Socket | null>(null);
 
-	if (!socketRef.current)
-		socketRef.current = io(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000`);
-
 	useEffect(() => {
 		if (user !== null) {
 			setIsAuthenticated(true);
@@ -24,6 +21,10 @@ export const useAuth = () => {
 	}, [user]);
 
 	const login = (newUser: User) => {
+		if (!socketRef.current) {
+			socketRef.current = io(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000`);
+			console.log('c le socket', socketRef.current)
+		}
 		addUser(newUser);
 	};
 

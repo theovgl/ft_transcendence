@@ -22,6 +22,7 @@ export default function ProfilePic({ path, size, stroke, currentUser }: Props) {
 	}, [isConnected]);
 
 	useEffect(() => {
+		console.log(UseAuth.socket?.connected);
 		UseAuth.socket?.emit('isConnected', currentUser, (status: boolean) => {
 			if (connectedRef.current !== 'In Game')
 				setIsConnected(status ? 'Online' : 'Offline');
