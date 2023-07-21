@@ -4,7 +4,7 @@ import ModalLink from './ModalLink/ModalLink';
 import {
 	BiSolidChat,
 	BiSolidExit,
-	BiSolidGroup,
+	BiSolidHome,
 	BiSolidPencil,
 	BiSolidUser
 } from 'react-icons/bi';
@@ -41,9 +41,9 @@ export default function SettingsModal(props: SettingsModalProps) {
 					<div className={style.modal_userInfo}>
 						<ProfilePic
 							path={user?.profilePic}
-							size={30} stroke={false}
+							size={30} stroke={false} currentUser={user?.name}
 						/>
-						<p className={style.modal_username}>{user?.name}</p>
+						<p className={style.modal_username}>{user?.displayName}</p>
 					</div>
 					<RxCross2 onClick={() => setIsModalOpen(!isModalOpen)} />
 				</div>
@@ -53,6 +53,12 @@ export default function SettingsModal(props: SettingsModalProps) {
 						${isModalOpen ? '' : style.hidden}
 					`}
 				>
+					<ModalLink 
+						title='Home'
+						href='/'
+						icon={ <BiSolidHome /> }
+						onClick={() => setIsModalOpen(false)}
+					/>
 					<ModalLink
 						title='Your profile'
 						href={'/user/' + user?.name}
@@ -61,14 +67,8 @@ export default function SettingsModal(props: SettingsModalProps) {
 					/>
 					<ModalLink
 						title='Edit your profile'
-						href='/edit'
+						href='/user/edit'
 						icon={ <BiSolidPencil /> }
-						onClick={() => setIsModalOpen(false)}
-					/>
-					<ModalLink
-						title='Your friends'
-						href='/'
-						icon={ <BiSolidGroup /> }
 						onClick={() => setIsModalOpen(false)}
 					/>
 					<ModalLink

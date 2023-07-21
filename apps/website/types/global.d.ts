@@ -2,6 +2,7 @@ type UserInfos = {
 	id: number;
 	email: string;
 	name: string;
+	displayName: string;
 
 	profilePicPath: string;
 

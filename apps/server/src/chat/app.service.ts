@@ -82,19 +82,21 @@ export class ChatService implements OnModuleInit {
   async loadRoomlist(client: Socket)
   {
 	const user = await this.findUser(this.clientList.get(client));
-	const talks = await this.prisma.talk.findMany({
-		where: {
-			userId: user.id,
-		},
-		include: {
-			room: true,
-		},
-	})
-
-	talks.forEach((talk) => {
-		console.log('add Room: ' + talk.room.name + ' to user: ' + user.name);
-		client.emit('loadRoom', talk.room.name);
-	});
+	if (user)
+	{
+		const talks = await this.prisma.talk.findMany({
+			where: {
+				userId: user.id,
+			},
+			include: {
+				room: true,
+			},
+		})
+		talks.forEach((talk) => {
+			console.log('add Room: ' + talk.room.name + ' to user: ' + user.name);
+			client.emit('loadRoom', talk.room.name);
+		});
+	}
 	//get roomlist 
 	//send room one by one
   }

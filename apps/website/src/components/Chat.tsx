@@ -1,12 +1,16 @@
 import chatStyle from "@/styles/chat.module.css";
 import Tab from "@/components/Tab.tsx";
 import Contact from "@/components/Contact.tsx";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, use } from "react";
 import { useRouter } from 'next/router';
 import { useUser } from "@/utils/hooks/useUser";
-import { useAuth } from "@/utils/hooks/useAuth";
 import { io, Socket } from "socket.io-client";
-
+import Button from '@/components/Button/Button';
+import Message from '@/components/Message/Message.tsx';
+import { BiMessageAltDetail } from "react-icons/bi";
+import { start } from "repl";
+import { UserInfos } from "global";
+import { useCookies } from 'react-cookie';
 
 type Message = {
   author: string;
@@ -27,6 +31,7 @@ interface ClientToServerEvents {
 	msgToServer: (msg: Message) => void;
 	ChangeRoomFromClient: (payload: string) => void;
 	UserConnection: (payload: string) => void;
+	startDm: (requesterName: string, addresseeName: string) => void;
 }
 
 interface InterServerEvents {
@@ -57,6 +62,10 @@ export default function Chat()
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [rooms, setRooms] = useState<Array<String>>([]);
   const [room, setRoom] = useState("General");
+  const router = useRouter();
+  const [cookies] = useCookies();
+  const [author, setAuthor] = useState(Object)
+  const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
   let 	[tabList, setTablist] = useState<TabItem[]>([	
 					// {
 					// 	label:"General",
@@ -75,14 +84,22 @@ export default function Chat()
 	useEffect(() => {
 		roomRef.current = room;
 	}, [room]);
+	
+	function startDm() {
+		socket.emit('startDm', `${router.query.requesterName}`, `${router.query.addresseeName}`);
+	}
 
+	useEffect(() => {
+		startDm();
+	}, [router.query.requesterName, router.query.addresseeName]);
+	
 	useEffect(() => {
 		if (user)
 		{
 			setChosenUsername(user.name);
 			if (socket)
 			{
-				socketInitializer();
+				setAuthor(socketInitializer());
 				socket.emit("UserConnection", user.name);
 				socket.on("loadRoom", (payload: string) => {
 					setTablist((currenTablist: TabItem[]) => {
@@ -101,7 +118,7 @@ export default function Chat()
 		return () => {
 			socket.off('msgToClient');
 		};
-  	}, [user, socket]);
+  	}, [user, socket,]);
 
 	  const socketInitializer = async () => {
 		socket.on("msgToClient", (msg: Message) => {
@@ -164,8 +181,8 @@ export default function Chat()
 				{tabList.map(item =>  
 				(
 					<Tab key={item.label} label={item.label} active={item.active}
-						onClick={() => handleTabClick(item.label)} />)
-				)}
+					onClick={() => handleTabClick(item.label)} />)
+					)}
 				</div>
 
 				<div className={chatStyle.contact_list}>
@@ -175,15 +192,16 @@ export default function Chat()
 					<Contact name="TheRealObama" picture="temp" content="offline" context="presentation"/>
 				</div>
 				<div className={chatStyle.main}>
-				{
-					messages.map((msg, i) =>
-					{
-						return (
-							<Contact name="M.Obama" picture="temp" content={msg.message} context="message" key={i}/>
-						);
-					})
-				}
-				</div>
+        {
+          messages.map((msg, i) => (
+            <Message
+              key={i}
+              content={msg.message}
+              username={msg.author}
+            />
+          ))
+        }
+      </div>
 				<input type="text" className={chatStyle.input}
 				        placeholder="New message..."
                 value={message}
@@ -191,6 +209,13 @@ export default function Chat()
                 onKeyUp={handleKeypress}
 				>
 				</input>
+<Button
+	text='Message'
+	theme='light'
+	boxShadow
+	icon={<BiMessageAltDetail />}
+	onClick={startDm}
+/>
 		</div>
 	);
 }

@@ -27,14 +27,41 @@ export class AuthService {
 			if (!response || !response.ok)
 				throw new Error('Failed to fetch user info');
 
-			const data = await response.json();
+			const ft_data = await response.json();
+
+			const foundWithName = await this.prisma.user.findUnique({
+				where: {
+					name: ft_data.login
+				}
+			});
+
+			const foundWithDisplayName = await this.prisma.user.findUnique({
+				where: {
+					displayName: ft_data.login
+				}
+			});
+
+			if (foundWithName) {
+				const newUser: FortyTwoUser = {
+					userId: ft_data.id,
+					username: ft_data.login,
+					displayname: foundWithName.displayName,
+					email: ft_data.email,
+					firstName: ft_data.first_name,
+					lastName: ft_data.last_name,
+					picture: foundWithName.profilePicPath,
+				};
+				return newUser;
+			}
+
 			const newUser: FortyTwoUser = {
-				userId: data.id,
-				username: data.login,
-				email: data.email,
-				firstName: data.first_name,
-				lastName: data.last_name,
-				picture: data.image.link,
+				userId: ft_data.id,
+				username: ft_data.login,
+				displayname: foundWithDisplayName ? ft_data.login + (Math.floor(Math.random() * 9999)).toString() : ft_data.login,
+				email: ft_data.email,
+				firstName: ft_data.first_name,
+				lastName: ft_data.last_name,
+				picture: ft_data.image.link,
 			};
 
 			return newUser;
@@ -64,7 +91,7 @@ export class AuthService {
 				throw new Error('Failed to exchange code for token');
 
 			const responseData = await response.json();
-		    return responseData;
+			return responseData;
 		} catch (error) {
 			console.error('Error: ', error);
 			throw error;
@@ -73,7 +100,7 @@ export class AuthService {
 	
 	async handleCallback(response: any): Promise<any> {
 		const user: FortyTwoUser = await this.getUserInfo(response.access_token);
-		const token = await this.signToken(user.userId, user.username, user.email, user.picture);
+		const token = await this.signToken(user.userId, user.username, user.displayname, user.email, user.picture);
 
 		await this.prisma.user.upsert({
 			where: { email: user.email },
@@ -82,6 +109,7 @@ export class AuthService {
 				firstName: user.firstName,
 				lastName: user.lastName,
 				name: user.username,
+				displayName: user.displayname,
 				profilePicPath: user.picture,
 				jwt: token,
 			},
@@ -92,12 +120,13 @@ export class AuthService {
 		return token;
 	}
 
-	async signToken(userId: number, username: string, email: string, profilePic: string): Promise<string> {
+	async signToken(userId: number, username: string, displayName: string, email: string, profilePic: string): Promise<string> {
 		const payload = {
 			userId,
 			email,
 			profilePic,
-			username
+			username,
+			displayName,
 		};
 		const secret = this.config.get('JWT_SECRET');
 		const token = await this.jwt.sign(payload, {
@@ -127,6 +156,7 @@ export class AuthService {
 					id: user.userId,
 					email: user.email,
 					name: user.username,
+					displayName: user.username,
 					firstName: user.firstName,
 					lastName: user.lastName,
 					profilePicPath: user.picture,
@@ -151,13 +181,13 @@ export class AuthService {
 		const otpauthUrl = authenticator.keyuri(user.email, 'ft_transcendence', secret);
 		await this.setTwoFactorAuthenticationSecret(secret, user.id, user.email);
 		return {secret, otpauthUrl};
-	  }
+	}
 
-	  async generateQrCodeDataURL(otpAuthUrl: string) {
+	async generateQrCodeDataURL(otpAuthUrl: string) {
 		return toDataURL(otpAuthUrl);
-	  }
+	}
 
-	  async setTwoFactorAuthenticationSecret(secret: string, userId: number, email: string) {
+	async setTwoFactorAuthenticationSecret(secret: string, userId: number, email: string) {
 		try {
 			return await this.prisma.user.update({
 				where: {
@@ -168,13 +198,13 @@ export class AuthService {
 					twoFASecret: secret,
 				},
 			});
-	  } catch (e) {
+		} catch (e) {
 			console.error('Error when setting 2FA secret:', e);
 			throw (new InternalServerErrorException('Failed to set two factor authentication secret'));
 		}
 	}			
 
-	  async turnOnTwoFactorAuthentication(jwtDecoded: any) {
+	async turnOnTwoFactorAuthentication(jwtDecoded: any) {
 		await this.prisma.user.update({
 			where: {
 				email: jwtDecoded.email,
@@ -183,9 +213,9 @@ export class AuthService {
 				twoFAEnabled: true
 			},
 		});
-	  }
+	}
 
-	  async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, jwtDecoded: any): Promise<boolean> {
+	async isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, jwtDecoded: any): Promise<boolean> {
 		const user = await this.prisma.user.findUnique({ where: { email: jwtDecoded.email } });
 		const isCodeValid = authenticator.verify({
 			token: twoFactorAuthenticationCode,
@@ -193,9 +223,9 @@ export class AuthService {
 		});
 
 		return isCodeValid;
-	  }
+	}
 
-	  async turnOffTwoFactorAuthentication(jwtDecoded: any) {
+	async turnOffTwoFactorAuthentication(jwtDecoded: any) {
 		await this.prisma.user.update({
 			where: {
 				email: jwtDecoded.email,
@@ -207,7 +237,7 @@ export class AuthService {
 		});
 	}
 
-	  async loginWith2fa(jwtDecoded: any) {
+	async loginWith2fa(jwtDecoded: any) {
 		const user = await this.prisma.user.findUnique({ where: { email: jwtDecoded.email } });
 		const payload = {
 			userId: user.id,
@@ -218,8 +248,8 @@ export class AuthService {
 		};
 	
 		return {
-		  email: payload.email,
-		  access_token: this.jwt.sign(payload),
+			email: payload.email,
+			access_token: this.jwt.sign(payload),
 		};
-	  }
+	}
 }

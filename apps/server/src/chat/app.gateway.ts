@@ -14,7 +14,17 @@ import {Message} from './app.interface';
 import { Logger } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 
-@WebSocketGateway({cors: {origin: ['https://hoppscotch.io', `http://${process.env.IP_ADDRESS}:3000`, `http://${process.env.IP_ADDRESS}:4000`]}})
+@WebSocketGateway({
+	cors: {
+	  origin: ['https://hoppscotch.io', `http://${process.env.IP_ADDRESS}:3000`, `http://${process.env.IP_ADDRESS}:4000`],
+	  methods: ['GET', 'POST'],
+	  credentials: true,
+	  allowedHeaders: ['Authorization', 'Content-Type'],
+	  exposedHeaders: ['Authorization'],
+	  allowEIO3: true,
+	  allowEIO4: true,
+	},
+})
 export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
 	constructor(private readonly chatService: ChatService) {}
  @WebSocketServer() server: Server;
@@ -32,12 +42,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
  //Room Events
  @SubscribeMessage('CreateRoomfromServer')
  handleRoomCreation(client: Socket, payload: String): void {
-	 this.server.emit('CreateRoomFromClient', payload)
+	 this.server.emit('CreateRoomFromClient', payload);
  }
 
  @SubscribeMessage('ChangeRoomFromClient')
  handleRoomChange(client: Socket, payload: string): void {
-	this.chatService.changeRoom(client, payload)
+	this.chatService.changeRoom(client, payload);
 	// this.server.emit('ChangeRoomFromServer', payload)
  }
 

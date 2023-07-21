@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import * as cors from 'cors';
 import * as session from 'express-session';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { urlencoded, json } from 'express';
 
 async function bootstrap() {
 	const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -25,6 +26,8 @@ async function bootstrap() {
 		  saveUninitialized: false,
 		}),
 	);
+	app.use(json({ limit: '20mb' }));
+	app.use(urlencoded({ extended: true, limit: '20mb' }));
 	await app.listen(4000);
 }
 bootstrap();

@@ -18,6 +18,7 @@ type jwtType = {
 	userId: number;
 	email: string;
 	username: string;
+	displayName: string;
 	iat: number;
 	exp: number;
 }
@@ -29,6 +30,7 @@ export default function Profile() {
 	const [buttonText, setButtonText] = useState<string>('');
 	const [status, setStatus] = useState<string>('');
 	const [isBlocked, setIsBlocked] = useState(false);
+	const username = router.query.username as string;
 
 	function updateButtonState(response: string) {
 		if (response === 'ACCEPTED')
@@ -85,6 +87,18 @@ export default function Profile() {
 
 	function redirectToEdit() {
 		router.push('/user/edit');
+	}
+
+	function startDm() {
+		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
+
+		router.push({
+			pathname: '/chat',
+			query: {
+				addresseeName: `${router.query.username}`,
+				requesterName: encodeURIComponent(jwtPayload.username),
+			}
+		})
 	}
 	
 	async function relationshipUpdate() {
@@ -175,11 +189,11 @@ export default function Profile() {
 		updateButtonState(status);
 		fetchUserInfo();
 	}, [router.isReady, router.query.username, router, cookies, status]);
-		
+
 	return (
 		<>
 			<Head>
-				<title>Profile - {userInfo?.name}</title>
+				<title>Profile - {userInfo?.displayName}</title>
 			</Head>
 			<Navbar />
 			<main className={styles.main}>
@@ -193,9 +207,10 @@ export default function Profile() {
 											path={userInfo.profilePicPath}
 											size={90}
 											stroke
+											currentUser={username}
 										/>
 										<Name
-											Username={userInfo.name}
+											Username={userInfo.displayName}
 											FirstName={userInfo.firstName}
 											LastName={userInfo.lastName}
 											initialIsBlocked={isBlocked}
@@ -209,6 +224,7 @@ export default function Profile() {
 											theme='light'
 											boxShadow
 											icon={<BiMessageAltDetail />}
+											onClick={startDm}
 										/>
 										<Button
 											text={buttonText}

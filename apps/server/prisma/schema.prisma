@@ -10,6 +10,7 @@ generator client {
 model User {
   id             Int     @id @default(autoincrement())
   name           String  @unique
+  displayName    String  @unique
   email          String  @unique
   jwt            String?
   firstName      String?
@@ -31,7 +32,7 @@ model User {
   mutedTalks    MutedTalk[]
   adminTalks    AdminTalk[]
 }
-
+ 
 model Room {
   id       String    @id @default(uuid())
   name     String		@unique

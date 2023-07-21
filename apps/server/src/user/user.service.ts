@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EditUserDto } from './dto';
 import * as sharp from 'sharp';
@@ -8,16 +8,27 @@ import * as fs from 'fs';
 @Injectable()
 export class UserService {
 	constructor(private prisma: PrismaService) {}
-	async editUser(userId: number, dto: EditUserDto) {
-		const user = await this.prisma.user.update({
+	async editUser(name: string, dto: EditUserDto) {
+		console.log(name);
+
+		const existingUser = await this.prisma.user.findUnique({
 			where: {
-				id: userId,
+				displayName: dto.newDisplayName
+			}
+		});
+
+		if (existingUser && existingUser.name !== name)
+			throw new ConflictException('Display name already in use');
+
+		const updatedUser = await this.prisma.user.update({
+			where: {
+				name: name
 			},
 			data: {
-				...dto,
+				displayName: dto.newDisplayName
 			},
 		});
-		return user;
+		return updatedUser;
 	}
 
 	async findAll() {
@@ -34,6 +45,7 @@ export class UserService {
 			select: {
 				id: true,
 				name: true,
+				displayName: true,
 				firstName: true,
 				lastName: true,
 				profilePicPath: true,
@@ -49,7 +61,7 @@ export class UserService {
 		return user;
 	}
 
-	async uploadProfilePicture(userId: number, image: Buffer): Promise<void> {
+	async uploadProfilePicture(username: string, image: Buffer): Promise<string> {
 		try {
 			// Convert whatever image in webp format
 			const convertedImage = await sharp(image)
@@ -75,12 +87,14 @@ export class UserService {
 			// Update user table with the location of the image
 			await this.prisma.user.update({
 				where: {
-					id: userId
+					name: username
 				},
 				data: {
-					profilePicPath: `${convertedImageFilename}`
+					profilePicPath: `/images/profile-pictures/${convertedImageFilename}`
 				}
 			});
+
+			return convertedImageFilename;
 		} catch (error) {
 			console.error('An error occurred during file handling or database operation:', error);
 			throw error;
