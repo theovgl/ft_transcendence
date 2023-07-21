@@ -59,6 +59,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	this.chatService.banUser(payload.userName, payload.roomName)
  }
  
+ @SubscribeMessage('mute')
+ handleMute(client: Socket, payload){
+	this.chatService.muteUser(payload.userName, payload.roomName)
+ }
+
  @SubscribeMessage('challenge')
  handleGameInvite(client: Socket, payload){
 	console.log('challenge: ' + payload.challenged )

@@ -39,6 +39,8 @@ model Room {
   name     String		@unique
   owner    User? @relation(fields: [ownerId], references: [id])
   ownerId  Int?
+  password String?
+  status   String
   users    Talk[]
   bannedUsers BannedTalk[]
   mutedUsers MutedTalk[]

@@ -16,7 +16,7 @@ export class ChatService implements OnModuleInit {
 	{
 	}
 
-	public async createRoom(room: string, owner: string)
+	public async createRoom(room: string, owner: string, status: string, password ?: string)
 	{
 		if (await this.prisma.room.findUnique({
 			where: {
@@ -24,18 +24,32 @@ export class ChatService implements OnModuleInit {
 			}
 		}))
 			return;
-		console.log(owner);
 		const user = await this.findUser(owner);
 		if (user){
 			await this.prisma.room.create({
 				data: {
 					name: room,
-					owner: {
-						connect: { id: user.id },
-					},
+					status: status,
+					password: password,
 				},
 			})
+			if (status === "public"){
+				this.addAllUsersToRoom(room);
+			}
+			else{
+				await this.addUserToRoom(owner, room);
+			}
 			await this.setUserAsOwner(owner, room);
+		}
+	}
+
+	async addAllUsersToRoom(roomName: string){
+		const users = await this.prisma.user.findMany();
+
+		if (users){
+			users.forEach((user) =>{
+				this.addUserToRoom(user.name, roomName)
+			})
 		}
 	}
 
@@ -58,6 +72,21 @@ export class ChatService implements OnModuleInit {
 			})
 		}
 		await this.setUserAsAdmin(owner, roomName);
+	}
+
+	async setPassword(roomName: string, password ?: string){
+		const room = await this.findRoom(roomName);
+
+		if (room){
+			await this.prisma.room.update({
+				where: {
+					id: room.id
+				},
+				data: {
+					password: password
+				}
+			})
+		}
 	}
 
 	async	setUserAsAdmin(admin: string, roomName: string){
@@ -85,8 +114,11 @@ export class ChatService implements OnModuleInit {
 		}
 	}
 
-	public async loadRoom(client: Socket, room: string)
+	public async loadRoom(client: Socket, room: string, password ?: string)
 	{
+		if (password && !this.checkPassword(password, room)){
+			return;
+		}
 		if (room !== this.currentRoomName)
 		{
 			console.log("client leaving : " + this.currentRoomName);
@@ -127,12 +159,13 @@ export class ChatService implements OnModuleInit {
 
 	public async changeRoom(client: Socket, room: string)
 	{
-		this.createRoom(room, this.clientList.get(client));
+		// this.createRoom(room, this.clientList.get(client));
 		this.loadRoom(client, room);
 	}
 
 	async loadRoomlist(client: Socket)
 	{
+		await this.addUsertoAllPublicRooms(this.clientList.get(client));
 		const user = await this.findUser(this.clientList.get(client));
 		if (user)
 		{
@@ -151,11 +184,23 @@ export class ChatService implements OnModuleInit {
 		}
 	}
 
+	async addUsertoAllPublicRooms(clientName: string){
+		const rooms = this.prisma.room.findMany({
+			where: {
+				status: "public",
+			}
+		})
+		if (rooms){
+			(await rooms).forEach((room) => {
+				this.addUserToRoom(clientName, room.name);
+			})
+		}
+	}
+
 	public async userConnection(client: Socket, room: string, payload: string)
 	{
 		this.clientList.set(client, payload);
-		await this.createRoom(room, this.clientList.get(client)); 
-		await this.addUserToRoom(this.clientList.get(client), room);
+		await this.createRoom(room, this.clientList.get(client), "public"); 
 		await this.loadRoomlist(client)
 		await this.loadRoom(client, room);
 		await this.checkAdmin(client, room);
@@ -202,7 +247,7 @@ export class ChatService implements OnModuleInit {
 	{
 		const username = this.clientList.get(client);
 		const roomName = [username, payload].sort().join('');
-		await this.createRoom(roomName, username);
+		await this.createRoom(roomName, username, "private");
 		await this.removeOwner(username, roomName)
 		await this.addUserToRoom(this.clientList.get(client), roomName);
 		await this.addUserToRoom(payload, roomName);
@@ -213,7 +258,7 @@ export class ChatService implements OnModuleInit {
 	{
 		const username = this.clientList.get(client);
 		const roomName = [username, payload].sort().join('');
-		await this.createRoom(roomName, username);
+		await this.createRoom(roomName, username, "private");
 		await this.removeOwner(username, roomName)
 		await this.addUserToRoom(this.clientList.get(client), roomName);
 		await this.addUserToRoom(payload, roomName);
@@ -231,6 +276,18 @@ export class ChatService implements OnModuleInit {
 		}
 		else{
 			client.emit('setAdmin', false);
+		}
+	}
+
+	public async checkPassword(password: string, roomName: string) {
+		const room = await this.findRoom(roomName);
+
+		if (room){
+			if (room.password === null)
+				return true;
+			else {
+				return password === room.password
+			}
 		}
 	}
 
@@ -288,7 +345,7 @@ export class ChatService implements OnModuleInit {
 					where: {
 						userId_roomId: {
 							userId: user.id,
-						roomId: room.id,
+							roomId: room.id,
 					},
 				}
 			}))
@@ -324,18 +381,26 @@ export class ChatService implements OnModuleInit {
 	async removeTalk(clientName: string, roomName: string, talk: any) {
 		const user = await this.findUser(clientName);
 		const room = await this.findRoom(roomName);
-
-		if (user && room){
-			await talk.delete({
-					where: {
-						userId_roomId: {
-							userId: user.id,
-							roomId: room.id
-						}
+	  
+		if (user && room) {
+		  const talks = await talk.findMany({
+			where: {
+			  userId: user.id,
+			  roomId: room.id,
+			},
+		  });
+	  
+		  if (talks.length > 0) {
+			await talk.deleteMany({
+				where: {
+					userId: user.id,
+					roomId: room.id,
 				}
 			})
+		  }
 		}
-	}
+	  }
+	  
 
 
 	async findUser(userName: string): Promise<User | null>
