@@ -198,6 +198,7 @@ export default function Chat()
               key={i}
               content={msg.message}
               username={msg.author}
+			  socket={socket}
             />
           ))
         }
