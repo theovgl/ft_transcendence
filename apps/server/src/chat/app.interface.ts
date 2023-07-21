@@ -11,6 +11,7 @@ export interface ServerToClientEvents {
 	withAck: (d: string, callback: (e: number) => void) => void;
 	msgToClient: (msg: Message) => void;
 	loadRoom: (payload: string) => void;
+	setAdmin: (status: boolean) => void;
 
 }
 
@@ -20,6 +21,7 @@ export interface ClientToServerEvents {
 	ChangeRoomfromClient: (payload: string) => void;
 	UserConnection: (payload: string) => void;
 	startDm: (requesterName: string, addresseeName: string) => void;
+	checkAdmin: (roomName: string) => void;
 }
 
 export interface InterServerEvents {

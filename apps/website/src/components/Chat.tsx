@@ -24,6 +24,8 @@ interface ServerToClientEvents {
   withAck: (d: string, callback: (e: number) => void) => void;
 	msgToClient: (msg: Message) => void;
 	loadRoom: (payload: string) => void;
+	setAdmin: (status: boolean) => void;
+
 }
 
 interface ClientToServerEvents {
@@ -32,6 +34,7 @@ interface ClientToServerEvents {
 	ChangeRoomFromClient: (payload: string) => void;
 	UserConnection: (payload: string) => void;
 	startDm: (requesterName: string, addresseeName: string) => void;
+	checkAdmin: (roomName: string) => void;
 }
 
 interface InterServerEvents {
@@ -64,7 +67,8 @@ export default function Chat()
   const [room, setRoom] = useState("General");
   const router = useRouter();
   const [cookies] = useCookies();
-  const [author, setAuthor] = useState(Object)
+  const [author, setAuthor] = useState(Object);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
   let 	[tabList, setTablist] = useState<TabItem[]>([	
 					// {
@@ -132,6 +136,10 @@ export default function Chat()
 			return currentMsg;
 		  });
 		});
+		socket.on('setAdmin', (status) => {
+			console.log("is Admin: " + status);
+			setIsAdmin(status);
+		})
 	  };
 
 	const sendMessage = async () => {
@@ -144,8 +152,10 @@ export default function Chat()
 
 	const changeRoom = async (newRoom: string) => {
 		console.log("newroom is : " + newRoom);
+		setIsAdmin(false);
 		setRoom(newRoom);
 		setMessages([]);
+		socket.emit('checkAdmin', newRoom);
 		socket.emit("ChangeRoomFromClient", newRoom);
 	}
 

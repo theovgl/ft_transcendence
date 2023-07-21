@@ -42,7 +42,12 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
  @SubscribeMessage('challenge')
  handleGameInvite(client: Socket, payload){
 	console.log('challenge: ' + payload.challenged )
-	this.chatService.createDm(client, payload.challenged);
+	this.chatService.createGameInvite(client, payload.challenged);
+ }
+
+ @SubscribeMessage('checkAdmin')
+ handleCheckAdmin(client: Socket, payload: string): void {
+	this.chatService.checkAdmin(client, payload);
  }
 
  //Room Events
