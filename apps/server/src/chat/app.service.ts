@@ -119,7 +119,68 @@ export class ChatService implements OnModuleInit {
 	this.clientList.delete(client)
   }
 
-  async addUserToRoom(clientName: string, roomName: string) {
+  async storeMessage(payload) {
+	console.log("channel name : " + payload.channel);
+	console.log("author name: " + payload.author);
+	
+	const author = await this.findUser(payload.author);
+
+	const room = await this.findRoom(payload.channel);
+
+	if (!author || !room)
+	{
+		console.log("author or room not found");
+	}
+	else {
+		const message = await this.prisma.message.create({
+		data: {
+			content: payload.message,
+			authorId: author.id,
+			roomId: room.id,
+		},
+		include: {
+			author: true,
+			room: true,
+		},
+		});
+		return message;
+	}
+
+	// return { msg: 'New message created'};
+  }
+
+  public async createDm(client: Socket, payload)
+  {
+	console.log('create room with : ' + payload);
+	const username = this.clientList.get(client);
+	const roomName = [username, payload].sort().join('');
+	console.log('create Dm: ' + roomName);
+	await this.createRoom(roomName);
+	await this.addUserToRoom(this.clientList.get(client), roomName);
+	await this.addUserToRoom(payload, roomName);
+	await this.storeMessage({author: username, channel: roomName, message: "Clique sur play pour jouer avec moi !"});
+	await this.loadRoom(client, roomName)
+  }
+
+//listen to an Event leaveRoom(in app.gateway)
+public async leaveRoom(client: Socket, roomName: string){
+	const user = await this.findUser(this.clientList.get((client)));
+	const room = await this.findRoom(roomName);
+	
+	// if (user && room){
+	// 	await this.prisma.talk.delete({
+	// 		where: {
+	// 			userId: user.id,
+	// 			roomId: room.id
+	// 		}
+	// 	})
+	// }
+	client.emit('leaveRoom', roomName);
+	//remove User from Room
+}
+
+
+async addUserToRoom(clientName: string, roomName: string) {
 	const user = await this.findUser(clientName);
 	const room = await this.findRoom(roomName);
 	
@@ -127,17 +188,20 @@ export class ChatService implements OnModuleInit {
 	{
 		for (const [client, userId] of this.clientList) {
 			if (userId === clientName)
+			{
 				client.emit('loadRoom', room.name);
-		}
-		await this.prisma.talk.findUnique({
-			where: {
-				userId_roomId: {
-				  userId: user.id,
-				  roomId: room.id,
-				},
 			}
-		})
-		
+		}
+		if (
+			await this.prisma.talk.findUnique({
+				where: {
+					userId_roomId: {
+					userId: user.id,
+					roomId: room.id,
+					},
+				}
+			})
+		)
 			return ;
 		await this.prisma.talk.create({
 			data: {
@@ -178,69 +242,6 @@ export class ChatService implements OnModuleInit {
 		}
 	}))
   }
-
-  async storeMessage(payload) {
-	console.log("channel name : " + payload.channel);
-	console.log("author name: " + payload.author);
-	
-	const author = await this.findUser(payload.author);
-
-	const room = await this.findRoom(payload.channel);
-
-	if (!author || !room)
-	{
-		console.log("author or room not found");
-	}
-	else {
-		const message = await this.prisma.message.create({
-		data: {
-			content: payload.message,
-			authorId: author.id,
-			roomId: room.id,
-		},
-		include: {
-			author: true,
-			room: true,
-		},
-		});
-		return message;
-	}
-
-	// return { msg: 'New message created'};
-  }
-
-//	CreateDM(client: socket, payload: string + socket de l'autre user)
-//	create room name
-//  createroom(roomname)
-//	joinroom
-
-  public async createDm(client: Socket, payload)
-  {
-	const username = this.clientList.get(client);
-	const roomName = [username, payload].sort().join('');
-	console.log('create Dm: ' + roomName);
-	this.createRoom(roomName);
-	this.addUserToRoom(this.clientList.get(client), roomName);
-	this.addUserToRoom(payload, roomName);
-	this.loadRoom(client, payload.roomName)
-  }
-
-//listen to an Event leaveRoom(in app.gateway)
-public async leaveRoom(client: Socket, roomName: string){
-	const user = await this.findUser(this.clientList.get((client)));
-	const room = await this.findRoom(roomName);
-	
-	// if (user && room){
-	// 	await this.prisma.talk.delete({
-	// 		where: {
-	// 			userId: user.id,
-	// 			roomId: room.id
-	// 		}
-	// 	})
-	// }
-	client.emit('leaveRoom', roomName);
-	//remove User from Room
-}
 
 // OPTIONAL
 // if no user delete the room (in app.gateway)
