@@ -28,10 +28,11 @@ export default function SettingsModal(props: SettingsModalProps) {
 	const handleLogout = () => {
 		setIsModalOpen(false);
 		socket?.socket?.emit('quit');
-		socket?.socket?.emit('quitGame');
+		socket?.socket?.emit('quitGame', user?.name);
 		socket?.socket?.emit('removeConnectedUser', user?.name);
-
-		socket?.socket?.disconnect();
+		socket?.socket?.on('cleared', () => {
+			socket?.socket?.disconnect();
+		});
 		logout();
 	};
 

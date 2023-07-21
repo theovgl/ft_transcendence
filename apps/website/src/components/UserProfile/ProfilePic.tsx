@@ -26,26 +26,27 @@ export default function ProfilePic({ path, size, stroke, currentUser }: Props) {
 			if (connectedRef.current !== 'In Game')
 				setIsConnected(status ? 'Online' : 'Offline');
 		});
+		
 		socket?.socket?.on('isInGame', (username) => {
+			console.log('isInGame:', username);
+			console.log('currentUser:', currentUser);
 			if (username === currentUser) 
 				setIsConnected('In Game');
-			
 		});
+
+		socket?.socket?.on('quitInGame', (data) => {
+			console.log('QuitGame:', data.username);
+			console.log('currentUser:', currentUser);
+			if (data.username === currentUser)
+				setIsConnected(data.status);
+			console.log('data status:', data.status);
+		});
+
 		if (currentUser !== user?.name) {
 			socket?.socket?.on('mapUpdated', () => {
 				socket?.socket?.emit('isConnected', currentUser, (status: boolean) => {
 					if (connectedRef.current !== 'In Game')
 						setIsConnected(status ? 'Online' : 'Offline');
-				});
-				socket?.socket?.on('isInGame', (username) => {
-					if (username === currentUser) 
-						setIsConnected('In Game');
-					
-				});
-				socket?.socket?.on('quitInGame', (data) => {
-					if (data.username === currentUser)
-						setIsConnected(data.status);
-					console.log('data status:', data.status);
 				});
 			});
 			return () => {
