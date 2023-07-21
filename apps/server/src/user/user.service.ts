@@ -37,6 +37,27 @@ export class UserService {
 		return users;
 	}
 
+	async findMatchesByUsername(username: string) {
+		const user = await this.prisma.user.findUnique(
+			{
+				where: {
+					name: username
+				}
+			}
+		)
+		const matches = await this.prisma.game.findMany({
+			where: {
+				userId: user.id
+			},
+			include: {
+				user: true
+			}
+		});
+		if (!matches)
+			throw new NotFoundException('User: ' + username + ' did not play any match');
+		return matches;
+	}
+
 	async findOneByUsername(username: string) {
 		const user = await this.prisma.user.findUnique({
 			where: {

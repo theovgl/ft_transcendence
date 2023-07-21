@@ -15,4 +15,13 @@ type UserInfos = {
 	losses: number;
 }
 
-export { UserInfos };
+type MatchInfos = {
+	userIdLeft: string
+	scorePlayerOne: number
+	userIdRight: string
+	scorePlayerTwo: number
+	createdAt: string
+	updatedAt: string
+}
+
+export { UserInfos, MatchInfos};

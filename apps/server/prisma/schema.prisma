@@ -73,6 +73,8 @@ model Game {
   winnerId           String
   userIdLeft         String
   userIdRight        String
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
   userId             Int
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
