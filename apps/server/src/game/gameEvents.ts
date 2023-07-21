@@ -37,7 +37,7 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     @SubscribeMessage('quit')
     handleQuit(@MessageBody() data: string, @ConnectedSocket() client: Socket){
-        console.log(`Socket Disconnected: ${client.id}`);
+        console.log(`Quit event: ${client.id}`);
         this.matchmakingService.removePlayer(client, this.clientModeList.get(client), this.playersId.get(client))
         this.matchmakingService.removePremadePlayer(this.RoomsId.get(client));
         this.RoomsId.delete(client);
@@ -50,7 +50,7 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
     @SubscribeMessage('matchmaking')
     startMathmaking(@MessageBody() data, @ConnectedSocket() client: Socket)
     {
-        console.log(`Socket Connected: ${client.id}`);
+        console.log(`Matchmaking start: ${client.id}`);
         const userId: string = Array.isArray(data.query.userId)
                     ? data.query.userId[0]
                     : data.query.userId.toString();
