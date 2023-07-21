@@ -13,11 +13,9 @@ export class ChatService implements OnModuleInit {
   
   async onModuleInit()
   {
-	this.createRoom('General');
-	this.currentRoomName = 'General';
   }
 
-  public async createRoom(room: string)
+  public async createRoom(room: string, owner: string)
   {
 	if (await this.prisma.room.findUnique({
 		where: {
@@ -25,12 +23,65 @@ export class ChatService implements OnModuleInit {
 		}
 	}))
 		return;
+	console.log(owner);
+	const user = await this.findUser(owner);
+	if (user){
+		await this.prisma.room.create({
+			data: {
+				name: room,
+				owner: {
+					connect: { id: user.id },
+				},
+			},
+		})
+		await this.setUserAsOwner(owner, room);
+	}
+  }
 
-	await this.prisma.room.create({
-		data: {
-			name: room,
-		},
-	})
+  async setUserAsOwner(owner: string, roomName: string){
+	const user = await this.findUser(owner);
+ 
+	const room = await this.findRoom(roomName)
+	if (room && user) {
+		await this.prisma.room.update({
+			where: {
+				id: room.id
+			},
+			data: {
+				owner:{
+					connect: { 
+						id: user.id 
+					}
+				}
+			}
+		})
+	}
+	await this.setUserAsAdmin(owner, roomName);
+  }
+
+  async	setUserAsAdmin(admin: string, roomName: string){
+	console.log("set admin: " + admin);
+	const room = await this.findRoom(roomName);
+	const user = await this.findUser(admin);
+	if (user && room)
+	{
+		console.log("in admin: " + admin);
+		if (await this.prisma.adminTalk.findUnique({
+			where : {
+				userId_roomId: {
+					userId: user.id,
+					roomId: room.id
+				}
+			}
+		}))
+			return;
+		await this.prisma.adminTalk.create({
+			data: {
+				userId: user.id,
+				roomId: room.id
+			}
+		})
+	}
   }
 
   public async loadRoom(client: Socket, room: string)
@@ -75,7 +126,7 @@ export class ChatService implements OnModuleInit {
 
   public async changeRoom(client: Socket, room: string)
   {
-	this.createRoom(room);
+	this.createRoom(room, this.clientList.get(client));
 	this.loadRoom(client, room);
   }
 
@@ -103,8 +154,8 @@ export class ChatService implements OnModuleInit {
 
   public async userConnection(client: Socket, room: string, payload: string)
   {
-	await this.createRoom(room); 
 	this.clientList.set(client, payload);
+	await this.createRoom(room, this.clientList.get(client)); 
 	await this.addUserToRoom(this.clientList.get(client), room);
 	await this.loadRoomlist(client)
 	await this.loadRoom(client, room);
@@ -155,7 +206,7 @@ export class ChatService implements OnModuleInit {
 	const username = this.clientList.get(client);
 	const roomName = [username, payload].sort().join('');
 	console.log('create Dm: ' + roomName);
-	await this.createRoom(roomName);
+	await this.createRoom(roomName, username);
 	await this.addUserToRoom(this.clientList.get(client), roomName);
 	await this.addUserToRoom(payload, roomName);
 	await this.storeMessage({author: username, channel: roomName, message: "Clique sur play pour jouer avec moi !"});

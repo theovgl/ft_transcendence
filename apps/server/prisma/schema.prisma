@@ -31,11 +31,14 @@ model User {
   bannedTalks   BannedTalk[]
   mutedTalks    MutedTalk[]
   adminTalks    AdminTalk[]
+  roomsOwned    Room[]
 }
  
 model Room {
   id       String    @id @default(uuid())
   name     String		@unique
+  owner    User @relation(fields: [ownerId], references: [id])
+  ownerId  Int
   users    Talk[]
   bannedUsers BannedTalk[]
   mutedUsers MutedTalk[]
