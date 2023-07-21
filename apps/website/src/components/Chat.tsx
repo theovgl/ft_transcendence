@@ -182,6 +182,7 @@ export default function Chat()
               content={msg.message}
               username={msg.author}
 			  socket={socket}
+			  room={msg.channel}
             />
           ))
         }

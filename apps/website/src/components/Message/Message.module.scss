@@ -2,6 +2,7 @@
 
 .message {
 	display: flex;
+	justify-content: space-between;
 	align-items: center;
 	width: 100%;
 	font-family: $font-family;
@@ -29,10 +30,14 @@
 	margin: 0 10px;
 }
 
-.message_container {
-	display: inline-block;
-	position: absolute;
-	right: 0;
+.message_left {
+	display: flex;
+	// align-items: center;
+	gap: 10px;
+}
 
-	
+.message_right {
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
