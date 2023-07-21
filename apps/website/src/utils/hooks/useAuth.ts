@@ -8,7 +8,7 @@ const isAuthenticatedAtom = atom<boolean>(false);
 const isLoadingAtom = atom<boolean>(true);
 
 export const useAuth = () => {
-	const { addUser, user } = useUser();
+	const { addUser, removeUser, user } = useUser();
 	const jwtCookie = new Cookies('jwt');
 	const [isAuthenticated, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
 	const [isLoading, setIsLoading] = useAtom(isLoadingAtom);
@@ -28,7 +28,7 @@ export const useAuth = () => {
 
 	const logout = () => {
 		setIsAuthenticated(false);
-		localStorage.removeItem('user');
+		removeUser();
 		jwtCookie.remove('jwt');
 	};
 
