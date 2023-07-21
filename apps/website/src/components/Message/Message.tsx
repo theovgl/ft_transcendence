@@ -77,7 +77,7 @@ export default function Message({content, username, socket }: MessageProps) {
 				</div>
 			</div>
 			<div className={styles.message_container}>
-				{username !== user?.name &&
+				{/* {username !== user?.name && */}
 					<Button
 						text='Play'
 						theme="light"
@@ -85,7 +85,7 @@ export default function Message({content, username, socket }: MessageProps) {
 						icon={<BiPlay />}
 						onClick={sendInvite}
 					/>
-				}
+				{/* } */}
 			</div>
 		</div>
 	);

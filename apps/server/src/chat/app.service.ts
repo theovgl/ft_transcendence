@@ -170,6 +170,10 @@ export class ChatService implements OnModuleInit {
 		console.log("channel name : " + payload.channel);
 		console.log("author name: " + payload.author);
 		
+		const mutedUser = await this.findMutedTalk(payload.author, payload.channel)
+		//emit un message pour dire au user qu'il est mute ?
+		if (mutedUser)
+			return;
 		const author = await this.findUser(payload.author);
 
 		const room = await this.findRoom(payload.channel);
@@ -231,17 +235,40 @@ export class ChatService implements OnModuleInit {
 	}
 
 	public async leaveRoom(clientName: string, roomName: string){
-		await this.removeTalk(clientName, roomName);				
+		await this.removeTalk(clientName, roomName, this.prisma.talk);				
 		for (const [client, userId] of this.clientList) {
 			if (userId === clientName)
 			{
-				client.emit('leaveRoom', roomName);
+				client.emit('leaveRoomClient', roomName);
 			}
 		}
 	}
 
-	async addUserToRoom(clientName: string, roomName: string) {
-		await this.addTalk(clientName, roomName)
+	async	kickUser(userName:string, roomName: string){
+		this.leaveRoom(userName, roomName);
+	}
+
+	async	banUser(userName: string, roomName: string){
+		this.kickUser(userName, roomName);
+		this.addTalk(userName, roomName, this.prisma.bannedTalk)
+	}
+
+	async 	muteUser(userName: string, roomName: string){
+		const mutedUser = await this.findMutedTalk(userName, roomName);
+		if (mutedUser)
+			return;
+		this.addTalk(userName, roomName, this.prisma.mutedTalk)
+		setTimeout(() => {
+			this.removeTalk(userName, roomName, this.prisma.mutedTalk)			
+		}, 6000 * 10);
+	}
+
+	async	addUserToRoom(clientName: string, roomName: string) {
+		const bannedUser = await this.findBannedTalk(clientName, roomName)
+		//emit un message pour dire au user qu'il est ban ?
+		if (bannedUser)
+			return;
+		await this.addTalk(clientName, roomName, this.prisma.talk)
 		for (const [client, userId] of this.clientList) {
 			if (userId === clientName)
 			{
@@ -250,14 +277,14 @@ export class ChatService implements OnModuleInit {
 		}
 	}
 
-	async addTalk(clientName: string, roomName: string){
+	async addTalk(clientName: string, roomName: string, talk: any){
 		const user = await this.findUser(clientName);
 		const room = await this.findRoom(roomName);
 		
 		if (user && room)
 		{
 			if (
-				await this.prisma.talk.findUnique({
+				await talk.findUnique({
 					where: {
 						userId_roomId: {
 							userId: user.id,
@@ -266,7 +293,7 @@ export class ChatService implements OnModuleInit {
 				}
 			}))
 				return ;
-			await this.prisma.talk.create({
+			await talk.create({
 				data: {
 					userId: user.id,
 					roomId: room.id
@@ -280,7 +307,7 @@ export class ChatService implements OnModuleInit {
 		const room = await this.findRoom(roomName);
 		
 		if (user && room){
-			await this.removeAdminTalk(clientName, roomName);
+			await this.removeTalk(clientName, roomName, this.prisma.adminTalk)
 			await this.prisma.user.update({
 				where: { id: user.id },
 				data: {
@@ -294,12 +321,12 @@ export class ChatService implements OnModuleInit {
 		}
 	}
 
-	async removeTalk(clientName: string, roomName: string) {
+	async removeTalk(clientName: string, roomName: string, talk: any) {
 		const user = await this.findUser(clientName);
 		const room = await this.findRoom(roomName);
 
 		if (user && room){
-			await this.prisma.talk.delete({
+			await talk.delete({
 					where: {
 						userId_roomId: {
 							userId: user.id,
@@ -310,20 +337,6 @@ export class ChatService implements OnModuleInit {
 		}
 	}
 
-	async removeAdminTalk(clientName: string, roomName: string) {
-		const adminTalk = await this.findAdminTalk(clientName, roomName)
-
-		if (adminTalk){
-			await this.prisma.adminTalk.delete({
-					where: {
-						userId_roomId: {
-							userId: adminTalk.userId,
-							roomId: adminTalk.roomId
-						}
-				}
-			})
-		}
-	}
 
 	async findUser(userName: string): Promise<User | null>
 	{

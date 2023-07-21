@@ -39,6 +39,26 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   // server.to(payload.channel).emit('msgToClient', payload.message);
  }
 
+ @SubscribeMessage('leaveRoom')
+ handleLeaveRoom(client: Socket, payload){
+	this.chatService.leaveRoom(payload.clientName, payload.roomName)
+ }
+
+ @SubscribeMessage('sendDm')
+ handleSendDm(client: Socket, payload){
+	this.chatService.createDm(client, payload)
+ }
+
+ @SubscribeMessage('kick')
+ handleKick(client: Socket, payload){
+	this.chatService.kickUser(payload.username, payload.roomName);
+ }
+
+ @SubscribeMessage('ban')
+ handleBan(client: Socket, payload){
+	this.chatService.banUser(payload.userName, payload.roomName)
+ }
+ 
  @SubscribeMessage('challenge')
  handleGameInvite(client: Socket, payload){
 	console.log('challenge: ' + payload.challenged )

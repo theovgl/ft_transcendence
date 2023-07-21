@@ -12,7 +12,7 @@ export interface ServerToClientEvents {
 	msgToClient: (msg: Message) => void;
 	loadRoom: (payload: string) => void;
 	setAdmin: (status: boolean) => void;
-
+	leaveRoomClient: (roomName: string) => void;
 }
 
 export interface ClientToServerEvents {
@@ -22,6 +22,8 @@ export interface ClientToServerEvents {
 	UserConnection: (payload: string) => void;
 	startDm: (requesterName: string, addresseeName: string) => void;
 	checkAdmin: (roomName: string) => void;
+	leaveRoom: (payload: {clientName: string, roomName: string}) => void;
+	sendDm: (payload: string) => void;
 }
 
 export interface InterServerEvents {
