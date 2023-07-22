@@ -10,8 +10,7 @@ export interface User {
 	authToken: string;
 }
 
-// const store = createStore();
-const userAtom = atomWithStorage<User | null>('user', null);
+export const userAtom = atomWithStorage<User | null>('user', null);
 
 // This hook will store the user in our context and localStorage.
 export const useUser = () => {
