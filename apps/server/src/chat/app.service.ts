@@ -332,7 +332,7 @@ export class ChatService implements OnModuleInit {
 		setTimeout(() => {
 			console.log('unmute user: ' + userName + "in room: " + roomName);
 			this.removeTalk(userName, roomName, this.prisma.mutedTalk)			
-		}, 300 * 10);
+		}, 600 * 10);
 	}
  
 	async	addUserToRoom(clientName: string, roomName: string) {
