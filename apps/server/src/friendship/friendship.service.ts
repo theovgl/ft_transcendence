@@ -28,6 +28,8 @@ export class FriendshipService {
 	}
 
 	async getFriendship(requester: any, addressee: any) {
+		if (!requester || !addressee)
+			return null;
 		const friendship = await this.prisma.friendship.findUnique({
 			where: {
 				requesterId_addresseeId: {
