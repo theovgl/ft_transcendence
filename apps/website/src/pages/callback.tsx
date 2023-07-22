@@ -18,8 +18,6 @@ export default function CallbackPage() {
 	const cookies = new Cookies();
 	const {
 		register,
-		watch,
-		reset,
 		setError,
 		handleSubmit,
 		formState: { errors },
@@ -71,7 +69,6 @@ export default function CallbackPage() {
 		try {
 			const jwt = cookies.get('jwt');
 			const body = { twoFactorAuthenticationCode: twoFAcode };
-			console.log('body', body);
 			const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/auth/2fa/authenticate`, {
 				method: 'POST',
 				headers: {

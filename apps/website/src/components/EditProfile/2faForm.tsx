@@ -37,7 +37,6 @@ export default function TwoFaForm() {
 		const body = {
 			twoFactorAuthenticationCode: code,
 		};
-		console.log('body2', body);
 		try {
 			const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/auth/2fa/${endpoint}`, {
 				method: 'POST',
