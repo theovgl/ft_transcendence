@@ -8,6 +8,7 @@ export interface User {
 	email: string;
 	profilePic: string;
 	authToken: string;
+	twoFAEnabled: boolean;
 }
 
 // This hook will store the user in our context and localStorage.

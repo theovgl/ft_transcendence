@@ -50,6 +50,7 @@ export class AuthService {
 					firstName: ft_data.first_name,
 					lastName: ft_data.last_name,
 					picture: foundWithName.profilePicPath,
+					twoFAEnabled: foundWithName.twoFAEnabled,
 				};
 				return newUser;
 			}
@@ -62,8 +63,8 @@ export class AuthService {
 				firstName: ft_data.first_name,
 				lastName: ft_data.last_name,
 				picture: ft_data.image.link,
+				twoFAEnabled: foundWithDisplayName.twoFAEnabled,
 			};
-
 			return newUser;
 		} catch (error) {
 			console.error('Error: ', error);
@@ -100,7 +101,7 @@ export class AuthService {
 	
 	async handleCallback(response: any): Promise<any> {
 		const user: FortyTwoUser = await this.getUserInfo(response.access_token);
-		const token = await this.signToken(user.userId, user.username, user.displayname, user.email, user.picture);
+		const token = await this.signToken(user.userId, user.username, user.displayname, user.email, user.picture, user.twoFAEnabled);
 
 		await this.prisma.user.upsert({
 			where: { email: user.email },
@@ -111,6 +112,7 @@ export class AuthService {
 				name: user.username,
 				displayName: user.displayname,
 				profilePicPath: user.picture,
+				twoFAEnabled: user.twoFAEnabled,
 				jwt: token,
 			},
 			update: {
@@ -120,13 +122,14 @@ export class AuthService {
 		return token;
 	}
 
-	async signToken(userId: number, username: string, displayName: string, email: string, profilePic: string): Promise<string> {
+	async signToken(userId: number, username: string, displayName: string, email: string, profilePic: string, twoFAEnabled: boolean): Promise<string> {
 		const payload = {
 			userId,
 			email,
 			profilePic,
 			username,
 			displayName,
+			twoFAEnabled
 		};
 		const secret = this.config.get('JWT_SECRET');
 		const token = await this.jwt.sign(payload, {
