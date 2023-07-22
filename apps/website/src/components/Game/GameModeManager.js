@@ -23,7 +23,6 @@ const GameModeManager = (props) => {
     useEffect(() => {
         if (router.query.premade === 'true') {
           setClicked(true);
-          console.log(router.query);
           setMode(router.query.premadeMode);
         }
     }, [router.query.premade, router.query.premadeMode]);

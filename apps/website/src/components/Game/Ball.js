@@ -59,7 +59,6 @@ const Ball = (props) => {
 
     // Ball movement online mode
     useEffect(() => {
-      console.log("effect");
       if (props.socket !== null) {
         props.socket.on('ball-moved', (pos) => {
           setPercentagePos({

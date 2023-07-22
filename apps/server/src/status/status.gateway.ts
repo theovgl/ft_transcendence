@@ -7,6 +7,7 @@ import { Server, Socket } from 'socket.io';
 	  origin: ['https://hoppscotch.io', `http://${process.env.IP_ADDRESS}:3000`, `http://${process.env.IP_ADDRESS}:4000`],
 	  methods: ['GET', 'POST'],
 	  credentials: true,
+	  transport: ['websocket', 'polling'],
 	  allowedHeaders: ['Authorization', 'Content-Type'],
 	  exposedHeaders: ['Authorization'],
 	  allowEIO3: true,
@@ -27,48 +28,30 @@ async handleUserConnected(@MessageBody() data: string, @ConnectedSocket() client
 }
 
 	@SubscribeMessage('removeConnectedUser')
-	async handleUserDisconnected(@MessageBody() data: string) {
+	async handleUserDisconnected(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
 		this.onlineUsers.forEach((value:string, key: string)=> {
 			if (value === data) {
 				this.onlineUsers.delete(key);
 				this.server.emit('mapUpdated', data);
+				client.emit('cleared');
 			}
 		});
 	}
 	
 	@SubscribeMessage('inGame')
-	async handleInGame(@ConnectedSocket() client: Socket) {
-		const username = this.onlineUsers.get(client.id);
-		if (username)
-		{
-			this.onlineUsersInGame.set(client.id, username);
-			this.server.emit('isInGame', username);
-		}
+	async handleInGame(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		console.log('inGame: ' + data);
+		this.server.emit('isInGame', data);
 	}
 
-	
 	@SubscribeMessage('quitGame')
-	async handleQuitGame(@ConnectedSocket() client: Socket) {
-		const username = this.onlineUsers.get(client.id);
-		if (username)
-		{
-			this.onlineUsersInGame.forEach((value:string, key: string)=> {
-				if (value === username) {
-					this.onlineUsersInGame.delete(key);
-				}
-			});
-			this.server.emit('quitInGame', { username: username, status: 'Online'});
-		}
+	async handleQuitGame(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
+		console.log('quitGame: ' + data);
+		this.server.emit('quitInGame', { username: data, status: 'Online'});
 	}
 
 	@SubscribeMessage('isConnected')
 	handleCheckUserStatus(@MessageBody() data: any): boolean {
-		for (const value of this.onlineUsersInGame.values()) {
-			if (value === data)
-			{
-				this.server.emit('isInGame', data);
-			}
-		}
 		for (const value of this.onlineUsers.values()) {
 			if (value === data)
 				return true;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import style from './SettingsModal.module.scss';
 import ModalLink from './ModalLink/ModalLink';
 import {
@@ -12,6 +12,7 @@ import { RxCross2 } from 'react-icons/rx';
 import ProfilePic from '../UserProfile/ProfilePic';
 import { useUser } from '@/utils/hooks/useUser';
 import { useAuth } from '@/utils/hooks/useAuth';
+import { SocketContext } from '@/utils/contexts/SocketContext';
 
 type SettingsModalProps = {
 	isModalOpen: boolean;
@@ -22,9 +23,17 @@ export default function SettingsModal(props: SettingsModalProps) {
 	const { user } = useUser();
 	const { logout } = useAuth();
 	const { isModalOpen, setIsModalOpen } = props;
+	const socket = useContext(SocketContext);
 
 	const handleLogout = () => {
 		setIsModalOpen(false);
+		console.log('from handleLogout');
+		socket?.socket?.emit('quit');
+		socket?.socket?.emit('quitGame', user?.name);
+		socket?.socket?.emit('removeConnectedUser', user?.name);
+		socket?.socket?.on('cleared', () => {
+			socket?.socket?.disconnect();
+		});
 		logout();
 	};
 

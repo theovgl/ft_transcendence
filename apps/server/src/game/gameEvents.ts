@@ -10,6 +10,7 @@ import { Injectable } from "@nestjs/common";
 	  origin: ['https://hoppscotch.io', `http://${process.env.IP_ADDRESS}:3000`, `http://${process.env.IP_ADDRESS}:4000`],
 	  methods: ['GET', 'POST'],
 	  credentials: true,
+	  transport: ['websocket', 'polling'],
 	  allowedHeaders: ['Authorization', 'Content-Type'],
 	  exposedHeaders: ['Authorization'],
 	  allowEIO3: true,
@@ -36,20 +37,21 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
     @SubscribeMessage('quit')
     handleQuit(@MessageBody() data: string, @ConnectedSocket() client: Socket){
-        console.log(`Socket Disconnected: ${client.id}`);
+        console.log(`Quit event: ${client.id}`);
         this.matchmakingService.removePlayer(client, this.clientModeList.get(client), this.playersId.get(client))
         this.matchmakingService.removePremadePlayer(this.RoomsId.get(client));
         this.RoomsId.delete(client);
         this.clientModeList.delete(client);
         this.playersId.delete(client);
         this.matchmakingService.deleteBallService(client)
+        client.emit('playerQuit');
     }
 
     //matchmaking even
     @SubscribeMessage('matchmaking')
     startMathmaking(@MessageBody() data, @ConnectedSocket() client: Socket)
     {
-        console.log(`Socket Connected: ${client.id}`);
+        console.log(`Matchmaking start: ${client.id}`);
         const userId: string = Array.isArray(data.query.userId)
                     ? data.query.userId[0]
                     : data.query.userId.toString();

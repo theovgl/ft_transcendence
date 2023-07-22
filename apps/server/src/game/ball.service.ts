@@ -41,6 +41,7 @@ export class BallService {
   private percentagePos: {x: number, y: number} = {x: 0, y: 0};
   private forfeited = false;
   private winnerId: string = "";
+  public  gameEnded: boolean = false;
 
   constructor(
 		private prisma: PrismaService,
@@ -113,8 +114,7 @@ export class BallService {
         name: userid
       }
     })
-    if (user)
-    {
+    if (user){
       await this.prisma.game.create({
         data: {
           scorePlayerOne: this.scoreLeft.toString(),
@@ -133,9 +133,9 @@ export class BallService {
 
   private updateGameResult()
   {
-    if (this.winnerId != "" && this.scoreLeft > this.scoreRight)
+    if (this.winnerId === "" && this.scoreLeft > this.scoreRight)
       this.winnerId = this.pOneId;
-    else if (this.winnerId != "")
+    else if (this.winnerId === "")
       this.winnerId = this.pTwoId;
     this.updateHistory(this.pOneId);
     this.updateHistory(this.pTwoId);
@@ -144,10 +144,13 @@ export class BallService {
   public unsetBallLoop() {
     clearInterval(this.interval);
     clearInterval(this.collectibleInterval);
+    this.gameEnded = true;
   }
 
   public  forfeit(player: Socket)
   {
+    // if (this.winnerId !== "")
+    //   return;
     if (player === this.pOneSocket)
     {
       console.log("winner right");
