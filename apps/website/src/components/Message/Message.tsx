@@ -54,30 +54,18 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 		);
 	}
 
-	// useEffect(() => {
-	// 	const fetchIsAdmin = async () => {
-	// 		const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/${room}/isAdmin?username=${user?.name}}`, {
-	// 			method: 'GET',
-	// 			headers: {
-	// 				Content-Type: 'application/json',
-	// 				'Authorization': 'Bearer ' + cookies['jwt'],
-	// 			}
-	// 		});
-	// 		const isAdmin = await response.json();
-	// 		setIsAdmin(isAdmin);
-	// 	};
-	// 	fetchIsAdmin();
-	// }, [room]);
-
 	useEffect(() => {
+		console.log(content);
 		const fetchProfilePic = async () => {
-			const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/${username}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': 'Bearer ' + cookies['jwt'],
-				}
-			});
+			const response = await fetch(
+				`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/${username}
+			`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': 'Bearer ' + cookies['jwt'],
+					}
+				});
 			const userInfos: UserInfos = await response.json();
 			setProfilePic(userInfos.profilePicPath);
 		};
