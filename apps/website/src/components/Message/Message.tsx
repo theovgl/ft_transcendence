@@ -95,6 +95,7 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 						path={profilePic}
 						size={35}
 						stroke={false}
+						currentUser={username}
 					/>
 				</Link>
 				<div>
@@ -107,7 +108,7 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 				</div>
 			</div>
 			<div className={styles.message_right}>
-				{username !== user?.name &&
+				{username === user?.name &&
 					<Button
 						text='Play'
 						theme="light"
@@ -116,7 +117,7 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 						onClick={sendInvite}
 					/>
 				}
-				{isAdmin && username !== user?.name &&
+				{isAdmin && username === user?.name &&
 				<Button
 					text='Kick'
 					theme="light"
@@ -125,7 +126,7 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 					onClick={kick}
 				/>
 				}
-				{isAdmin && username !== user?.name &&
+				{isAdmin && username === user?.name &&
 				<Button
 					text='Ban'
 					theme="light"
@@ -134,7 +135,7 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 					onClick={ban}
 				/>
 				}
-				{isAdmin && username !== user?.name &&
+				{isAdmin && username === user?.name &&
 				<Button
 					text='mute'
 					theme="light"

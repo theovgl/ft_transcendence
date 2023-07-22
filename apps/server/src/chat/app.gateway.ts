@@ -32,10 +32,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
  //Message Events
  @SubscribeMessage('msgToServer')
- handleMessage(client: Socket, payload: Message): void {
-  this.chatService.storeMessage(payload);
-	console.log(payload.message);
-  this.server.to(payload.channel).emit('msgToClient', payload);
+ async handleMessage(client: Socket, payload: Message) {
+  if (await this.chatService.storeMessage(payload) === true)
+	  this.server.to(payload.channel).emit('msgToClient', payload);
   // server.to(payload.channel).emit('msgToClient', payload.message);
  }
 
@@ -51,19 +50,19 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
  @SubscribeMessage('kick')
  handleKick(client: Socket, payload){
-	this.chatService.kickUser(payload.username, payload.roomName);
+	this.chatService.kickUser(payload.kicked, payload.room);
  }
 
  @SubscribeMessage('ban')
  handleBan(client: Socket, payload){
-	this.chatService.banUser(payload.userName, payload.roomName)
+	this.chatService.banUser(payload.banned, payload.room)
  }
  
  @SubscribeMessage('mute')
  handleMute(client: Socket, payload){
-	this.chatService.muteUser(payload.userName, payload.roomName)
+	this.chatService.muteUser(payload.muted, payload.room)
  }
-
+ 
  @SubscribeMessage('challenge')
  handleGameInvite(client: Socket, payload){
 	console.log('challenge: ' + payload.challenged )
@@ -86,7 +85,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	this.chatService.changeRoom(client, payload);
 	// this.server.emit('ChangeRoomFromServer', payload)
  }
-
+ 
  @SubscribeMessage('UserConnection')
  handleUserConnection(client: Socket, payload: string){
 	setTimeout(() => {

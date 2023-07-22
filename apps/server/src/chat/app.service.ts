@@ -119,11 +119,16 @@ export class ChatService implements OnModuleInit {
 		if (password && !this.checkPassword(password, room)){
 			return;
 		}
+		await this.checkAdmin(client, room);
 		if (room !== this.currentRoomName)
 		{
 			console.log("client leaving : " + this.currentRoomName);
 			console.log("client joining : " + room);
 		}
+		const bannedUser = await this.findBannedTalk(this.clientList.get(client), room)
+		//emit un message pour dire au user qu'il est ban ?
+		if (bannedUser)
+			return;
 		this.addUserToRoom(this.clientList.get(client), room)
 		client.leave(this.currentRoomName);
 		client.join(room);
@@ -203,7 +208,6 @@ export class ChatService implements OnModuleInit {
 		await this.createRoom(room, this.clientList.get(client), "public"); 
 		await this.loadRoomlist(client)
 		await this.loadRoom(client, room);
-		await this.checkAdmin(client, room);
 	}
 
 	public async userDisconnection(client: Socket)
@@ -218,7 +222,10 @@ export class ChatService implements OnModuleInit {
 		const mutedUser = await this.findMutedTalk(payload.author, payload.channel)
 		//emit un message pour dire au user qu'il est mute ?
 		if (mutedUser)
-			return;
+		{
+			console.log('muted user: ' + payload.author + ' tried to talk in: ' + payload.channel) 
+			return false;
+		}
 		const author = await this.findUser(payload.author);
 
 		const room = await this.findRoom(payload.channel);
@@ -226,8 +233,9 @@ export class ChatService implements OnModuleInit {
 		if (!author || !room)
 		{
 			console.log("author or room not found");
+			return false;
 		}
-		else {
+		else { 
 			const message = await this.prisma.message.create({
 			data: {
 				content: payload.message,
@@ -239,7 +247,7 @@ export class ChatService implements OnModuleInit {
 				room: true,
 			},
 			});
-			return message;
+			return true;
 		}
 	}
 
@@ -274,7 +282,8 @@ export class ChatService implements OnModuleInit {
 			console.log('setAdmin for: ' + roomName);
 			client.emit('setAdmin', true);
 		}
-		else{
+		else {
+			console.log('unsetAdmin for: ' + roomName);
 			client.emit('setAdmin', false);
 		}
 	}
@@ -302,6 +311,7 @@ export class ChatService implements OnModuleInit {
 	}
 
 	async	kickUser(userName:string, roomName: string){
+		console.log("kick: " + userName + " from: " + roomName);
 		this.leaveRoom(userName, roomName);
 	}
 
@@ -313,13 +323,18 @@ export class ChatService implements OnModuleInit {
 	async 	muteUser(userName: string, roomName: string){
 		const mutedUser = await this.findMutedTalk(userName, roomName);
 		if (mutedUser)
+		{
+			console.log("already muted");
 			return;
+		}
+		console.log('mute user: ' + userName + "in room: " + roomName);
 		this.addTalk(userName, roomName, this.prisma.mutedTalk)
 		setTimeout(() => {
+			console.log('unmute user: ' + userName + "in room: " + roomName);
 			this.removeTalk(userName, roomName, this.prisma.mutedTalk)			
-		}, 6000 * 10);
+		}, 300 * 10);
 	}
-
+ 
 	async	addUserToRoom(clientName: string, roomName: string) {
 		const bannedUser = await this.findBannedTalk(clientName, roomName)
 		//emit un message pour dire au user qu'il est ban ?

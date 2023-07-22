@@ -118,6 +118,17 @@ export default function Chat()
 							]
 					})
 				})
+				socket.on('leaveRoomClient', (roomName) => {
+				if (tablistRef.current.length > 1)
+					handleTabClick(tablistRef.current.find((tabItem) => tabItem.label !== roomName)?.label)
+				setTablist((prevTablist) =>
+					prevTablist.filter((tabItem) => tabItem.label !== roomName)
+				  );
+				  setMessages([]);
+				})
+				socket.on('setAdmin', (isUserAdmin) => {
+					setIsAdmin(isUserAdmin);
+				})
 			}
 		}
 		// socket.emit('ChangeRoomFromClient', room);
@@ -169,7 +180,9 @@ export default function Chat()
 		}
 	}
 
-	const handleTabClick = (label: string) => {
+	const handleTabClick = (label?: string) => {
+		if (!label)
+			return false;
 		const updatedTabs = tabList.map((tab) => {
 		  if (tab.label === label) {
 			changeRoom(label);
