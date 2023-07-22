@@ -100,7 +100,8 @@ export class MatchmakingService {
       if (ballService.containSocket(socket))
       {
         console.log("delete ballservice");
-        ballService.forfeit(socket);
+        if (!ballService.gameEnded)
+          ballService.forfeit(socket);
         this.ballServices.delete(ballService)
         return ;
       }

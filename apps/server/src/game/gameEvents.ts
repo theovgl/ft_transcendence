@@ -44,6 +44,7 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.clientModeList.delete(client);
         this.playersId.delete(client);
         this.matchmakingService.deleteBallService(client)
+        client.emit('playerQuit');
     }
 
     //matchmaking even

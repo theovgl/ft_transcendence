@@ -23,17 +23,17 @@ const MultiplayerManager = (props) => {
     })
     // const UseAuth = useAuth();
     const socketRef = useRef(null);
-
+    
     useEffect(() => {
-        
-        const socket = io.connect(`ws://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000`, {
-            query: {
-                userId: infos.userId,
-                mode: props.mode,
-                premade: props.premadeId
-            }
-          })
-          socketRef.current = socket;
+      
+      const socket = io.connect(`ws://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000`, {
+          query: {
+              userId: infos.userId,
+              mode: props.mode,
+              premade: props.premadeId
+          }
+        })
+        socketRef.current = socket;
         
         
         window.addEventListener('beforeunload', () => {
@@ -83,14 +83,17 @@ const MultiplayerManager = (props) => {
            });
         });
         
+        socket.on('playerQuit', () => {
+          socket.disconnect();
+        })
         // Clean up the event listeners when the component unmounts
         return () => {
             window.removeEventListener('beforeunload', () => {
             socket.emit('quitGame', infos.userId);
             socket.emit('quit');
               });
-           socket.off('connect');
-           socket.off('opponentMoved');
+            socket.off('connect');
+            socket.off('opponentMoved');
             socket.emit('quitGame', infos.userId);
             socket.emit('quit');
         };

@@ -41,6 +41,7 @@ export class BallService {
   private percentagePos: {x: number, y: number} = {x: 0, y: 0};
   private forfeited = false;
   private winnerId: string = "";
+  public  gameEnded: boolean = false;
 
   constructor(
 		private prisma: PrismaService,
@@ -143,10 +144,13 @@ export class BallService {
   public unsetBallLoop() {
     clearInterval(this.interval);
     clearInterval(this.collectibleInterval);
+    this.gameEnded = true;
   }
 
   public  forfeit(player: Socket)
   {
+    // if (this.winnerId !== "")
+    //   return;
     if (player === this.pOneSocket)
     {
       console.log("winner right");
