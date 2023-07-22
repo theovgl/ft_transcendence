@@ -94,6 +94,7 @@ export default function Chat()
 	}, [room]);
 	
 	function startDm() {
+		if (typeof router.query.requesterName !== 'undefined' && typeof router.query.addresseeName !== 'undefined')
 		socket?.emit('startDm', `${router.query.requesterName}`, `${router.query.addresseeName}`);
 	}
 
