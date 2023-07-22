@@ -38,7 +38,7 @@ export class AuthService {
 			const foundWithDisplayName = await this.prisma.user.findUnique({
 				where: {
 					displayName: ft_data.login
-				}
+				}	
 			});
 
 			if (foundWithName) {
@@ -63,7 +63,7 @@ export class AuthService {
 				firstName: ft_data.first_name,
 				lastName: ft_data.last_name,
 				picture: ft_data.image.link,
-				twoFAEnabled: foundWithDisplayName.twoFAEnabled,
+				twoFAEnabled: foundWithDisplayName ? foundWithDisplayName.twoFAEnabled : false,
 			};
 			return newUser;
 		} catch (error) {
@@ -224,7 +224,9 @@ export class AuthService {
 			token: twoFactorAuthenticationCode,
 			secret: user.twoFASecret,
 		});
-
+		console.log('isValid token', twoFactorAuthenticationCode);
+		console.log('isValid secret', user.twoFASecret);
+		console.log('isCodeValid: ', isCodeValid);
 		return isCodeValid;
 	}
 

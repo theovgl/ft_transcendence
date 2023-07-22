@@ -52,6 +52,7 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	async turnOnTwoFactorAuthentication(@Req() req, @Body() body) {
 		const user = jwt_decode(req.headers.authorization);
+		console.log('body in route', body);
 		const isCodeValid = await this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
 			user,
@@ -83,6 +84,7 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	async authenticate(@Req() req, @Body() body) {
 		const user = jwt_decode(req.headers.authorization);
+		console.log('body in route', body);
 		const isCodeValid = await this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
 			user,

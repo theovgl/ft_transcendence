@@ -70,7 +70,8 @@ export default function CallbackPage() {
 	const checkTwoFACode = async (twoFAcode: number): Promise<boolean> => {
 		try {
 			const jwt = cookies.get('jwt');
-			const body = { twoFACode: twoFAcode };
+			const body = { twoFactorAuthenticationCode: twoFAcode };
+			console.log('body', body);
 			const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/auth/2fa/authenticate`, {
 				method: 'POST',
 				headers: {
@@ -109,6 +110,7 @@ export default function CallbackPage() {
 			auth?.login({
 				id: decodedPayload.userId,
 				name: decodedPayload.username,
+				displayName: decodedPayload.displayName,
 				email: decodedPayload.email,
 				profilePic: decodedPayload.profilePic,
 				authToken: decodedPayload.authToken,
@@ -178,7 +180,7 @@ export default function CallbackPage() {
 						>{errors.tfaCode && errors.tfaCode.message}</span>
 					</div>
 				</form>
-				: <p>Redirecting...</p>}
+				: <p>Checking 2FA...</p>}
 		</div>
 	);
 }
