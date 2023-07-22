@@ -28,18 +28,18 @@ export default function ProfilePic({ path, size, stroke, currentUser }: Props) {
 		});
 		
 		socket?.socket?.on('isInGame', (username) => {
-			console.log('isInGame:', username);
-			console.log('currentUser:', currentUser);
+			// console.log('isInGame:', username);
+			// console.log('currentUser:', currentUser);
 			if (username === currentUser) 
 				setIsConnected('In Game');
 		});
 
 		socket?.socket?.on('quitInGame', (data) => {
-			console.log('QuitGame:', data.username);
-			console.log('currentUser:', currentUser);
+			// console.log('QuitGame:', data.username);
+			// console.log('currentUser:', currentUser);
 			if (data.username === currentUser)
 				setIsConnected(data.status);
-			console.log('data status:', data.status);
+			// console.log('data status:', data.status);
 		});
 
 		if (currentUser !== user?.name) {

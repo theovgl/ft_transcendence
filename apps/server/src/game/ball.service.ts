@@ -113,26 +113,28 @@ export class BallService {
         name: userid
       }
     })
-    await this.prisma.game.create({
-      data: {
-        scorePlayerOne: this.scoreLeft.toString(),
-        scorePlayerTwo: this.scoreRight.toString(),
-        winnerId: this.winnerId,
-        userIdLeft: this.pOneId,
-        userIdRight: this.pTwoId,
-        userId: user.id
-      },
-      include: {
-        user: true
-      }
-    })
+    if (user){
+      await this.prisma.game.create({
+        data: {
+          scorePlayerOne: this.scoreLeft.toString(),
+          scorePlayerTwo: this.scoreRight.toString(),
+          winnerId: this.winnerId,
+          userIdLeft: this.pOneId,
+          userIdRight: this.pTwoId,
+          userId: user.id
+        },
+        include: {
+          user: true
+        }
+      })
+    }
   }
 
   private updateGameResult()
   {
-    if (this.winnerId != "" && this.scoreLeft > this.scoreRight)
+    if (this.winnerId === "" && this.scoreLeft > this.scoreRight)
       this.winnerId = this.pOneId;
-    else if (this.winnerId != "")
+    else if (this.winnerId === "")
       this.winnerId = this.pTwoId;
     this.updateHistory(this.pOneId);
     this.updateHistory(this.pTwoId);

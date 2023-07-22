@@ -27,6 +27,7 @@ export default function SettingsModal(props: SettingsModalProps) {
 
 	const handleLogout = () => {
 		setIsModalOpen(false);
+		console.log('from handleLogout');
 		socket?.socket?.emit('quit');
 		socket?.socket?.emit('quitGame', user?.name);
 		socket?.socket?.emit('removeConnectedUser', user?.name);

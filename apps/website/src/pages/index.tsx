@@ -6,15 +6,19 @@ import Head from 'next/head';
 import Button from '@/components/Button/Button';
 import { useRouter } from 'next/router';
 import Friendlist, { FriendListType } from '@/components/Friendlist/Friendlist';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useUser } from '@/utils/hooks/useUser';
+import { SocketContext } from '@/utils/contexts/SocketContext';
 
 export default function Home(props: any) {
 	const router = useRouter();
 	const {user} = useUser(); 
 	const [friendListData, setFriendListData] = useState<FriendListType | null>(null);
+	const socketContext = useContext(SocketContext);
+	const socket = socketContext?.socket;
 
 	const onButtonClick = () => {
+		// socket.emit()
 		router.push({
 			pathname: '/game',
 			query: {premade: true, premadeId: "20305", premadeMode: "Normal", userId: user?.name }

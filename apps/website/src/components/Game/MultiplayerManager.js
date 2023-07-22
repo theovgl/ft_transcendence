@@ -1,10 +1,9 @@
-import { useEffect, useState, useRef, useContext } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import GameBox from './GameBox';
 import io from 'socket.io-client'
 import WaitingBox from './WaitingBox'
 import { useUser } from '@/utils/hooks/useUser';
 import { useAuth } from '@/utils/hooks/useAuth';
-import { SocketContext } from '@/utils/contexts/SocketContext';
 
 const STARTPOS_Y = 200;
 const STARTPOS_X = 860;
@@ -23,40 +22,30 @@ const MultiplayerManager = (props) => {
         connected: false
     })
     // const UseAuth = useAuth();
-	const socketContext = useContext(SocketContext);
-	const socket = socketContext.socket;
-	const socketRef = useRef(null);
-
-	// useEffect(() => {
-	// 	if (socketRef.current && !infos.connected) {
-    //         socketRef.current.emit('quitGame');
-	// 	}
-	// }, [infos.connected]);
+    const socketRef = useRef(null);
 
     useEffect(() => {
-			console.log(infos.userId);
         
-        // const socket = 
-		// io.connect(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000`, {
-        //     query: {
-        //         userId: infos.userId,
-        //         mode: props.mode,
-        //         premade: props.premadeId
-        //     }
-        //   })
+        const socket = io.connect(`ws://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000`, {
+            query: {
+                userId: infos.userId,
+                mode: props.mode,
+                premade: props.premadeId
+            }
+          })
           socketRef.current = socket;
         
         
         window.addEventListener('beforeunload', () => {
-			console.log("beforeunload");
             socket.emit('quit');
             socket.emit('quitGame', infos.userId);
           });
         
         // Listen to the 'connect' event
-		if (socket.connected) {
-			socket.emit('inGame', infos.userId);
-            // console.log('Connected to socket.io server');
+        socket.on('connect', () => {
+            socket.emit('addConnectedUser', infos.userId);
+            socket.emit('inGame', infos.userId);
+            console.log('Connected to socket.io server');
             socket.emit('matchmaking', {
               query: {
                 userId: infos.userId,
@@ -68,7 +57,7 @@ const MultiplayerManager = (props) => {
               ...prevInfos,
               connected: true,
             }));
-        };
+        });
         
 
         //Listen to both p1 and p2 events to determinate on which pos you will be
@@ -97,11 +86,11 @@ const MultiplayerManager = (props) => {
         // Clean up the event listeners when the component unmounts
         return () => {
             window.removeEventListener('beforeunload', () => {
-            	socket.emit('quitGame', infos.userId);
-            	socket.emit('quit');
-            });
-        	socket.off('connect');
-        	socket.off('opponentMoved');
+            socket.emit('quitGame', infos.userId);
+            socket.emit('quit');
+              });
+           socket.off('connect');
+           socket.off('opponentMoved');
             socket.emit('quitGame', infos.userId);
             socket.emit('quit');
         };
