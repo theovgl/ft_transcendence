@@ -59,7 +59,8 @@ export default function Chat()
   const [cookies] = useCookies();
   const [author, setAuthor] = useState(Object)
   const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
-  
+  const [isAdmin, setIsAdmin] = useState(false);
+
   let [tabList, setTablist] = useState([	
 	  {
 		  label:"General",
@@ -183,6 +184,7 @@ export default function Chat()
               username={msg.author}
 			  socket={socket}
 			  room={msg.channel}
+			  isUserAdmin={isAdmin}
             />
           ))
         }

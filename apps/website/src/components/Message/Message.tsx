@@ -15,14 +15,15 @@ type MessageProps = {
 	username: string;
 	socket: Socket;
 	room: string;
+	isUserAdmin: boolean
 }
 
-export default function Message({content, username, socket, room }: MessageProps) {
+export default function Message({content, username, socket, room, isUserAdmin }: MessageProps) {
 	const [profilePic, setProfilePic] = useState<string>('');
 	const [cookies] = useCookies();
 	const router = useRouter();
 	const {user} = useUser();
-	const [isAdmin, setIsAdmin] = useState<boolean>(false);
+	const [isAdmin, setIsAdmin] = useState<boolean>(isUserAdmin);
 
 	function kick() {
 		socket.emit('kick', {kicked: username, room: room});
@@ -53,20 +54,20 @@ export default function Message({content, username, socket, room }: MessageProps
 		);
 	}
 
-	useEffect(() => {
-		const fetchIsAdmin = async () => {
-			const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/${room}/isAdmin?username=${user?.name}}`, {
-				method: 'GET',
-				headers: {
-					Content-Type: 'application/json',
-					'Authorization': 'Bearer ' + cookies['jwt'],
-				}
-			});
-			const isAdmin = await response.json();
-			setIsAdmin(isAdmin);
-		};
-		fetchIsAdmin();
-	}, [room]);
+	// useEffect(() => {
+	// 	const fetchIsAdmin = async () => {
+	// 		const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/${room}/isAdmin?username=${user?.name}}`, {
+	// 			method: 'GET',
+	// 			headers: {
+	// 				Content-Type: 'application/json',
+	// 				'Authorization': 'Bearer ' + cookies['jwt'],
+	// 			}
+	// 		});
+	// 		const isAdmin = await response.json();
+	// 		setIsAdmin(isAdmin);
+	// 	};
+	// 	fetchIsAdmin();
+	// }, [room]);
 
 	useEffect(() => {
 		const fetchProfilePic = async () => {
