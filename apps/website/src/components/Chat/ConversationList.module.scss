@@ -1,0 +1,27 @@
+@import '../../styles/library';
+
+.conversationList_container {
+	display: flex;
+	height: 100%;
+	flex-direction: column;
+	overflow-y: auto;
+	font-family: $font-family;
+	border-right: 3px solid $black-color;
+	min-width: 150px;
+}
+
+.conversationList_item {
+	display: flex;
+	cursor: pointer;
+	padding: 12px 12px;
+	box-sizing: border-box;
+	align-items: center;
+	border-bottom: 1px solid rgba($black-color, 0.15);
+	width: 100%;
+
+	&active {
+		background-color: $black-color;
+		color: white;
+		font-weight: 600;
+	}
+}
