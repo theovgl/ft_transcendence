@@ -29,7 +29,7 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
     afterInit(server: any) {
         this.matchmakingService.startMatchmaking(this.server);
     }
-
+ 
     //connexion
     handleConnection(client: Socket){}
 
@@ -46,10 +46,10 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.matchmakingService.deleteBallService(client)
         client.emit('playerQuit');
     }
-
+  
     //matchmaking even
     @SubscribeMessage('matchmaking')
-    startMathmaking(@MessageBody() data, @ConnectedSocket() client: Socket)
+    startMatchmaking(@MessageBody() data, @ConnectedSocket() client: Socket)
     {
         console.log(`Matchmaking start: ${client.id}`);
         const userId: string = Array.isArray(data.query.userId)

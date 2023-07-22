@@ -426,8 +426,10 @@ export class ChatService implements OnModuleInit {
 	  
 
 
-	async findUser(userName: string): Promise<User | null>
+	async findUser(userName?: string): Promise<User | null>
 	{
+		if (!userName)
+			return null;
 		return (await this.prisma.user.findUnique({
 			where: {
 				name: userName,
@@ -435,8 +437,10 @@ export class ChatService implements OnModuleInit {
 		}))
 	}
 
-	async	findRoom(roomName: string): Promise<Room | null>
+	async	findRoom(roomName?: string): Promise<Room | null>
 	{
+		if (!roomName)
+			return null;	
 		return ( await this.prisma.room.findUnique({
 			where: {
 				name: roomName,

@@ -21,7 +21,7 @@ export default function Home(props: any) {
 		// socket.emit()
 		router.push({
 			pathname: '/game',
-			query: {premade: true, premadeId: "20305", premadeMode: "Normal", userId: user?.name }
+			query: {premade: false, premadeId: "", premadeMode: "Normal", userId: user?.name }
 		});
 	};
 

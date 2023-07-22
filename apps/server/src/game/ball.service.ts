@@ -115,6 +115,19 @@ export class BallService {
       }
     })
     if (user){
+      const wins = user.wins + (this.winnerId === userid ? 1 : 0);
+      const losses = user.losses + (this.winnerId !== userid ? 1 : 0);
+      const level = (wins / 2) * 10;
+      await this.prisma.user.update({
+        where: {
+          name: userid,
+        },
+        data: {
+          wins: wins,
+          losses: losses,
+          level: level,
+        }
+      })
       await this.prisma.game.create({
         data: {
           scorePlayerOne: this.scoreLeft.toString(),
