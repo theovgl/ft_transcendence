@@ -96,7 +96,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	// Put user in General chat
 	// Get messages from General
 	// Emit the messages
-  this.logger.log(`Client connected: ${client.id}`);
  }
 
  //WebSocket Log events

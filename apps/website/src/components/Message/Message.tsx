@@ -13,7 +13,7 @@ import { Socket } from 'socket.io-client';
 type MessageProps = {
 	content: string;
 	username: string;
-	socket: Socket;
+	socket?: Socket | null;
 	room: string;
 	isUserAdmin: boolean
 }
@@ -26,21 +26,21 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 	const [isAdmin, setIsAdmin] = useState<boolean>(isUserAdmin);
 
 	function kick() {
-		socket.emit('kick', {kicked: username, room: room});
+		socket?.emit('kick', {kicked: username, room: room});
 	}
 
 	function ban() {
-		socket.emit('ban', {banned: username, room: room});
+		socket?.emit('ban', {banned: username, room: room});
 	}
 
 	function mute() {
-		socket.emit('mute', {muted: username, room: room});
+		socket?.emit('mute', {muted: username, room: room});
 	}
 
 	function sendInvite() {
 		const id = [username, user?.name].sort().join('');
 		console.log('id', id);
-		socket.emit('challenge', {challenged: username});
+		socket?.emit('challenge', {challenged: username});
 		router.push(
 			{
 				pathname: '/game',

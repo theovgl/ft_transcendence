@@ -1,7 +1,7 @@
 import chatStyle from "@/styles/chat.module.css";
 import Tab from "@/components/Tab.tsx";
 import Contact from "@/components/Contact.tsx";
-import { useState, useEffect, useRef, use } from "react";
+import { useState, useEffect, useRef, use, useContext } from "react";
 import { useRouter } from 'next/router';
 import { useUser } from "@/utils/hooks/useUser";
 import { io, Socket } from "socket.io-client";
@@ -11,6 +11,7 @@ import { BiMessageAltDetail } from "react-icons/bi";
 import { start } from "repl";
 import { UserInfos } from "global";
 import { useCookies } from 'react-cookie';
+import { SocketContext } from "@/utils/contexts/SocketContext";
 
 type Message = {
   author: string;
@@ -54,11 +55,12 @@ type TabItem = {
 	onClick: (label: string) => boolean; // Adjust the type of onClick accordingly
 };
 
-let socket: Socket<ServerToClientEvents, ClientToServerEvents>;
-socket = io( `http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000` );
+
 
 export default function Chat()
 {
+  const socketContext = useContext(SocketContext);
+  const socket = socketContext?.socket;
   const { user } = useUser();
 //   const { socket } = useAuth();
   const [username, setUsername] = useState("");
@@ -66,7 +68,7 @@ export default function Chat()
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Array<Message>>([]);
   const [rooms, setRooms] = useState<Array<String>>([]);
-  const [room, setRoom] = useState("General");
+  const [room, setRoom] = useState("");
   const router = useRouter();
   const [cookies] = useCookies();
   const [author, setAuthor] = useState(Object);
@@ -92,7 +94,7 @@ export default function Chat()
 	}, [room]);
 	
 	function startDm() {
-		socket.emit('startDm', `${router.query.requesterName}`, `${router.query.addresseeName}`);
+		socket?.emit('startDm', `${router.query.requesterName}`, `${router.query.addresseeName}`);
 	}
 
 	useEffect(() => {
@@ -113,18 +115,38 @@ export default function Chat()
 						if (isLabelAlreadyExists)
 							return [...currenTablist];
 						else
-							return [...currenTablist,
-								{ label: payload, active: tablistRef.current.length === 0 ? true : false, onClick: () => handleTabClick(payload) }
-							]
+							if (tablistRef.current.length === 0)
+							{
+								setRoom(payload);
+								return [...currenTablist,
+									{ label: payload, active: tablistRef.current.length === 0 ? true : false, onClick: () => handleTabClick(payload) }
+								]
+							}
+							else {
+								return [...currenTablist,
+									{ label: payload, active: tablistRef.current.length === 0 ? true : false, onClick: () => handleTabClick(payload) }
+								]
+							}
+							
 					})
 				})
 				socket.on('leaveRoomClient', (roomName) => {
-				if (tablistRef.current.length > 1)
-					handleTabClick(tablistRef.current.find((tabItem) => tabItem.label !== roomName)?.label)
-				setTablist((prevTablist) =>
-					prevTablist.filter((tabItem) => tabItem.label !== roomName)
-				  );
-				  setMessages([]);
+					// if (tablistRef.current.length >= 1){
+					// 	console.log('auto change room');
+					// 	handleTabClick(tablistRef.current.find((tabItem) => tabItem.label !== roomName)?.label)					
+					// }
+					// else {
+					// 	console.log("newroom is : " + "");
+					// 	setIsAdmin(false);
+					// 	setRoom("");
+					// 	setMessages([]);
+					// }
+					setTablist(() => {
+						let newtablist = tablistRef.current.filter((tabItem) => tabItem.label !== roomName)
+						setMessages([]);
+						return newtablist
+					});
+					
 				})
 				socket.on('setAdmin', (isUserAdmin) => {
 					setIsAdmin(isUserAdmin);
@@ -133,12 +155,12 @@ export default function Chat()
 		}
 		// socket.emit('ChangeRoomFromClient', room);
 		return () => {
-			socket.off('msgToClient');
+			socket?.off('msgToClient');
 		};
   	}, [user, socket,]);
 
 	  const socketInitializer = async () => {
-		socket.on("msgToClient", (msg: Message) => {
+		socket?.on("msgToClient", (msg: Message) => {
 		  setMessages((currentMsg) => {
 			if (msg.channel === roomRef.current) {
 			  return [
@@ -149,14 +171,16 @@ export default function Chat()
 			return currentMsg;
 		  });
 		});
-		socket.on('setAdmin', (status) => {
+		socket?.on('setAdmin', (status) => {
 			console.log("is Admin: " + status);
 			setIsAdmin(status);
 		})
 	  };
 
 	const sendMessage = async () => {
-		socket.emit("msgToServer", { author: chosenUsername, message: message, channel: room });
+		if (room === "")
+			return;
+		socket?.emit("msgToServer", { author: chosenUsername, message: message, channel: room });
 		setMessages((currentMsg) => [
 			...currentMsg,
 		]);
@@ -168,8 +192,8 @@ export default function Chat()
 		setIsAdmin(false);
 		setRoom(newRoom);
 		setMessages([]);
-		socket.emit('checkAdmin', newRoom);
-		socket.emit("ChangeRoomFromClient", newRoom);
+		socket?.emit('checkAdmin', newRoom);
+		socket?.emit("ChangeRoomFromClient", newRoom);
 	}
 
 	const handleKeypress = (e:any) => {
@@ -223,7 +247,7 @@ export default function Chat()
               key={i}
               content={msg.message}
               username={msg.author}
-			  socket={socket}
+			  socket={socket ? socket : null}
 			  room={msg.channel}
 			  isUserAdmin={isAdmin}
             />

@@ -15,7 +15,7 @@ export class ChatService implements OnModuleInit {
 	async onModuleInit()
 	{
 	}
-
+   
 	public async createRoom(room: string, owner: string, status: string, password ?: string)
 	{
 		if (await this.prisma.room.findUnique({
@@ -117,6 +117,7 @@ export class ChatService implements OnModuleInit {
 	public async loadRoom(client: Socket, room: string, password ?: string)
 	{
 		if (password && !this.checkPassword(password, room)){
+			console.log("bad password");
 			return;
 		}
 		await this.checkAdmin(client, room);
@@ -172,6 +173,8 @@ export class ChatService implements OnModuleInit {
 	{
 		await this.addUsertoAllPublicRooms(this.clientList.get(client));
 		const user = await this.findUser(this.clientList.get(client));
+		let	  counter = 0;
+		let	  firstRoomName;
 		if (user)
 		{
 			const talks = await this.prisma.talk.findMany({
@@ -183,9 +186,13 @@ export class ChatService implements OnModuleInit {
 				},
 			})
 			talks.forEach((talk) => {
+				if (counter === 0)
+					firstRoomName = talk.room.name;
 				console.log('add Room: ' + talk.room.name + ' to user: ' + user.name);
 				client.emit('loadRoom', talk.room.name);
+				counter++;
 			});
+			return firstRoomName;
 		}
 	}
 
@@ -204,10 +211,11 @@ export class ChatService implements OnModuleInit {
 
 	public async userConnection(client: Socket, room: string, payload: string)
 	{
+		let firstRoomName;
 		this.clientList.set(client, payload);
 		await this.createRoom(room, this.clientList.get(client), "public"); 
-		await this.loadRoomlist(client)
-		await this.loadRoom(client, room);
+		firstRoomName = await this.loadRoomlist(client)
+		await this.loadRoom(client, firstRoomName);
 	}
 
 	public async userDisconnection(client: Socket)
@@ -261,7 +269,7 @@ export class ChatService implements OnModuleInit {
 		await this.addUserToRoom(payload, roomName);
 		await this.loadRoom(client, roomName)
 	}
-
+ 
 	public async createGameInvite(client: Socket, payload)
 	{
 		const username = this.clientList.get(client);
@@ -275,7 +283,7 @@ export class ChatService implements OnModuleInit {
 	}
   
 	public async checkAdmin(client: Socket, roomName: string) {
-		console.log("check Admin: " + roomName);
+		console.log("check Admin for room: " + roomName);
 		const userName = this.clientList.get(client);
 		const adminTalk = await this.findAdminTalk(userName, roomName)
 		if (adminTalk){
