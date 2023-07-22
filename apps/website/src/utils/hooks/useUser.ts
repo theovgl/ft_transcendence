@@ -8,6 +8,7 @@ export interface User {
 	email: string;
 	profilePic: string;
 	authToken: string;
+	twoFAEnabled: boolean;
 }
 
 export const userAtom = atomWithStorage<User | null>('user', null);
