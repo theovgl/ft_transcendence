@@ -33,7 +33,7 @@ export class AuthController {
 			res.status(200).send();
 		} catch (error) {
 			console.error(error);
-			res.status(500).send('Internal server error');
+			res.status(403).send('Failed to fetch user info');
 		}
 	}
 

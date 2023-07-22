@@ -1,10 +1,9 @@
 import jwtDecode from 'jwt-decode';
 import { useRouter } from 'next/router';
-import {useContext, useEffect, useState} from 'react';
+import { useContext, useEffect, useState} from 'react';
 import {AuthContext} from '@/utils/contexts/AuthContext.tsx';
 import styles from '../components/TwoFA/TwoFAForm.module.scss';
 import { useForm } from 'react-hook-form';
-import { useCookies } from 'react-cookie';
 import Cookies from 'universal-cookie';
 import Navbar from '@/components/Navbar';
 
@@ -102,12 +101,19 @@ export default function CallbackPage() {
 	};
 
 	const onSubmit = async (data: any) => {
+		const jwt = cookies.get('jwt');
+		if (!jwt) return;
+		const decodedPayload: any = jwtDecode(jwt);
 		const isSuccess = await checkTwoFACode(data.tfaCode);
 		if (isSuccess) {
-			if (auth?.isAuthenticated === false) {
-				console.log('ah');
-				auth.isAuthenticated = true;
-			}
+			auth?.login({
+				id: decodedPayload.userId,
+				name: decodedPayload.username,
+				email: decodedPayload.email,
+				profilePic: decodedPayload.profilePic,
+				authToken: decodedPayload.authToken,
+				twoFAEnabled: false,
+			});
 			router.replace('/');
 		}
 	};

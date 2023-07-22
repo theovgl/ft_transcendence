@@ -17,7 +17,8 @@ export const useAuth = () => {
 	}, [user]);
 
 	const login = (newUser: User) => {
-		addUser(newUser);
+		if (!newUser.twoFAEnabled)
+			addUser(newUser);
 	};
 
 	const logout = () => {
