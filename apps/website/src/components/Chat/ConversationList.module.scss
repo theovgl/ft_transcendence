@@ -2,8 +2,9 @@
 
 .conversationList_container {
 	display: flex;
-	height: 100%;
 	flex-direction: column;
+	justify-content: space-between;
+	height: 100%;
 	overflow-y: auto;
 	font-family: $font-family;
 	border-right: 3px solid $black-color;
@@ -24,4 +25,13 @@
 		color: white;
 		font-weight: 600;
 	}
+}
+
+.conversationList_create {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	height: 50px;
+	border-top: 1px solid rgba($black-color, 0.15);
 }
