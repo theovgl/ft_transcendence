@@ -9,20 +9,19 @@ interface PrivateRouteProps {
   }
 
 export default function PrivateRoute({ protectedRoutes, children }: PrivateRouteProps) {
-    const router = useRouter();
-    const { isAuthenticated, isLoading, setIsLoading } = useAuth();
-    const pathIsProtected = protectedRoutes.indexOf(router.pathname) !== -1;
+	const router = useRouter();
+	const { isAuthenticated, isLoading, setIsLoading } = useAuth();
+	const pathIsProtected = protectedRoutes.indexOf(router.pathname) !== -1;
 
-    useEffect(() => {
-        if (!isLoading && !isAuthenticated && pathIsProtected) {
-            router.push('/login');
-        }
+	useEffect(() => {
+		if (!isLoading && !isAuthenticated && pathIsProtected) 
+			router.push('/login');
+        
 		setIsLoading(false);
-    }, []);
+	}, []);
 
-    if ((isLoading || !isAuthenticated) && pathIsProtected) {
-        return <LoadingPage />;
-    }
+	if ((isLoading || !isAuthenticated) && pathIsProtected) 
+		return <LoadingPage />;
 
-    return <>{children}</>;
+	return <>{children}</>;
 }
