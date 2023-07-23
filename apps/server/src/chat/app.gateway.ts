@@ -46,7 +46,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
  @SubscribeMessage('startDm')
  handleSendDm(client: Socket, payload){
-	this.chatService.createDm(client, payload)
+	this.chatService.createDm(client, payload.clientName, payload.receiverName)
  }
 
  @SubscribeMessage('kick')
@@ -88,9 +88,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
  }
  
  @SubscribeMessage('UserConnection')
- handleUserConnection(client: Socket, payload: string){
+ handleUserConnection(client: Socket, payload: {username: string, dmReceiverName: string}){
 	setTimeout(() => {
-		this.chatService.userConnection(client, "General", payload);
+		this.chatService.userConnection(client, "General", payload.username, payload.dmReceiverName);
 	}, 150);
 	// client.emit('userConnected')
 	// Put user in General chat

@@ -1,7 +1,7 @@
 import Navbar from '@/components/Navbar';
 import { useRouter } from 'next/router';
 import styles from '@/styles/userProfile/userProfile.module.scss';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Name from '@/components/UserProfile/Name';
 import ProfilePic from '@/components/UserProfile/ProfilePic';
 import Button from '@/components/Button/Button';
@@ -13,6 +13,7 @@ import { useCookies } from 'react-cookie';
 import type { UserInfos } from 'global';
 import jwtDecode from 'jwt-decode';
 import Head from 'next/head';
+import { SocketContext } from '@/utils/contexts/SocketContext';
 
 type jwtType = {
 	userId: number;
@@ -31,6 +32,8 @@ export default function Profile() {
 	const [status, setStatus] = useState<string>('');
 	const [isBlocked, setIsBlocked] = useState(false);
 	const username = router.query.username as string;
+	const socketContext = useContext(SocketContext);
+	const socket = socketContext?.socket;
 
 	function updateButtonState(response: string) {
 		if (response === 'ACCEPTED')
@@ -92,6 +95,7 @@ export default function Profile() {
 	const startDm = () => {
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 
+		// socket?.emit('startDm', {clientName: `${router.query.username}`, receiverName: encodeURIComponent(jwtPayload.username)})
 		router.push({
 			pathname: '/chat',
 			query: {

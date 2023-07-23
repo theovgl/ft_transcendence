@@ -22,8 +22,10 @@ export class MatchmakingService {
   public addPlayer(player: Socket, mode: string, id: string): void {
     if (mode === "Normal") {
       this.waitingPlayers.set(id, player);
+      console.log('add normal: ' + this.waitingPlayers.size);
     } else if (mode === "Special") {
       this.waitingPlayerSpecial.set(id, player);
+      console.log('add special: ' + this.waitingPlayerSpecial.size);
     }
   }
 
@@ -142,9 +144,22 @@ export class MatchmakingService {
     }
   }
   
-
+  public checkQueue(userId: string){
+    if (this.waitingPlayerSpecial.get(userId) !== undefined || this.waitingPlayers.get(userId) !== undefined)
+      return true;
+    return false;
+  }
+  private pingStatus(waitingPlayers: Map<string, Socket>): void {
+    const values = waitingPlayers.values()
+    
+    for (const value of values){
+      value.emit('statusinGame');
+    }
+  }
   public startMatchmaking(server): void {
     setInterval(() => {
+      this.pingStatus(this.waitingPlayerSpecial);
+      this.pingStatus(this.waitingPlayers);
       this.matchPlayers(server, this.waitingPlayers, "Normal");
       this.matchPlayers(server, this.waitingPlayerSpecial, "Special");
     }, 5000);

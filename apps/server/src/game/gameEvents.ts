@@ -70,9 +70,17 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
             this.matchmakingService.addPremadePlayer(client, mode, userId, premade, this.server)
         }
         else {
-            this.clientModeList.set(client, mode);
-            this.playersId.set(client, userId)
-            this.matchmakingService.addPlayer(client, mode, userId)
+            if (this.matchmakingService.checkQueue(userId)){
+                console.log('already in Queue ! ');
+                client.emit('cancel');
+            }
+            else{
+                console.log('add to queue')
+                client.emit('statusinGame', userId);
+                this.clientModeList.set(client, mode);
+                this.playersId.set(client, userId)
+                this.matchmakingService.addPlayer(client, mode, userId)
+            }
         } 
         client.emit('searching');
 

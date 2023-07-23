@@ -25,6 +25,7 @@ interface ServerToClientEvents {
   withAck: (d: string, callback: (e: number) => void) => void;
 	msgToClient: (msg: Message) => void;
 	loadRoom: (payload: string) => void;
+	loadDm: (payload: {name: string, dmName: string}) => void;
 	setAdmin: (status: boolean) => void;
 	leaveRoomClient: (roomName: string) => void;
 }
@@ -33,7 +34,7 @@ interface ClientToServerEvents {
 	hello: () => void;
 	msgToServer: (msg: Message) => void;
 	ChangeRoomFromClient: (payload: string) => void;
-	UserConnection: (payload: string) => void;
+	UserConnection: (payload: {username: string, dmReceiverName: string}) => void;
 	startDm: (requesterName: string, addresseeName: string) => void;
 	checkAdmin: (roomName: string) => void;
 	leaveRoom: (payload: {clientName: string, roomName: string}) => void;
@@ -81,21 +82,34 @@ export default function Chat()
 					// 	onClick: () => handleTabClick("General")
 					// },
 	]);
+	const [dmRoom, setdmRoom] = useState({clientName: "", receiverName: ""});
 
 	const roomRef = useRef(room);
 	const tablistRef = useRef(tabList);
+	const usernameRef = useRef(chosenUsername);
+	const dmRoomRef = useRef(dmRoom);
+
+	useEffect(() => {
+		usernameRef.current = chosenUsername;
+	}, [chosenUsername])
 
 	useEffect(() => {
 		tablistRef.current = tabList;
 	}, [tabList])
 
 	useEffect(() => {
+		dmRoomRef.current = dmRoom;
+	}, [dmRoom]);
+
+	useEffect(() => {
 		roomRef.current = room;
 	}, [room]);
 	
 	function startDm() {
-		if (typeof router.query.requesterName !== 'undefined' && typeof router.query.addresseeName !== 'undefined')
-		socket?.emit('startDm', `${router.query.requesterName}`, `${router.query.addresseeName}`);
+		if (typeof router.query.requesterName !== 'undefined' && typeof router.query.addresseeName !== 'undefined'){
+			setdmRoom({ clientName : `${router.query.requesterName}`, receiverName: `${router.query.addresseeName}`})
+			// socket?.emit('startDm', { clientName : `${router.query.requesterName}`, receiverName: `${router.query.addresseeName}`});
+		}
 	}
 
 	useEffect(() => {
@@ -109,7 +123,7 @@ export default function Chat()
 			if (socket)
 			{
 				setAuthor(socketInitializer());
-				socket.emit("UserConnection", user.name);
+				socket.emit("UserConnection", { username: user.name, dmReceiverName: dmRoom.receiverName});
 				socket.on("loadRoom", (payload: string) => {
 					setTablist((currenTablist: TabItem[]) => {
 						const isLabelAlreadyExists = tablistRef.current.some((tab: any) => tab.label === payload);
@@ -146,8 +160,15 @@ export default function Chat()
 						let newtablist = tablistRef.current.filter((tabItem) => tabItem.label !== roomName)
 						setMessages([]);
 						return newtablist
-					});
-					
+					});	
+				})
+				socket.on('loadDm', (payload) => {
+					console.log('load Dm')
+					if (usernameRef.current === payload.name)
+					{
+						console.log('click on tab: ' + payload.dmName);
+						simulateClick(payload.dmName);
+					}
 				})
 				socket.on('setAdmin', (isUserAdmin) => {
 					setIsAdmin(isUserAdmin);
@@ -157,6 +178,7 @@ export default function Chat()
 		// socket.emit('ChangeRoomFromClient', room);
 		return () => {
 			socket?.off('msgToClient');
+			socket?.off('loadDm');
 		};
   	}, [user, socket,]);
 
@@ -173,7 +195,7 @@ export default function Chat()
 		  });
 		});
 		socket?.on('setAdmin', (status) => {
-			console.log("is Admin: " + status);
+			// console.log("is Admin: " + status);
 			setIsAdmin(status);
 		})
 	  };
@@ -205,10 +227,27 @@ export default function Chat()
 		}
 	}
 
+	const simulateClick = (label: string) => {
+		if (!label)
+		return false;
+	const updatedTabs = tablistRef.current.map((tab) => {
+		console.log(tab.label);
+	  if (tab.label === label) {
+		changeRoom(label);
+		return { ...tab, active: true };
+	  }
+	  return { ...tab, active: false };
+	});
+
+	setTablist(updatedTabs);
+	return true;
+	}
+
 	const handleTabClick = (label?: string) => {
 		if (!label)
 			return false;
 		const updatedTabs = tabList.map((tab) => {
+			console.log(tab.label);
 		  if (tab.label === label) {
 			changeRoom(label);
 			return { ...tab, active: true };
