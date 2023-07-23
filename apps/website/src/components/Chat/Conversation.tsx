@@ -53,6 +53,11 @@ export default function Conversation(props: ConversationProps) {
 
 	return (
 		<div className={styles.conversation_container}>
+			<div className={styles.conversation_header}>
+				<p className={styles.conversation_title}>
+					{room}
+				</p>
+			</div>
 			<div className={styles.messages_container}>
 				{messages.map((message, i) => (
 					<Message
@@ -67,6 +72,7 @@ export default function Conversation(props: ConversationProps) {
 			</div>
 			<form
 				onSubmit={handleSubmit(onSubmit)}
+				className={styles.message_form}
 			>
 				<input
 					placeholder='Type your message...'
