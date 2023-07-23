@@ -34,8 +34,9 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
  //Message Events
  @SubscribeMessage('msgToServer')
  async handleMessage(client: Socket, payload: Message) {
-  if (await this.chatService.storeMessage(payload) === true)
-	  this.server.to(payload.channel).emit('msgToClient', payload);
+	await this.chatService.storeMessageAndSend(client, payload);
+//   if (await this.chatService.storeMessage(payload) === true)
+// 	  this.server.to(payload.channel).emit('msgToClient', payload);
   // server.to(payload.channel).emit('msgToClient', payload.message);
  }
 
@@ -87,11 +88,21 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	// this.server.emit('ChangeRoomFromServer', payload)
  }
  
+ private clientList: Map<Socket, string> = new Map();
  @SubscribeMessage('UserConnection')
- handleUserConnection(client: Socket, payload: {username: string, dmReceiverName: string}){
-	setTimeout(() => {
-		this.chatService.userConnection(client, "General", payload.username, payload.dmReceiverName);
-	}, 150);
+ async handleUserConnection(client: Socket, payload: {username: string, dmReceiverName?: string}){
+	// setTimeout(async () => {
+	if (this.clientList.get(client))
+	{
+		this.chatService.userReconnection(client, payload.username, payload.dmReceiverName)
+		// this.chatService.loadRoomlist(client);
+		console.log("already registered in chat");
+		return ;
+	}
+	console.log("registering in chat: " + client)
+	this.clientList.set(client, payload.username)
+	await this.chatService.userConnection(client, "General", payload.username, payload?.dmReceiverName);
+	// }, 150);
 	// client.emit('userConnected')
 	// Put user in General chat
 	// Get messages from General

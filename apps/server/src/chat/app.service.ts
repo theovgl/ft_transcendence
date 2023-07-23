@@ -11,19 +11,25 @@ export class ChatService implements OnModuleInit {
 
 	private clientList: Map<Socket, string> = new Map<Socket, string>()
 	private currentRoomName = "";
-	
+	private roomList: Set<string> = new Set();
 	async onModuleInit()
 	{
 	}
-   
+ 
 	public async createRoom(room: string, owner: string, status: string, password ?: string)
 	{
+		if (this.roomList.has(room))
+		{
+			return ;
+		}
 		if (await this.prisma.room.findUnique({
 			where: {
 				name: room,
 			}
 		}))
 			return;
+		this.roomList.add(room);
+		console.log("create room: " + room);
 		const user = await this.findUser(owner);
 		if (user){
 			await this.prisma.room.create({
@@ -34,7 +40,7 @@ export class ChatService implements OnModuleInit {
 				},
 			})
 			if (status === "public"){
-				this.addAllUsersToRoom(room);
+				await this.addAllUsersToRoom(room);
 			}
 			else{
 				await this.addUserToRoom(owner, room);
@@ -149,7 +155,7 @@ export class ChatService implements OnModuleInit {
 		if (currentRoom) {
 			currentRoom.messages.forEach((message) => {
 				const msg: Message = {
-					author: message.author.name,
+					author: message.author.displayName,
 					channel: message.room.name,
 					message: message.content
 				};
@@ -209,14 +215,25 @@ export class ChatService implements OnModuleInit {
 		return null
 	}
  
-	public async userConnection(client: Socket, room: string, payload: string, dmReceiverName: string)
+	public async userConnection(client: Socket, room: string, payload: string, dmReceiverName?: string)
 	{
 		let firstRoomName;
+
+		console.log("user Connection")
 		this.clientList.set(client, payload);
 		await this.createRoom(room, this.clientList.get(client), "public"); 
 		firstRoomName = await this.loadRoomlist(client)
 		await this.loadRoom(client, firstRoomName);
-		if (dmReceiverName !== "")
+		if (dmReceiverName && dmReceiverName !== "" && dmReceiverName !== undefined && dmReceiverName !== 'undefined')
+			await this.createDm(client, payload, dmReceiverName)
+	}
+
+	public async userReconnection(client: Socket, payload: string, dmReceiverName?: string){
+		let firstRoomName;
+		
+		firstRoomName = await this.loadRoomlist(client)
+		await this.loadRoom(client, firstRoomName);
+		if (dmReceiverName && dmReceiverName !== "" && dmReceiverName !== undefined && dmReceiverName !== 'undefined')
 			await this.createDm(client, payload, dmReceiverName)
 	}
 
@@ -224,7 +241,20 @@ export class ChatService implements OnModuleInit {
 	{
 		this.clientList.delete(client)
 	}
-
+	
+	async storeMessageAndSend(client: Socket, payload){
+		const message = await this.storeMessage(payload)
+		if (message)
+		{
+			const msg: Message = {
+				author: message.author.displayName,
+				channel: message.room.name,
+				message: message.content,
+			};
+			client.emit('msgToClient', msg);
+		}
+	}
+	
 	async storeMessage(payload) {
 		console.log("channel name : " + payload.channel);
 		console.log("author name: " + payload.author);
@@ -234,7 +264,7 @@ export class ChatService implements OnModuleInit {
 		if (mutedUser)
 		{
 			console.log('muted user: ' + payload.author + ' tried to talk in: ' + payload.channel) 
-			return false;
+			return null;
 		}
 		const author = await this.findUser(payload.author);
 
@@ -243,7 +273,7 @@ export class ChatService implements OnModuleInit {
 		if (!author || !room)
 		{
 			console.log("author or room not found");
-			return false;
+			return null;
 		}
 		else { 
 			const message = await this.prisma.message.create({
@@ -257,7 +287,7 @@ export class ChatService implements OnModuleInit {
 				room: true,
 			},
 			});
-			return true;
+			return message;
 		}
 	}
 

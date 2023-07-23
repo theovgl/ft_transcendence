@@ -80,7 +80,7 @@ export default function Chat() {
 		// },
 	]);
 	const [dmRoom, setdmRoom] = useState({clientName: "", receiverName: ""});
-
+	const [emitted, setEmitted] = useState(false);
 	const roomRef = useRef(room);
 	const tablistRef = useRef(tabList);
 	const usernameRef = useRef(chosenUsername);
@@ -104,6 +104,7 @@ export default function Chat() {
 	
 	function startDm() {
 		if (typeof router.query.requesterName !== 'undefined' && typeof router.query.addresseeName !== 'undefined'){
+			console.log('setdmRoomName');
 			setdmRoom({ clientName : `${router.query.requesterName}`, receiverName: `${router.query.addresseeName}`})
 			// socket?.emit('startDm', { clientName : `${router.query.requesterName}`, receiverName: `${router.query.addresseeName}`});
 		}
@@ -112,13 +113,21 @@ export default function Chat() {
 	useEffect(() => {
 		startDm();
 	}, [router.query.requesterName, router.query.addresseeName]);
-	
+
+	useEffect(() => {
+		if (!emitted && user && socket){
+			console.log('emit user connection');
+			setEmitted(true);
+			socket.emit("UserConnection", { username: user.name, dmReceiverName: `${router.query.addresseeName}`});
+		}
+	}, [])
+
 	useEffect(() => {
 		if (user) {
 			setChosenUsername(user.name);
 			if (socket) {
 				setAuthor(socketInitializer());
-				socket.emit("UserConnection", { username: user.name, dmReceiverName: dmRoom.receiverName});
+				
 				socket.on("loadRoom", (payload: string) => {
 					setTablist((currenTablist: TabItem[]) => {
 						const isLabelAlreadyExists = tablistRef.current.some((tab: any) => tab.label === payload);
@@ -172,8 +181,10 @@ export default function Chat() {
 		return () => {
 			socket?.off('msgToClient');
 			socket?.off('loadDm');
+			socket?.off('setAdmin');
+			socket?.off('leaveRoomClient');
 		};
-	}, [user, socket,]);
+	}, [user, socket]);
 
 	const socketInitializer = async () => {
 		socket?.on('msgToClient', (msg: Message) => {
