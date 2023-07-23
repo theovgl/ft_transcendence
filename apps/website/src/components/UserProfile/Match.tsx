@@ -3,7 +3,7 @@ import styles from './Match.module.scss';
 import Link from 'next/link';
 
 interface Props {
-	matchDate: number,
+	//matchDate: number,
 	player1Score: number;
 	player1Name: string;
 	player2Score: number;
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function Match({
-	matchDate,
+	//matchDate,
 	player1Score,
 	player1Name,
 	player2Score,

@@ -20,8 +20,8 @@ type MatchInfos = {
 	scorePlayerOne: number
 	userIdRight: string
 	scorePlayerTwo: number
-	createdAt: string
-	updatedAt: string
+	duration: string
 }
+
 
 export { UserInfos, MatchInfos};

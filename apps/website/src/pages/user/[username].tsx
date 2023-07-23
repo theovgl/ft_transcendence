@@ -84,7 +84,7 @@ export default function Profile() {
 						setMatches(response);
 						
 						matches.map((match, i) => (
-							console.log(new Date(match.createdAt).getFullYear())
+							//console.log(new Date(match.createdAt).getFullYear())
 							//matchDuration = {(new Date(match.createdAt).getMinutes()- new Date(match.updatedAt).getMinutes()).toString()}
 						))
 									
@@ -308,10 +308,10 @@ export default function Profile() {
 												key={i}
 												player1Name = {match.userIdLeft}
 												player2Name =  {match.userIdRight}
-												matchDate = {new Date(match.createdAt).getDate()}
+//												matchDate = {new Date(match.createdAt).getDate()}
 												player1Score = {match.scorePlayerOne}
 												player2Score = {match.scorePlayerTwo}
-												matchDuration = {( new Date(match.updatedAt).getMinutes() - new Date(match.createdAt).getMinutes()).toString()}
+												matchDuration = {match.duration}
 												/>
 											))
 										}
