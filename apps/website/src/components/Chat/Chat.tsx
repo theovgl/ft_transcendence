@@ -3,7 +3,6 @@ import { useUser } from '@/utils/hooks/useUser';
 import { UserInfos } from 'global';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { useCookies } from 'react-cookie';
 import styles from './Chat.module.scss';
 import Conversation from './Conversation';
 import ConversationList from './ConversationList';
@@ -54,7 +53,6 @@ export default function Chat() {
 	const socketContext = useContext(SocketContext);
 	const socket = socketContext?.socket;
 	const { user } = useUser();
-	// const { socket } = useAuth();
 	const [username, setUsername] = useState('');
 	const [chosenUsername, setChosenUsername] = useState('');
 	const [message, setMessage] = useState('');
@@ -62,11 +60,10 @@ export default function Chat() {
 	const [rooms, setRooms] = useState<Array<String>>([]);
 	const [room, setRoom] = useState('');
 	const router = useRouter();
-	const [cookies] = useCookies();
 	const [author, setAuthor] = useState(Object);
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
-	let 	[tabList, setTablist] = useState<TabItem[]>([	
+	let [tabList, setTablist] = useState<TabItem[]>([
 		// {
 		// 	label:"General",
 		// 	active:true,
@@ -169,18 +166,17 @@ export default function Chat() {
 			});
 		});
 		socket?.on('setAdmin', (status) => {
-			console.log('is Admin: ' + status);
 			setIsAdmin(status);
 		});
 	};
 
-	const sendMessage = async () => {
+	const sendMessage = async (messageToSend: MessageType) => {
 		if (room === '')
 			return;
 		socket?.emit('msgToServer', {
-			author: chosenUsername,
-			message: message,
-			channel: room 
+			author: messageToSend.author,
+			message: messageToSend.message,
+			channel: messageToSend.channel 
 		});
 		setMessages((currentMsg) => [
 			...currentMsg,
@@ -226,7 +222,12 @@ export default function Chat() {
 	return (
 		<div className={styles.chat_container}>
 			<ConversationList conversations={tabList}/>
-			<Conversation />
+			<Conversation
+				messages={messages}
+				isAdmin={isAdmin}
+				room={room}
+				sendMessage={sendMessage}
+			/>
 		</div>
 	);
 

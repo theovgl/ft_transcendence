@@ -23,15 +23,17 @@
 
 .message_content {
 	display: flex;
-	align-items: center;
+	flex-direction: column;
 	width: 100%;
+}
+
+.message_text {
 	color: $black-color;
-	margin: 0 10px;
+	word-break: break-word;
 }
 
 .message_left {
 	display: flex;
-	// align-items: center;
 	gap: 10px;
 }
 

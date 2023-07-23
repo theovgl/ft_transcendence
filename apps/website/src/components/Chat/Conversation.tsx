@@ -1,11 +1,15 @@
+import { useUser } from '@/utils/hooks/useUser';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { Socket } from 'socket.io-client';
+import Message from '../Message/Message';
 import { MessageType } from './Chat';
 import styles from './Conversation.module.scss';
 
 interface ConversationProps {
 	messages: MessageType[];
-	socket?: Socket | null;
+	isAdmin: boolean;
+	room: string;
+	sendMessage: (message: MessageType) => void;
 }
 
 interface UseFormInputs {
@@ -13,31 +17,53 @@ interface UseFormInputs {
 }
 
 export default function Conversation(props: ConversationProps) {
-	const { messages } = props;
+	const { messages, isAdmin, room, sendMessage } = props;
+	const { user } = useUser();
 	const {
 		register,
 		handleSubmit,
 		reset
 	} = useForm<UseFormInputs>();
 
-	const onSubmit = () => {
+	const messagesEndRef = useRef<HTMLDivElement>(null);
+
+	const onSubmit = (data: any) => {
+		const newMessage: MessageType = {
+			message: data.message,
+			author: user!.name,
+			channel: room
+		};
 		console.log('Message submit');
+		sendMessage(newMessage);
 		reset();
 	};
+
+	useEffect(() => {
+		console.log('isAdmin: ', isAdmin);
+	});
+
+	const scrollToBottom = () => {
+		if (messagesEndRef.current) 
+			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+	};
+
+	useEffect(() => {
+		scrollToBottom();
+	}, [messages]);
 
 	return (
 		<div className={styles.conversation_container}>
 			<div className={styles.messages_container}>
-				<p>hey</p>
-				{/* {messages.map((message, i) => (
-					// <Message
-					// 	key={i}
-					// 	content={message}
-					// 	username={}
-					// 	room={}
-					// 	isUserAdmin={}
-					// />
-				))} */}
+				{messages.map((message, i) => (
+					<Message
+						key={i}
+						content={message.message}
+						username={message.author}
+						room={message.channel}
+						isUserAdmin={isAdmin}
+					/>
+				))}
+				<div ref={messagesEndRef} />
 			</div>
 			<form
 				onSubmit={handleSubmit(onSubmit)}
