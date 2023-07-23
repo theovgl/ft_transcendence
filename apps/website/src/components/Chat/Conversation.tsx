@@ -64,10 +64,11 @@ export default function Conversation(props: ConversationProps) {
 				<p className={styles.conversation_title}>
 					{room}
 				</p>
-				<ImExit
-					className={styles.conversation_leave}
-					onClick={() => leaveRoom(room)}
-				/>
+				{room == 'General' ? null : 
+					<ImExit
+						className={styles.conversation_leave}
+						onClick={() => leaveRoom(room)}
+					/>}
 			</div>
 			<div className={styles.messages_container}>
 				{messages.map((message, i) => (
