@@ -1,14 +1,14 @@
-import styles from './Message.module.scss';
-import ProfilePic from '../UserProfile/ProfilePic';
-import Link from 'next/link';
-import { use, useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
-import { UserInfos } from 'global';
 import Button from '@/components/Button/Button';
-import { BiLogoKickstarter, BiPlay, BiUserMinus, BiVolumeMute } from 'react-icons/bi';
-import { useRouter } from 'next/router';
 import { useUser } from '@/utils/hooks/useUser';
+import { UserInfos } from 'global';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
+import { BiLogoKickstarter, BiPlay, BiVolumeMute } from 'react-icons/bi';
 import { Socket } from 'socket.io-client';
+import ProfilePic from '../UserProfile/ProfilePic';
+import styles from './Message.module.scss';
 
 type MessageProps = {
 	content: string;

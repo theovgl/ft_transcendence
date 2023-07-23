@@ -8,4 +8,5 @@ type FortyTwoUser = {
 	accessToken?: string | undefined;
 	refreshToken?: string | undefined;
 	picture: string;
+	twoFAEnabled: boolean;
 }
