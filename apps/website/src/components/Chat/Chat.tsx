@@ -20,6 +20,7 @@ interface ServerToClientEvents {
 	withAck: (d: string, callback: (e: number) => void) => void;
 	msgToClient: (msg: MessageType) => void;
 	loadRoom: (payload: string) => void;
+	loadDm: (payload: {name: string, dmName: string}) => void;
 	setAdmin: (status: boolean) => void;
 	leaveRoomClient: (roomName: string) => void;
 }
@@ -65,31 +66,36 @@ export default function Chat() {
 	const [author, setAuthor] = useState(Object);
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
-	let [tabList, setTablist] = useState<TabItem[]>([
-		// {
-		// 	label:"General",
-		// 	active:true,
-		// 	onClick: () => handleTabClick("General")
-		// },
-	]);
-
+	let [tabList, setTablist] = useState<TabItem[]>([]);
+	const [dmRoom, setdmRoom] = useState({clientName: '', receiverName: ''});
+	const [emitted, setEmitted] = useState(false);
 	const roomRef = useRef(room);
 	const tablistRef = useRef(tabList);
+	const usernameRef = useRef(chosenUsername);
+	const dmRoomRef = useRef(dmRoom);
+
+	useEffect(() => {
+		usernameRef.current = chosenUsername;
+	}, [chosenUsername]);
 
 	useEffect(() => {
 		tablistRef.current = tabList;
 	}, [tabList]);
 
 	useEffect(() => {
+		dmRoomRef.current = dmRoom;
+	}, [dmRoom]);
+
+	useEffect(() => {
 		roomRef.current = room;
 	}, [room]);
 	
 	function startDm() {
-		socket?.emit(
-			'startDm',
-			`${router.query.requesterName}`,
-			`${router.query.addresseeName}`
-		);
+		if (typeof router.query.requesterName !== 'undefined' && typeof router.query.addresseeName !== 'undefined'){
+			console.log('setdmRoomName');
+			setdmRoom({ clientName : `${router.query.requesterName}`, receiverName: `${router.query.addresseeName}`});
+			// socket?.emit('startDm', { clientName : `${router.query.requesterName}`, receiverName: `${router.query.addresseeName}`});
+		}
 	}
 
 	useEffect(() => {
@@ -97,11 +103,18 @@ export default function Chat() {
 	}, [router.query.requesterName, router.query.addresseeName]);
 	
 	useEffect(() => {
+		if (!emitted && user && socket){
+			console.log('emit user connection');
+			setEmitted(true);
+			socket.emit('UserConnection', { username: user.name, dmReceiverName: `${router.query.addresseeName}`});
+		}
+	}, []);
+
+	useEffect(() => {
 		if (user) {
 			setChosenUsername(user.name);
 			if (socket) {
 				setAuthor(socketInitializer());
-				socket.emit('UserConnection', user.name);
 				socket.on('loadRoom', (payload: string) => {
 					setTablist((currenTablist: TabItem[]) => {
 						const isLabelAlreadyExists = tablistRef.current.some(
@@ -128,7 +141,6 @@ export default function Chat() {
 									}
 								];
 							}
-							
 					});
 				});
 				socket.on('leaveRoomClient', (roomName) => {
@@ -141,6 +153,13 @@ export default function Chat() {
 					});
 					
 				});
+				socket.on('loadDm', (payload) => {
+					console.log('load Dm');
+					if (usernameRef.current === payload.name) {
+						console.log('click on tab: ' + payload.dmName);
+						simulateClick(payload.dmName);
+					}
+				});
 				socket.on('setAdmin', (isUserAdmin) => {
 					setIsAdmin(isUserAdmin);
 				});
@@ -148,6 +167,9 @@ export default function Chat() {
 		}
 		return () => {
 			socket?.off('msgToClient');
+			socket?.off('loadDm');
+			socket?.off('setAdmin');
+			socket?.off('leaveRoomClient');
 		};
 	}, [user, socket]);
 
@@ -195,12 +217,19 @@ export default function Chat() {
 		socket?.emit('ChangeRoomFromClient', newRoom);
 	};
 
-	// const handleKeypress = (e:any) => {
-	// 	if (e.keyCode === 13) {
-	// 		if (message) 
-	// 			sendMessage();
-	// 	}
-	// };
+	const simulateClick = (label: string) => {
+		if (!label) return false;
+		
+		const updatedTabs = tablistRef.current.map((tab) => {
+			console.log(tab.label);
+		
+			if (tab.label === label) {
+				changeRoom(label);
+				return { ...tab, active: true };
+			}
+			return { ...tab, active: false };
+		});
+	};
 
 	const handleTabClick = (label?: string) => {
 		if (!label)
