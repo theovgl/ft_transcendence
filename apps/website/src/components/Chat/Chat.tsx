@@ -6,6 +6,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.scss';
 import Conversation from './Conversation';
 import ConversationList from './ConversationList';
+import CreateRoomForm from './CreateRoomForm';
 
 export type MessageType = {
 	author: string;
@@ -54,6 +55,7 @@ export default function Chat() {
 	const socket = socketContext?.socket;
 	const { user } = useUser();
 	const [username, setUsername] = useState('');
+	const [isCreatingRoom, setIsCreatingRoom] = useState(false);
 	const [chosenUsername, setChosenUsername] = useState('');
 	const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState<Array<MessageType>>([]);
@@ -193,12 +195,12 @@ export default function Chat() {
 		socket?.emit('ChangeRoomFromClient', newRoom);
 	};
 
-	const handleKeypress = (e:any) => {
-		if (e.keyCode === 13) {
-			if (message) 
-				sendMessage();
-		}
-	};
+	// const handleKeypress = (e:any) => {
+	// 	if (e.keyCode === 13) {
+	// 		if (message) 
+	// 			sendMessage();
+	// 	}
+	// };
 
 	const handleTabClick = (label?: string) => {
 		if (!label)
@@ -212,22 +214,28 @@ export default function Chat() {
 		});
 
 		setTablist(updatedTabs);
+		setIsCreatingRoom(false);
 		return true;
 	};
 
-	const CreateConversation = (name: string) => {
-		console.log(name);
+	const CreateConversation = () => {
+		console.log('createRoom');
+		setIsCreatingRoom(true);
 	};
 
 	return (
 		<div className={styles.chat_container}>
-			<ConversationList conversations={tabList}/>
-			<Conversation
-				messages={messages}
-				isAdmin={isAdmin}
-				room={room}
-				sendMessage={sendMessage}
-			/>
+			<ConversationList conversations={tabList} createRoom={CreateConversation}/>
+			{isCreatingRoom ? 
+				<CreateRoomForm />
+				: 
+				<Conversation
+					messages={messages}
+					isAdmin={isAdmin}
+					room={room}
+					sendMessage={sendMessage}
+				/>
+			}
 		</div>
 	);
 
