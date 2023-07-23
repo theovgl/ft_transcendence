@@ -230,13 +230,21 @@ export default function Chat() {
 			}
 			return { ...tab, active: false };
 		});
+
+		setTablist(updatedTabs);
+		setIsCreatingRoom(false);
 	};
 
 	const handleTabClick = (label?: string) => {
-		console.log('allo');
-		if (!label)
+		if (!label){
+			console.log('no label');
 			return false;
-		const updatedTabs = tabList.map((tab) => {
+		}
+		console.log('allo');
+		// console.log(tablistRef.current);
+		// // console.log(tabList);
+		const updatedTabs = tablistRef.current.map((tab) => {
+			console.log('inTablist');
 			if (tab.label === label) {
 				changeRoom(label);
 				return { ...tab, active: true };

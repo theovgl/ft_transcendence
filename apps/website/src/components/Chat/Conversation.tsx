@@ -39,7 +39,7 @@ export default function Conversation(props: ConversationProps) {
 	};
 
 	useEffect(() => {
-		console.log('isAdmin: ', isAdmin);
+	// console.log('isAdmin: ', isAdmin);
 	});
 
 	const scrollToBottom = () => {
