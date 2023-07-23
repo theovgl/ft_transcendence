@@ -3,7 +3,7 @@ import { PrismaService, User, Room } from '../prisma/prisma.service';
 import { MessageDto } from './dto';
 import { Socket } from 'socket.io';
 import { Message } from './app.interface';
-import { AdminTalk, BannedTalk, MutedTalk, Talk } from '@prisma/client';
+import { AdminTalk, BannedTalk, FriendshipStatus, MutedTalk, Talk } from '@prisma/client';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -11,19 +11,25 @@ export class ChatService implements OnModuleInit {
 
 	private clientList: Map<Socket, string> = new Map<Socket, string>()
 	private currentRoomName = "";
-	
+	private roomList: Set<string> = new Set();
 	async onModuleInit()
 	{
 	}
-   
+ 
 	public async createRoom(room: string, owner: string, status: string, password ?: string)
 	{
+		if (this.roomList.has(room))
+		{
+			return ;
+		}
 		if (await this.prisma.room.findUnique({
 			where: {
 				name: room,
 			}
 		}))
 			return;
+		this.roomList.add(room);
+		console.log("create room: " + room);
 		const user = await this.findUser(owner);
 		if (user){
 			await this.prisma.room.create({
@@ -34,7 +40,7 @@ export class ChatService implements OnModuleInit {
 				},
 			})
 			if (status === "public"){
-				this.addAllUsersToRoom(room);
+				await this.addAllUsersToRoom(room);
 			}
 			else{
 				await this.addUserToRoom(owner, room);
@@ -95,7 +101,6 @@ export class ChatService implements OnModuleInit {
 		const user = await this.findUser(admin);
 		if (user && room)
 		{
-			console.log("in admin: " + admin);
 			if (await this.prisma.adminTalk.findUnique({
 				where : {
 					userId_roomId: {
@@ -130,14 +135,10 @@ export class ChatService implements OnModuleInit {
 		//emit un message pour dire au user qu'il est ban ?
 		if (bannedUser)
 			return;
-		this.addUserToRoom(this.clientList.get(client), room)
+		await this.addUserToRoom(this.clientList.get(client), room)
 		client.leave(this.currentRoomName);
 		client.join(room);
 		this.currentRoomName = room;
-		// this.prisma.room.Update({
-			
-		// Put user in the room in the db
-		// })
 		const currentRoom = await this.prisma.room.findUnique({
 			where: {
 				name: room,
@@ -152,12 +153,14 @@ export class ChatService implements OnModuleInit {
 			},
 		});
 		if (currentRoom) {
-			currentRoom.messages.forEach((message) => {
+			currentRoom.messages.forEach(async (message) => {
 				const msg: Message = {
-					author: message.author.name,
+					author: message.author.displayName,
 					channel: message.room.name,
 					message: message.content
 				};
+				if (await this.isBlocked(this.clientList.get(client), message.author.name))
+					return ;
 				client.emit('msgToClient', msg);
 			});
 		}
@@ -166,16 +169,16 @@ export class ChatService implements OnModuleInit {
 	public async changeRoom(client: Socket, room: string)
 	{
 		// this.createRoom(room, this.clientList.get(client));
-		this.loadRoom(client, room);
+		await this.loadRoom(client, room);
 	}
 
-	async loadRoomlist(client: Socket)
+	async loadRoomlist(client: Socket): Promise<string | 'General'>
 	{
-		await this.addUsertoAllPublicRooms(this.clientList.get(client));
+		const rooms = await this.addUsertoAllPublicRooms(this.clientList.get(client));
 		const user = await this.findUser(this.clientList.get(client));
 		let	  counter = 0;
 		let	  firstRoomName;
-		if (user)
+		if (user && rooms)
 		{
 			const talks = await this.prisma.talk.findMany({
 				where: {
@@ -185,44 +188,96 @@ export class ChatService implements OnModuleInit {
 					room: true,
 				},
 			})
-			talks.forEach((talk) => {
-				if (counter === 0)
-					firstRoomName = talk.room.name;
-				console.log('add Room: ' + talk.room.name + ' to user: ' + user.name);
-				client.emit('loadRoom', talk.room.name);
-				counter++;
-			});
-			return firstRoomName;
+			if (talks && talks.length > 0){
+				talks.forEach((talk) => {
+					if (counter === 0)
+						firstRoomName = talk.room.name;
+					client.emit('loadRoom', talk.room.name);
+					counter++;
+				});
+				return firstRoomName;
+			}
+			return 'General'
 		}
+		return 'General'
 	}
 
-	async addUsertoAllPublicRooms(clientName: string){
-		const rooms = this.prisma.room.findMany({
+	async addUsertoAllPublicRooms(clientName: string): Promise<Room[] | null>{
+		const rooms = await this.prisma.room.findMany({
 			where: {
 				status: "public",
 			}
 		})
 		if (rooms){
-			(await rooms).forEach((room) => {
+			rooms.forEach((room) => {
 				this.addUserToRoom(clientName, room.name);
 			})
+			return rooms;
 		}
+		return null
 	}
-
-	public async userConnection(client: Socket, room: string, payload: string)
+ 
+	public async userConnection(client: Socket, room: string, payload: string, dmReceiverName?: string)
 	{
 		let firstRoomName;
+
+		console.log("user Connection")
 		this.clientList.set(client, payload);
 		await this.createRoom(room, this.clientList.get(client), "public"); 
 		firstRoomName = await this.loadRoomlist(client)
 		await this.loadRoom(client, firstRoomName);
+		if (dmReceiverName && dmReceiverName !== "" && dmReceiverName !== undefined && dmReceiverName !== 'undefined')
+			await this.createDm(client, payload, dmReceiverName)
+	}
+
+	public async userReconnection(client: Socket, payload: string, dmReceiverName?: string){
+		let firstRoomName;
+		
+		firstRoomName = await this.loadRoomlist(client)
+		await this.loadRoom(client, firstRoomName);
+		if (dmReceiverName && dmReceiverName !== "" && dmReceiverName !== undefined && dmReceiverName !== 'undefined')
+			await this.createDm(client, payload, dmReceiverName)
 	}
 
 	public async userDisconnection(client: Socket)
 	{
 		this.clientList.delete(client)
 	}
+	
+	async isBlocked(clientName: string, authorName: string){
+		// Check if author is block by User
+		const requester = await this.findUser(clientName);
+		const addressee = await this.findUser(authorName);
+		const friendship = await this.prisma.friendship.findUnique({
+			where: {
+				requesterId_addresseeId: {
+					requesterId: requester.id,
+					addresseeId: addressee.id
+				}
+			}
+		})
+		if (friendship)
+		{
+			return (friendship.status === FriendshipStatus.BLOCKED)
+		}
+		return false;
+	}
 
+	async storeMessageAndSend(client: Socket, payload){
+		const message = await this.storeMessage(payload)
+		if (message)
+		{
+			const msg: Message = {
+				author: message.author.displayName,
+				channel: message.room.name,
+				message: message.content,
+			};
+			if (await this.isBlocked(this.clientList.get(client), message.author.name))
+				return ;
+			client.emit('msgToClient', msg);
+		}
+	}
+	
 	async storeMessage(payload) {
 		console.log("channel name : " + payload.channel);
 		console.log("author name: " + payload.author);
@@ -232,16 +287,16 @@ export class ChatService implements OnModuleInit {
 		if (mutedUser)
 		{
 			console.log('muted user: ' + payload.author + ' tried to talk in: ' + payload.channel) 
-			return false;
+			return null;
 		}
 		const author = await this.findUser(payload.author);
 
 		const room = await this.findRoom(payload.channel);
-
+ 
 		if (!author || !room)
 		{
 			console.log("author or room not found");
-			return false;
+			return null;
 		}
 		else { 
 			const message = await this.prisma.message.create({
@@ -255,21 +310,23 @@ export class ChatService implements OnModuleInit {
 				room: true,
 			},
 			});
-			return true;
+			return message;
 		}
 	}
 
-	public async createDm(client: Socket, payload)
+	public async createDm(client: Socket, clientName: string, receiverName: string)
 	{
 		const username = this.clientList.get(client);
-		const roomName = [username, payload].sort().join('');
+		const roomName = [username, receiverName].sort().join('');
+		console.log('createDm: ' + receiverName + username);
 		await this.createRoom(roomName, username, "private");
-		await this.removeOwner(username, roomName)
-		await this.addUserToRoom(this.clientList.get(client), roomName);
-		await this.addUserToRoom(payload, roomName);
-		await this.loadRoom(client, roomName)
+		await this.removeOwner(username, roomName);
+		await this.addUserToRoom(username, roomName);
+		await this.addUserToRoom(receiverName, roomName);
+		await this.loadRoom(client, roomName);
+		client.emit('loadDm', {name: username, dmName: roomName});
 	}
- 
+
 	public async createGameInvite(client: Socket, payload)
 	{
 		const username = this.clientList.get(client);
@@ -283,7 +340,6 @@ export class ChatService implements OnModuleInit {
 	}
   
 	public async checkAdmin(client: Socket, roomName: string) {
-		console.log("check Admin for room: " + roomName);
 		const userName = this.clientList.get(client);
 		const adminTalk = await this.findAdminTalk(userName, roomName)
 		if (adminTalk){
@@ -342,11 +398,14 @@ export class ChatService implements OnModuleInit {
 			this.removeTalk(userName, roomName, this.prisma.mutedTalk)			
 		}, 600 * 10);
 	}
- 
+  
 	async	addUserToRoom(clientName: string, roomName: string) {
 		const bannedUser = await this.findBannedTalk(clientName, roomName)
 		//emit un message pour dire au user qu'il est ban ?
 		if (bannedUser)
+			return;
+		const talk = await this.findTalk(clientName, roomName);
+		if (talk)
 			return;
 		await this.addTalk(clientName, roomName, this.prisma.talk)
 		for (const [client, userId] of this.clientList) {
@@ -428,7 +487,7 @@ export class ChatService implements OnModuleInit {
 
 	async findUser(userName?: string): Promise<User | null>
 	{
-		if (!userName)
+		if (!userName || typeof userName === 'undefined')
 			return null;
 		return (await this.prisma.user.findUnique({
 			where: {
@@ -439,7 +498,7 @@ export class ChatService implements OnModuleInit {
 
 	async	findRoom(roomName?: string): Promise<Room | null>
 	{
-		if (!roomName)
+		if (!roomName || typeof roomName === 'undefined')
 			return null;	
 		return ( await this.prisma.room.findUnique({
 			where: {
@@ -503,7 +562,6 @@ export class ChatService implements OnModuleInit {
 	{
 		const user = await this.findUser(userName);
 		const room = await this.findRoom(roomName);
-		
 		if (user && room){
 			return ( await this.prisma.bannedTalk.findUnique({
 				where: {
@@ -514,6 +572,7 @@ export class ChatService implements OnModuleInit {
 				}
 			}))
 		}
+		return null;
 	}
 
 // OPTIONAL

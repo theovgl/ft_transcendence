@@ -41,11 +41,13 @@ const MultiplayerManager = (props) => {
             socket.emit('quitGame', infos.userId);
           });
         
+        socket.on('statusinGame', () => {
+          socket.emit('inGame', infos.userId);
+        })
         // Listen to the 'connect' event
         socket.on('connect', () => {
             socket.emit('addConnectedUser', infos.userId);
-            socket.emit('inGame', infos.userId);
-            console.log('Connected to socket.io server');
+            // console.log('Connected to socket.io server');
             socket.emit('matchmaking', {
               query: {
                 userId: infos.userId,
@@ -82,7 +84,9 @@ const MultiplayerManager = (props) => {
               opponentY: data.y,
            });
         });
-        
+        socket.on('cancel', () => {
+          window.location.reload();
+        })
         socket.on('playerQuit', () => {
           socket.disconnect();
         })
