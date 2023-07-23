@@ -160,6 +160,7 @@ export class ChatService implements OnModuleInit {
 				};
 				if (await this.isBlocked(this.clientList.get(client), message.author.name))
 					return ;
+				console.log('emitting message: ' + msg.message)
 				client.emit('msgToClient', msg);
 			});
 		}
@@ -221,7 +222,8 @@ export class ChatService implements OnModuleInit {
 
 		console.log("user Connection")
 		this.clientList.set(client, payload);
-		await this.createRoom(room, this.clientList.get(client), "public"); 
+		await this.createRoom(room, this.clientList.get(client), "public");
+		await this.removeOwner(this.clientList.get(client), room);
 		firstRoomName = await this.loadRoomlist(client)
 		await this.loadRoom(client, firstRoomName);
 		if (dmReceiverName && dmReceiverName !== "" && dmReceiverName !== undefined && dmReceiverName !== 'undefined')
@@ -321,7 +323,7 @@ export class ChatService implements OnModuleInit {
 		await this.removeOwner(username, roomName);
 		await this.addUserToRoom(username, roomName);
 		await this.addUserToRoom(receiverName, roomName);
-		await this.loadRoom(client, roomName);
+		//await this.loadRoom(client, roomName);
 		client.emit('loadDm', {name: username, dmName: roomName});
 	}
 

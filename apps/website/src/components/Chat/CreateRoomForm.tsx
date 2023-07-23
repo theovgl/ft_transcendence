@@ -2,21 +2,28 @@ import { useForm } from 'react-hook-form';
 import Button from '../Button/Button';
 import FormLabel from '../EditProfile/FormLabel';
 import styles from './CreateRoomForm.module.scss';
+import { Socket } from 'socket.io-client';
 
 interface UseFormInputs {
 	roomName: string
 	password: string
 }
 
-export default function CreateRoomForm() {
+interface  CreateRoomFormProps{
+	socket: Socket
+}
+
+export default function CreateRoomForm({ socket }: CreateRoomFormProps) {
 	const {
 		register,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<UseFormInputs>();
 
-	const onSubmit = (data: any) => {
+	const onSubmit = (data: UseFormInputs) => {
 		console.log(data);
+		// socket.emit('createRoom', data.roomName, 'public')
+		// createRoom
 	};
 
 	return (

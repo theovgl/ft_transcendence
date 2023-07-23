@@ -1,9 +1,10 @@
 import { useUser } from '@/utils/hooks/useUser';
-import { useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import Message from '../Message/Message';
 import { MessageType } from './Chat';
 import styles from './Conversation.module.scss';
+import { SocketContext } from '@/utils/contexts/SocketContext';
 
 interface ConversationProps {
 	messages: MessageType[];
@@ -24,7 +25,8 @@ export default function Conversation(props: ConversationProps) {
 		handleSubmit,
 		reset
 	} = useForm<UseFormInputs>();
-
+	const socketContext = useContext(SocketContext);
+	const socket = socketContext?.socket;
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
 	const onSubmit = (data: any) => {
@@ -61,6 +63,7 @@ export default function Conversation(props: ConversationProps) {
 						content={message.message}
 						username={message.author}
 						room={message.channel}
+						socket={socket}
 						isUserAdmin={isAdmin}
 					/>
 				))}
