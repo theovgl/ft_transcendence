@@ -22,7 +22,7 @@ export default function CreateRoomForm({ socket }: CreateRoomFormProps) {
 
 	const onSubmit = (data: UseFormInputs) => {
 		console.log(data);
-		// socket.emit('createRoom', data.roomName, 'public')
+		socket.emit('createRoom', { roomName: data.roomName, status: 'public' })
 		// createRoom
 	};
 

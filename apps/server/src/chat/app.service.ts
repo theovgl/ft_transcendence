@@ -382,6 +382,8 @@ export class ChatService implements OnModuleInit {
 
 	async roomCreation(client: Socket, roomName: string, status: string){
 		const owner = this.clientList.get(client);
+		console.log('create room: ' + roomName);
+		console.log('by: ' + owner);
 		await this.createRoom(roomName, owner, status);
 		await this.loadRoom(client, roomName);
 		client.emit('loadDm', {name: owner, dmName: roomName})
