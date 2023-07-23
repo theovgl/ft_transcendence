@@ -136,6 +136,8 @@ export default function Chat() {
 					});
 				});
 				socket.on('leaveRoomClient', (roomName) => {
+					if (tablistRef.current.length > 0)
+						simulateClick(tablistRef.current[0].label);
 					setTablist(() => {
 						let newtablist = tablistRef.current.filter(
 							(tabItem) => tabItem.label !== roomName
@@ -143,7 +145,7 @@ export default function Chat() {
 						setMessages([]);
 						return newtablist;
 					});
-					
+					router.replace('/chat');
 				});
 				socket.on('loadDm', (payload) => {
 					console.log('load Dm');
@@ -266,6 +268,7 @@ export default function Chat() {
 					isAdmin={isAdmin}
 					room={room}
 					sendMessage={sendMessage}
+					socket={socket}
 				/>
 			}
 		</div>
