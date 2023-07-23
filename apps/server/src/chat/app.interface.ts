@@ -25,6 +25,7 @@ export interface ClientToServerEvents {
 	checkAdmin: (roomName: string) => void;
 	leaveRoom: (payload: {clientName: string, roomName: string}) => void;
 	sendDm: (payload: string) => void;
+	createRoom: (payload:  {roomName: string, status: string}) => void;
 }
 
 export interface InterServerEvents {

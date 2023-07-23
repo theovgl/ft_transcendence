@@ -227,7 +227,7 @@ export class ChatService implements OnModuleInit {
 		firstRoomName = await this.loadRoomlist(client)
 		await this.loadRoom(client, firstRoomName);
 		if (dmReceiverName && dmReceiverName !== "" && dmReceiverName !== undefined && dmReceiverName !== 'undefined')
-			await this.createDm(client, payload, dmReceiverName)
+			await this.createDm(client, payload, dmReceiverName);
 	}
 
 	public async userReconnection(client: Socket, payload: string, dmReceiverName?: string){
@@ -362,6 +362,13 @@ export class ChatService implements OnModuleInit {
 				return password === room.password
 			}
 		}
+	}
+
+	async roomCreation(client: Socket, roomName: string, status: string){
+		const owner = this.clientList.get(client);
+		await this.createRoom(roomName, owner, status);
+		await this.loadRoom(client, roomName);
+		client.emit('loadDm', {name: owner, dmName: roomName})
 	}
 
 	public async leaveRoom(clientName: string, roomName: string){

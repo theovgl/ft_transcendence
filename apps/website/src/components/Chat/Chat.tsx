@@ -33,6 +33,7 @@ interface ClientToServerEvents {
 	startDm: (requesterName: string, addresseeName: string) => void;
 	checkAdmin: (roomName: string) => void;
 	leaveRoom: (payload: {clientName: string, roomName: string}) => void;
+	createRoom: (payload:  {roomName: string, status: string}) => void;
 	sendDm: (payload: string) => void;
 }
 
@@ -232,6 +233,7 @@ export default function Chat() {
 	};
 
 	const handleTabClick = (label?: string) => {
+		console.log('allo');
 		if (!label)
 			return false;
 		const updatedTabs = tabList.map((tab) => {
