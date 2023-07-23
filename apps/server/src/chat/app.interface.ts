@@ -1,5 +1,6 @@
 export interface Message
 {
+	username:string;
 	author: string;
 	message: string;
 	channel: string;
