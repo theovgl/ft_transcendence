@@ -1,9 +1,8 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { PrismaService, User, Room } from '../prisma/prisma.service';
-import { MessageDto } from './dto';
-import { Socket } from 'socket.io';
-import { Message } from './app.interface';
 import { AdminTalk, BannedTalk, FriendshipStatus, MutedTalk, Talk } from '@prisma/client';
+import { Server, Socket } from 'socket.io';
+import { PrismaService, Room, User } from '../prisma/prisma.service';
+import { Message } from './app.interface';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -168,7 +167,6 @@ export class ChatService implements OnModuleInit {
 
 	public async changeRoom(client: Socket, room: string)
 	{
-		// this.createRoom(room, this.clientList.get(client));
 		await this.loadRoom(client, room);
 	}
 
@@ -263,7 +261,7 @@ export class ChatService implements OnModuleInit {
 		return false;
 	}
 
-	async storeMessageAndSend(client: Socket, payload){
+	async storeMessageAndSend(client: Socket, payload, server: Server){
 		const message = await this.storeMessage(payload)
 		if (message)
 		{
@@ -274,7 +272,7 @@ export class ChatService implements OnModuleInit {
 			};
 			if (await this.isBlocked(this.clientList.get(client), message.author.name))
 				return ;
-			client.emit('msgToClient', msg);
+			server.to(payload.channel).emit('msgToClient', msg);
 		}
 	}
 	

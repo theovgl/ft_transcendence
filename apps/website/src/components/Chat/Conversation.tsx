@@ -38,10 +38,6 @@ export default function Conversation(props: ConversationProps) {
 		reset();
 	};
 
-	useEffect(() => {
-	// console.log('isAdmin: ', isAdmin);
-	});
-
 	const scrollToBottom = () => {
 		if (messagesEndRef.current) 
 			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });

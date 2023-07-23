@@ -70,7 +70,7 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 			setProfilePic(userInfos.profilePicPath);
 		};
 		fetchProfilePic();
-	});
+	}, []);
 
 	return (
 		<div className={styles.message}>

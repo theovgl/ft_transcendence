@@ -59,7 +59,7 @@ export default function Chat() {
 	const [username, setUsername] = useState('');
 	const [isCreatingRoom, setIsCreatingRoom] = useState(false);
 	const [chosenUsername, setChosenUsername] = useState('');
-	const [message, setMessage] = useState('');
+	// const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState<Array<MessageType>>([]);
 	const [rooms, setRooms] = useState<Array<String>>([]);
 	const [room, setRoom] = useState('');
@@ -69,7 +69,6 @@ export default function Chat() {
 	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
 	let [tabList, setTablist] = useState<TabItem[]>([]);
 	const [dmRoom, setdmRoom] = useState({clientName: '', receiverName: ''});
-	const [emitted, setEmitted] = useState(false);
 	const roomRef = useRef(room);
 	const tablistRef = useRef(tabList);
 	const usernameRef = useRef(chosenUsername);
@@ -95,27 +94,19 @@ export default function Chat() {
 		if (typeof router.query.requesterName !== 'undefined' && typeof router.query.addresseeName !== 'undefined'){
 			console.log('setdmRoomName');
 			setdmRoom({ clientName : `${router.query.requesterName}`, receiverName: `${router.query.addresseeName}`});
-			// socket?.emit('startDm', { clientName : `${router.query.requesterName}`, receiverName: `${router.query.addresseeName}`});
 		}
 	}
 
 	useEffect(() => {
 		startDm();
 	}, [router.query.requesterName, router.query.addresseeName]);
-	
-	useEffect(() => {
-		if (!emitted && user && socket){
-			console.log('emit user connection');
-			setEmitted(true);
-			socket.emit('UserConnection', { username: user.name, dmReceiverName: `${router.query.addresseeName}`});
-		}
-	}, []);
 
 	useEffect(() => {
 		if (user) {
 			setChosenUsername(user.name);
 			if (socket) {
 				setAuthor(socketInitializer());
+				socket.emit('UserConnection', { username: user.name, dmReceiverName: `${router.query.addresseeName}`});
 				socket.on('loadRoom', (payload: string) => {
 					setTablist((currenTablist: TabItem[]) => {
 						const isLabelAlreadyExists = tablistRef.current.some(
@@ -177,6 +168,7 @@ export default function Chat() {
 	const socketInitializer = async () => {
 		socket?.on('msgToClient', (msg: MessageType) => {
 			setMessages((currentMsg) => {
+				console.log('roomref: ' + roomRef.current);
 				if (msg.channel === roomRef.current) {
 					return [
 						...currentMsg,
@@ -203,10 +195,11 @@ export default function Chat() {
 			message: messageToSend.message,
 			channel: messageToSend.channel 
 		});
-		setMessages((currentMsg) => [
-			...currentMsg,
-		]);
-		setMessage('');
+		// setMessages((currentMsg) => [
+		// 	...currentMsg,
+		// 	messageToSend
+		// ]);
+		// setMessage('');
 	};	
 
 	const changeRoom = async (newRoom: string) => {
@@ -279,51 +272,3 @@ export default function Chat() {
 	);
 
 }
-
-// return (
-// 	<div className={chatStyle.grid}>
-
-// 		<div className={chatStyle.tab_list}>	
-// 			{tabList.map(item =>
-// 				(
-// 					<Tab key={item.label} label={item.label} active={item.active}
-// 						onClick={() => handleTabClick(item.label)} />)
-// 			)}
-// 		</div>
-
-// 		<div className={chatStyle.contact_list}>
-// 			<Contact name="M.Obama" picture="temp" content="in-game" context="presentation"
-// 				onClickFunction={() => CreateConversation('M.Obama')}/>
-// 			<Contact name="XxX_Obama_Gaming_XxX" picture="temp" content="online" context="presentation"/>
-// 			<Contact name="TheRealObama" picture="temp" content="offline" context="presentation"/>
-// 		</div>
-// 		<div className={chatStyle.main}>
-// 			{
-// 				messages.map((msg, i) => (
-// 					<Message
-// 						key={i}
-// 						content={msg.message}
-// 						username={msg.author}
-// 						socket={socket ? socket : null}
-// 						room={msg.channel}
-// 						isUserAdmin={isAdmin}
-// 					/>
-// 				))
-// 			}
-// 		</div>
-// 		<input type="text" className={chatStyle.input}
-// 			placeholder="New message..."
-// 			value={message}
-// 			onChange={(e) => setMessage(e.target.value)}
-// 			onKeyUp={handleKeypress}
-// 		>
-// 		</input>
-// 		<Button
-// 			text='Message'
-// 			theme='light'
-// 			boxShadow
-// 			icon={<BiMessageAltDetail />}
-// 			onClick={startDm}
-// 		/>
-// 	</div>
-// );
