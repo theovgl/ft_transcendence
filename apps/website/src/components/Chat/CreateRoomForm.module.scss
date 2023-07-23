@@ -45,6 +45,24 @@
 	}
 }
 
+.hidePassword {
+	font-size: 12px;
+	padding: 5px 2px;
+	cursor: pointer;
+	color: rgb(94, 94, 94);
+
+	&:hover {
+		text-decoration: underline;
+		color: rgb(15, 15, 15);
+	}
+}
+
+.privateField_container {
+	display: flex;
+	align-items: center;
+	gap: 5px
+}
+
 .input_error {
 	@extend .input;
 	border: solid rgb(245, 82, 82) 3px;
