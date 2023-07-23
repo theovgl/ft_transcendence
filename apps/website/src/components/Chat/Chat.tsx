@@ -170,7 +170,7 @@ export default function Chat() {
 	const socketInitializer = async () => {
 		socket?.on('msgToClient', (msg: MessageType) => {
 			setMessages((currentMsg) => {
-				console.log('roomref: ' + roomRef.current);
+				console.log('receive message');
 				if (msg.channel === roomRef.current) {
 					return [
 						...currentMsg,
@@ -217,7 +217,6 @@ export default function Chat() {
 		if (!label) return false;
 		
 		const updatedTabs = tablistRef.current.map((tab) => {
-			console.log(tab.label);
 		
 			if (tab.label === label) {
 				changeRoom(label);
@@ -261,7 +260,7 @@ export default function Chat() {
 		<div className={styles.chat_container}>
 			<ConversationList conversations={tabList} createRoom={CreateConversation}/>
 			{isCreatingRoom ? 
-				<CreateRoomForm />
+				<CreateRoomForm socket={socket} />
 				: 
 				<Conversation
 					messages={messages}

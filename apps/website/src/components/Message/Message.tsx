@@ -26,6 +26,8 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 	const [isAdmin, setIsAdmin] = useState<boolean>(isUserAdmin);
 
 	function kick() {
+		console.log("KICK");
+		console.log(socket);
 		socket?.emit('kick', {kicked: username, room: room});
 	}
 
