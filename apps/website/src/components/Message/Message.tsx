@@ -86,13 +86,11 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 						currentUser={username}
 					/>
 				</Link>
-				<div>
+				<div className={styles.message_content}>
 					<div className={styles.message_username}>
-						{username}
+						<span>{username}</span>
 					</div>
-					<div className={styles.message_content}>
-						{content}
-					</div>
+					<span className={styles.message_text}>{content}</span>
 				</div>
 			</div>
 			<div className={styles.message_right}>
