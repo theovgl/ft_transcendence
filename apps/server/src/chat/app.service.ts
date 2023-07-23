@@ -3,7 +3,7 @@ import { PrismaService, User, Room } from '../prisma/prisma.service';
 import { MessageDto } from './dto';
 import { Socket } from 'socket.io';
 import { Message } from './app.interface';
-import { AdminTalk, BannedTalk, MutedTalk, Talk } from '@prisma/client';
+import { AdminTalk, BannedTalk, FriendshipStatus, MutedTalk, Talk } from '@prisma/client';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -153,12 +153,14 @@ export class ChatService implements OnModuleInit {
 			},
 		});
 		if (currentRoom) {
-			currentRoom.messages.forEach((message) => {
+			currentRoom.messages.forEach(async (message) => {
 				const msg: Message = {
 					author: message.author.displayName,
 					channel: message.room.name,
 					message: message.content
 				};
+				if (await this.isBlocked(this.clientList.get(client), message.author.name))
+					return ;
 				client.emit('msgToClient', msg);
 			});
 		}
@@ -242,6 +244,25 @@ export class ChatService implements OnModuleInit {
 		this.clientList.delete(client)
 	}
 	
+	async isBlocked(clientName: string, authorName: string){
+		// Check if author is block by User
+		const requester = await this.findUser(clientName);
+		const addressee = await this.findUser(authorName);
+		const friendship = await this.prisma.friendship.findUnique({
+			where: {
+				requesterId_addresseeId: {
+					requesterId: requester.id,
+					addresseeId: addressee.id
+				}
+			}
+		})
+		if (friendship)
+		{
+			return (friendship.status === FriendshipStatus.BLOCKED)
+		}
+		return false;
+	}
+
 	async storeMessageAndSend(client: Socket, payload){
 		const message = await this.storeMessage(payload)
 		if (message)
@@ -251,6 +272,8 @@ export class ChatService implements OnModuleInit {
 				channel: message.room.name,
 				message: message.content,
 			};
+			if (await this.isBlocked(this.clientList.get(client), message.author.name))
+				return ;
 			client.emit('msgToClient', msg);
 		}
 	}
