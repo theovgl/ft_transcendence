@@ -79,8 +79,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
  }
  
  @SubscribeMessage('setUserAdmin')
- handleSetUserAdmin(client: Socket, payload: string){
-	this.chatService.setAdmin(client, payload);
+ handleSetUserAdmin(client: Socket, payload: {username: string, roomName: string}){
+	this.chatService.setAdmin(payload.username, payload.roomName);
  }
  
  //Room Events

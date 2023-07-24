@@ -40,7 +40,7 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 	}
 
 	function promote() {
-		socket?.emit('setAdmin', {username: username, roomName: room});
+		socket?.emit('setUserAdmin', {username: username, roomName: room});
 	}
 
 	function sendInvite() {

@@ -362,15 +362,22 @@ export class ChatService implements OnModuleInit {
 		await this.loadRoom(client, roomName)
 	}
   
-	public async setAdmin(client: Socket, roomName: string){
+	public async setAdmin(userName: string, roomName: string){
 		//if user && room , addTalk admintalk
-		const	userName = this.clientList.get(client)
+		let	clientSocket: Socket = null;
+		for (const [key, value]  of this.clientList.entries()){
+			if (value === userName)
+				clientSocket = key;
+		}
+		if (!clientSocket)
+			return;
+		console.log('client socket is : ' + clientSocket);
 		const	user = await this.findUser(userName);
 		const	room = await this.findRoom(roomName);
 
 		if (user && room) {
 			await this.addTalk(userName, roomName, this.prisma.adminTalk);
-			client.emit('setAdmin', true);
+			clientSocket.emit('setAdmin', true);
 		}
 	}
 
