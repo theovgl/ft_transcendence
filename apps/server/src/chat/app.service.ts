@@ -10,28 +10,25 @@ export class ChatService implements OnModuleInit {
 
 	private clientList: Map<Socket, string> = new Map<Socket, string>()
 	private currentRoomName = "";
-	private roomList: Set<string> = new Set();
+	// private roomList: Set<string> = new Set();
 	async onModuleInit()
 	{
 	}
  
 	public async createRoom(room: string, owner: string, status: string, password ?: string)
 	{
-		if (this.roomList.has(room))
-		{
-			return ;
-		}
-		if (await this.prisma.room.findUnique({
-			where: {
-				name: room,
-			}
-		}))
-			return;
-		this.roomList.add(room);
+		// if (this.roomList.has(room))
+		// {
+		// 	return ;
+		// }
+		let newRoom = await this.findRoom(room);
+		if (newRoom)
+			return newRoom;
+		// this.roomList.add(room);
 		console.log("create room: " + room);
 		const user = await this.findUser(owner);
 		if (user){
-			await this.prisma.room.create({
+			newRoom = await this.prisma.room.create({
 				data: {
 					name: room,
 					status: status,
@@ -46,6 +43,7 @@ export class ChatService implements OnModuleInit {
 			}
 			await this.setUserAsOwner(owner, room);
 		}
+		return newRoom;
 	}
 
 	async addAllUsersToRoom(roomName: string){
@@ -398,11 +396,12 @@ export class ChatService implements OnModuleInit {
 		const owner = this.clientList.get(client);
 		console.log('create room: ' + roomName);
 		console.log('by: ' + owner);
-		await this.createRoom(roomName, owner, status, password);
+		const newRoom = await this.createRoom(roomName, owner, status, password);
+		console.log("new room status: " + newRoom.status);
 		const checkPass = await this.checkPassword(password, roomName);
 		const isOwner = await this.isOwner(owner, roomName);
-		if (status === 'public' || checkPass || isOwner){
-			if (!checkPass && status !== 'public' && isOwner)
+		if (newRoom.status === 'public' || checkPass || isOwner){
+			if (!checkPass && newRoom.status !== 'public' && isOwner)
 				await this.setPassword(roomName ,password);
 			// await this.loadRoom(client, roomName, password);
 			client.emit('loadDm', {name: owner, dmName: roomName});
