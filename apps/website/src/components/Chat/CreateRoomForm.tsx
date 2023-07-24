@@ -12,7 +12,7 @@ interface UseFormInputs {
 }
 
 interface  CreateRoomFormProps{
-	socket: Socket
+	socket?: Socket | null
 }
 
 export default function CreateRoomForm({ socket }: CreateRoomFormProps) {
@@ -26,7 +26,10 @@ export default function CreateRoomForm({ socket }: CreateRoomFormProps) {
 
 	const onSubmit = (data: UseFormInputs) => {
 		reset();
-		socket.emit('createRoom', { roomName: data.roomName, status: 'public' })
+		socket?.emit('createRoom', {
+			roomName: data.roomName,
+			status: data.privateToggle ? 'private' : 'public'
+		});
 		// createRoom
 	};
 
