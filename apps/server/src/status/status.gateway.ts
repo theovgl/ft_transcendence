@@ -40,13 +40,11 @@ export class StatusGateway {
 
 	@SubscribeMessage('inGame')
 	async handleInGame(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log('inGame: ' + data);
 		this.server.emit('isInGame', data);
 	}
 
 	@SubscribeMessage('quitGame')
 	async handleQuitGame(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log('quitGame: ' + data);
 		this.server.emit('quitInGame', { username: data, status: 'Online'});
 	}
 

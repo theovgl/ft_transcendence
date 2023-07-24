@@ -36,7 +36,6 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('quit')
 	handleQuit(@MessageBody() data: string, @ConnectedSocket() client: Socket){
-		console.log(`Quit event: ${client.id}`);
 		this.matchmakingService.removePlayer(client, this.clientModeList.get(client), this.playersId.get(client));
 		this.matchmakingService.removePremadePlayer(this.RoomsId.get(client));
 		this.RoomsId.delete(client);
@@ -49,7 +48,6 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	//matchmaking even
 	@SubscribeMessage('matchmaking')
 	startMatchmaking(@MessageBody() data, @ConnectedSocket() client: Socket) {
-		console.log(`Matchmaking start: ${client.id}`);
 		const userId: string = Array.isArray(data.query.userId)
 			? data.query.userId[0]
 			: data.query.userId.toString();
@@ -59,19 +57,15 @@ export class GameEvents  implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		const premade: string = Array.isArray(data.query.premade)
 			? data.query.premade[0]
 			: data.query.premade.toString();
-		console.log(`User Connected: ${data.query.userId}`);
 		if (premade !== '' && typeof premade !== 'undefined') {
-			console.log('premade with: ' + premade);
 			//ajouter au pool de premades
 			//la pool à une id
 			this.RoomsId.set(client, premade);
 			this.matchmakingService.addPremadePlayer(client, mode, userId, premade, this.server);
 		} else {
-			if (this.matchmakingService.checkQueue(userId)){
-				console.log('already in Queue ! ');
+			if (this.matchmakingService.checkQueue(userId))
 				client.emit('cancel');
-			} else {
-				console.log('add to queue');
+			 else {
 				client.emit('statusinGame', userId);
 				this.clientModeList.set(client, mode);
 				this.playersId.set(client, userId);

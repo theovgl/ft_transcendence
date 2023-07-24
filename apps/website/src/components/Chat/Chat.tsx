@@ -92,10 +92,8 @@ export default function Chat() {
 	}, [room]);
 
 	function startDm() {
-		if (typeof router.query.requesterName !== 'undefined' && typeof router.query.addresseeName !== 'undefined'){
-			console.log('setdmRoomName');
+		if (typeof router.query.requesterName !== 'undefined' && typeof router.query.addresseeName !== 'undefined')
 			setdmRoom({ clientName : `${router.query.requesterName}`, receiverName: `${router.query.addresseeName}`});
-		}
 	}
 
 	useEffect(() => {
@@ -149,11 +147,8 @@ export default function Chat() {
 					router.replace('/chat');
 				});
 				socket.on('loadDm', (payload) => {
-					console.log('load Dm');
-					if (usernameRef.current === payload.name) {
-						console.log('click on tab: ' + payload.dmName);
+					if (usernameRef.current === payload.name)
 						simulateClick(payload.dmName);
-					}
 				});
 				socket.on('setAdmin', (isUserAdmin) => {
 					setIsAdmin(isUserAdmin);
@@ -185,9 +180,6 @@ export default function Chat() {
 				return currentMsg;
 			});
 		});
-		// socket?.on('setAdmin', (status) => {
-		// 	setIsAdmin(status);
-		// });
 	};
 
 	const sendMessage = async (messageToSend: MessageType) => {
@@ -225,10 +217,9 @@ export default function Chat() {
 	};
 
 	const handleTabClick = (label?: string) => {
-		if (!label){
-			console.log('no label');
+		if (!label)
 			return false;
-		}
+
 		const updatedTabs = tablistRef.current.map((tab) => {
 			if (tab.label === label) {
 				changeRoom(label);

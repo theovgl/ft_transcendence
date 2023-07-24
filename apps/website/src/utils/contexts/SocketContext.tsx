@@ -32,7 +32,7 @@ export const SocketProvider = (props: React.PropsWithChildren) => {
 			});
 
 			socket.current?.on('error', (err: any) => {
-				console.log('Socket Error:', err.message);
+				console.error('Socket Error:', err.message);
 			});
 		}
 	}, [isAuthenticated]);

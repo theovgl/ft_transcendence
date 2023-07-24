@@ -155,16 +155,12 @@ export class BallService {
 		this.gameEnded = true;
 	}
 
-	public  forfeit(player: Socket) {
-		// if (this.winnerId !== "")
-		//   return;
-		if (player === this.pOneSocket) {
-			console.log('winner right');
+	public forfeit(player: Socket) {
+		if (player === this.pOneSocket)
 			this.winnerId = this.pTwoId;
-		} else {
-			console.log('winner left');
+		 else
 			this.winnerId = this.pOneId;
-		}
+
 		this.updateGameResult();
 		this.unsetBallLoop();
 		this.forfeited = true;
@@ -279,6 +275,4 @@ export class BallService {
 	public getBallPos(): {x: number, y: number} {
 		return this.ballPos;
 	}
-
-	//when game end clear th
 }

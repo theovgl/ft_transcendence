@@ -1,7 +1,7 @@
-import { Server, Socket } from 'socket.io';
 import { Injectable } from '@nestjs/common';
-import { BallService } from './ball.service';
+import { Server, Socket } from 'socket.io';
 import { PrismaService } from '../prisma/prisma.service';
+import { BallService } from './ball.service';
 
 const ONLINEMODE = 0;
 const PLAYERMODE = 2;
@@ -19,26 +19,22 @@ export class MatchmakingService {
 	private ballServices = new Set<BallService>();
 
 	public addPlayer(player: Socket, mode: string, id: string): void {
-		if (mode === 'Normal') {
+		if (mode === 'Normal')
 			this.waitingPlayers.set(id, player);
-			console.log('add normal: ' + this.waitingPlayers.size);
-		} else if (mode === 'Special') {
+		 else if (mode === 'Special')
 			this.waitingPlayerSpecial.set(id, player);
-			console.log('add special: ' + this.waitingPlayerSpecial.size);
-		}
+
 	}
 
 	public removePlayer(player: Socket, mode: string, id: string): void {
 		if (mode === 'Normal') {
-			if (this.waitingPlayers.has(id) && this.waitingPlayers.get(id) === player) {
-				console.log('User disconnected from normal queue: ' + id);
+			if (this.waitingPlayers.has(id) && this.waitingPlayers.get(id) === player)
 				this.waitingPlayers.delete(id);
-			}
+
 		} else if (mode === 'Special') {
-			if (this.waitingPlayerSpecial.has(id) && this.waitingPlayerSpecial.get(id) === player) {
-				console.log('User disconnected from special queue: ' + id);
+			if (this.waitingPlayerSpecial.has(id) && this.waitingPlayerSpecial.get(id) === player)
 				this.waitingPlayerSpecial.delete(id);
-			}
+
 		}
 	}
 
@@ -49,7 +45,6 @@ export class MatchmakingService {
 	//first premade user connect
 	//create a room and add player to it
 	public addPremadePlayer(player: Socket, mode: string, id: string, roomId: string, server: Server) {
-		console.log('add premade player');
 		if (this.premadePlayers.has(roomId)) {
 			//set the players
 			const playerOne = {
@@ -66,7 +61,6 @@ export class MatchmakingService {
 				rect: { x: 860, y: 200, width: 10, height: 10 },
 			};
 
-			console.log('Premade found!');
 			//Create premade room
 			const room = `${playerOne.id}-${playerTwo.id}}`;
 			playerOne.socket.join(room);
@@ -96,7 +90,6 @@ export class MatchmakingService {
 	public deleteBallService(socket: Socket) {
 		for (const ballService of this.ballServices) {
 			if (ballService.containSocket(socket)) {
-				console.log('delete ballservice');
 				if (!ballService.gameEnded)
 					ballService.forfeit(socket);
 				this.ballServices.delete(ballService);
@@ -126,7 +119,6 @@ export class MatchmakingService {
 			waitingPlayers.delete(players[0][0]);
 			waitingPlayers.delete(players[1][0]);
 
-			console.log('Match found!');
 			const room = `${players[0][0]}-${players[1][0]}`;
 			playerOne.socket.join(room);
 			playerTwo.socket.join(room);

@@ -44,7 +44,6 @@ const MultiplayerManager = (props) => {
 		// Listen to the 'connect' event
 		socket.on('connect', () => {
 			socket.emit('addConnectedUser', infos.userId);
-			// console.log('Connected to socket.io server');
 			socket.emit('matchmaking', {
 				query: {
 					userId: infos.userId,
@@ -60,7 +59,6 @@ const MultiplayerManager = (props) => {
 
 		//Listen to both p1 and p2 events to determinate on which pos you will be
 		socket.on('game-start', (leftPlayer, rightPlayer) => {
-			console.log('match found !');
 			setInfos(prevInfos => ({
 				...prevInfos,
 				matchFound: true,

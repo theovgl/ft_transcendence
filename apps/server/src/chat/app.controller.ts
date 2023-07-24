@@ -8,9 +8,6 @@ export class ChatController {
 
 	@Post('storeMessage')
 	storeMessage(@Body() dto: MessageDto) {
-		console.log({
-			dto,
-		});
 		return this.chatService.storeMessage(dto);
 	}
 	/*Definir les routes pour envoyer a prisma les messages

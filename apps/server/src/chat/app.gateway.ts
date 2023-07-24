@@ -61,7 +61,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	@SubscribeMessage('challenge')
 	handleGameInvite(client: Socket, payload){
-		console.log('challenge: ' + payload.challenged );
 		this.chatService.createGameInvite(client, payload.challenged);
 	}
 
@@ -96,10 +95,8 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	async handleUserConnection(client: Socket, payload: {username: string, dmReceiverName?: string}){
 		if (this.clientList.get(client)) {
 			this.chatService.userReconnection(client, payload.username, payload.dmReceiverName);
-			console.log('already registered in chat');
 			return ;
 		}
-		console.log('registering in chat: ' + client);
 		this.clientList.set(client, payload.username);
 		await this.chatService.userConnection(client, 'General', payload.username, payload?.dmReceiverName);
 

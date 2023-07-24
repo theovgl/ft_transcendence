@@ -15,18 +15,12 @@ export class ChatService implements OnModuleInit {
 	async onModuleInit() {}
 
 	public async createRoom(room: string, owner: string, status: string, password ?: string) {
-		// if (this.roomList.has(room))
-		// {
-		// 	return ;
-		// }
 		let hash = password;
 		if (password)
 			hash = await argon2.hash(password);
 		let newRoom = await this.findRoom(room);
 		if (newRoom)
 			return newRoom;
-		// this.roomList.add(room);
-		console.log('create room: ' + room);
 		const user = await this.findUser(owner);
 		if (user){
 			newRoom = await this.prisma.room.create({
@@ -94,7 +88,6 @@ export class ChatService implements OnModuleInit {
 		const room = await this.findRoom(roomName);
 
 		if (room){
-			console.log('set password to: ' + password);
 			let hash = password;
 			if (password)
 				hash = await argon2.hash(password);
@@ -110,7 +103,6 @@ export class ChatService implements OnModuleInit {
 	}
 
 	async	setUserAsAdmin(admin: string, roomName: string){
-		console.log('set admin: ' + admin);
 		const room = await this.findRoom(roomName);
 		const user = await this.findUser(admin);
 		if (user && room) {
@@ -134,10 +126,6 @@ export class ChatService implements OnModuleInit {
 
 	public async loadRoom(client: Socket, room: string, password ?: string) {
 		await this.checkAdmin(client, room);
-		if (room !== this.currentRoomName) {
-			console.log('client leaving : ' + this.currentRoomName);
-			console.log('client joining : ' + room);
-		}
 		const bannedUser = await this.findBannedTalk(this.clientList.get(client), room);
 		//emit un message pour dire au user qu'il est ban ?
 		if (bannedUser)
@@ -169,14 +157,12 @@ export class ChatService implements OnModuleInit {
 				};
 				if (await this.isBlocked(this.clientList.get(client), message.author.name))
 					return true;
-				// console.log('emitting message: ' + msg.message)
 				client.emit('msgToClient', msg);
 			});
 		}
 	}
 
 	public async changeRoom(client: Socket, room: string) {
-		console.log('changing room');
 		await this.loadRoom(client, room);
 	}
 
@@ -226,7 +212,6 @@ export class ChatService implements OnModuleInit {
 	public async userConnection(client: Socket, room: string, payload: string, dmReceiverName?: string) {
 		let firstRoomName;
 
-		console.log('user Connection');
 		this.clientList.set(client, payload);
 		await this.createRoom(room, this.clientList.get(client), 'public');
 		await this.removeOwner(this.clientList.get(client), room);
@@ -287,33 +272,26 @@ export class ChatService implements OnModuleInit {
 			};
 			const roomSockets = this.getRoomSockets(message.room.name, server);
 			for (const roomSocket of roomSockets){
-				console.log('check if blocked: ' + this.clientList.get(roomSocket));
 				if (await this.isBlocked(this.clientList.get(roomSocket), message.author.name))
 					continue ;
-				console.log('not blocked');
 				roomSocket.emit('msgToClient', msg);
 			}
 		}
 	}
 
 	async storeMessage(payload) {
-		console.log('channel name : ' + payload.channel);
-		console.log('author name: ' + payload.author);
-
 		const mutedUser = await this.findMutedTalk(payload.author, payload.channel);
 		//emit un message pour dire au user qu'il est mute ?
-		if (mutedUser) {
-			console.log('muted user: ' + payload.author + ' tried to talk in: ' + payload.channel);
+		if (mutedUser)
 			return null;
-		}
+
 		const author = await this.findUser(payload.author);
 
 		const room = await this.findRoom(payload.channel);
 
-		if (!author || !room) {
-			console.log('author or room not found');
+		if (!author || !room)
 			return null;
-		} else {
+		 else {
 			const message = await this.prisma.message.create({
 				data: {
 					content: payload.message,
@@ -332,12 +310,10 @@ export class ChatService implements OnModuleInit {
 	public async createDm(client: Socket, clientName: string, receiverName: string) {
 		const username = this.clientList.get(client);
 		const roomName = [username, receiverName].sort().join(' <-> ');
-		console.log('createDm: ' + receiverName + username);
 		await this.createRoom(roomName, username, 'private');
 		await this.removeOwner(username, roomName);
 		await this.addUserToRoom(username, roomName);
 		await this.addUserToRoom(receiverName, roomName);
-		//await this.loadRoom(client, roomName);
 		client.emit('loadDm', {name: username, dmName: roomName});
 	}
 
@@ -361,7 +337,6 @@ export class ChatService implements OnModuleInit {
 		}
 		if (!clientSocket)
 			return;
-		console.log('client socket is : ' + clientSocket);
 		const	user = await this.findUser(userName);
 		const	room = await this.findRoom(roomName);
 
@@ -374,36 +349,28 @@ export class ChatService implements OnModuleInit {
 	public async checkAdmin(client: Socket, roomName: string) {
 		const userName = this.clientList.get(client);
 		const adminTalk = await this.findAdminTalk(userName, roomName);
-		if (adminTalk){
-			console.log('setAdmin for: ' + roomName);
+		if (adminTalk)
 			client.emit('setAdmin', true);
-		} else {
-			console.log('unsetAdmin for: ' + roomName);
+		 else
 			client.emit('setAdmin', false);
-		}
+
 	}
 
 	public async checkPassword(password: string, roomName: string) {
 		const room = await this.findRoom(roomName);
 		if (room){
-			console.log('check password: ' + password + ' with: ' + room.password);
-			if (room.password === null) {
-				console.log('no password');
+			if (room.password === null)
 				return true;
-			} else if (password) {
-				console.log('password match: ' + (await argon2.verify(room.password, password)));
+			 else if (password)
 				return (await argon2.verify(room.password, password));
-			}
+
 		}
 		return false;
 	}
 
 	async roomCreation(client: Socket, roomName: string, status: string, password?: string){
 		const owner = this.clientList.get(client);
-		console.log('create room: ' + roomName);
-		console.log('by: ' + owner);
 		const newRoom = await this.createRoom(roomName, owner, status, password);
-		console.log('new room status: ' + newRoom.status);
 		const checkPass = await this.checkPassword(password, roomName);
 		const isOwner = await this.isOwner(owner, roomName);
 		if (newRoom.status === 'public' || checkPass || isOwner){
@@ -411,8 +378,7 @@ export class ChatService implements OnModuleInit {
 			if (!checkPass && newRoom.status !== 'public' && isOwner)
 				await this.setPassword(roomName ,password);
 			client.emit('loadDm', {name: owner, dmName: roomName});
-		} else
-			console.log('bad password');
+		}
 	}
 
 	public async leaveRoom(clientName: string, roomName: string){
@@ -442,14 +408,11 @@ export class ChatService implements OnModuleInit {
 		const isUserOwner = await this.isOwner(userName, roomName);
 		if (!isUserOwner){
 			const mutedUser = await this.findMutedTalk(userName, roomName);
-			if (mutedUser) {
-				console.log('already muted');
+			if (mutedUser)
 				return;
-			}
-			console.log('mute user: ' + userName + 'in room: ' + roomName);
+
 			this.addTalk(userName, roomName, this.prisma.mutedTalk);
 			setTimeout(() => {
-				console.log('unmute user: ' + userName + 'in room: ' + roomName);
 				this.removeTalk(userName, roomName, this.prisma.mutedTalk);
 			}, 6009 * 10 * 2);
 		}

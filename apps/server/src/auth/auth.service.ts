@@ -224,9 +224,6 @@ export class AuthService {
 			token: twoFactorAuthenticationCode,
 			secret: user.twoFASecret,
 		});
-		console.log('isValid token', twoFactorAuthenticationCode);
-		console.log('isValid secret', user.twoFASecret);
-		console.log('isCodeValid: ', isCodeValid);
 		return isCodeValid;
 	}
 
