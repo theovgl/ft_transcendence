@@ -1,28 +1,36 @@
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { Socket } from 'socket.io-client';
 import Button from '../Button/Button';
 import FormLabel from '../EditProfile/FormLabel';
 import styles from './CreateRoomForm.module.scss';
-import { Socket } from 'socket.io-client';
 
 interface UseFormInputs {
 	roomName: string
 	password: string
+	privateToggle: string
 }
 
 interface  CreateRoomFormProps{
-	socket: Socket
+	socket?: Socket | null
 }
 
 export default function CreateRoomForm({ socket }: CreateRoomFormProps) {
 	const {
 		register,
 		handleSubmit,
+		reset,
 		formState: { errors },
 	} = useForm<UseFormInputs>();
+	const [passwordInputType, setPasswordInputType] = useState<string>('password');
 
 	const onSubmit = (data: UseFormInputs) => {
-		console.log(data);
-		socket.emit('createRoom', { roomName: data.roomName, status: 'private', password: data.password })
+		reset();
+		socket?.emit('createRoom', {
+			roomName: data.roomName,
+			status: data.privateToggle ? 'private' : 'public',
+			password: data.password
+		});
 		// createRoom
 	};
 
@@ -36,6 +44,7 @@ export default function CreateRoomForm({ socket }: CreateRoomFormProps) {
 				<div className={styles.input_label_container}>
 					<FormLabel content='Room name'/>
 					<input
+						type='text'
 						className={`
 							${styles.input}
 							${errors.roomName ? styles.input_error : ''}
@@ -61,11 +70,26 @@ export default function CreateRoomForm({ socket }: CreateRoomFormProps) {
 				<div className={styles.input_label_container}>
 					<FormLabel content='Password'/>
 					<input
+						type={passwordInputType}
 						className={`
 							${styles.input}
 							${errors.password ? styles.input_error : ''}
 						`}
 						{...register('password')}/>
+					<span
+						className={styles.hidePassword}
+						onClick={() => {
+							passwordInputType === 'password' ? 
+								setPasswordInputType('text') : 
+								setPasswordInputType('password');
+						}}
+					>
+						{passwordInputType === 'password' ? 'Show password' : 'Hide password'}
+					</span>
+				</div>
+				<div className={styles.privateField_container}>
+					<span>Private ?</span>
+					<input type="checkbox" {...register('privateToggle')}/>
 				</div>
 				<Button text='Join !' type='submit'/>
 			</form>

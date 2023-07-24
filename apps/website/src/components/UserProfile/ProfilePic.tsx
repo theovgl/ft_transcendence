@@ -1,8 +1,8 @@
 import styles from '@/styles/userProfile/profilePic.module.scss';
-import Image from 'next/image';
-import { useEffect, useState, useRef, useContext} from 'react';
-import { useUser } from '../../utils/hooks/useUser';
 import { SocketContext } from '@/utils/contexts/SocketContext';
+import Image from 'next/image';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { useUser } from '../../utils/hooks/useUser';
 
 interface Props {
 	path?: string;
@@ -28,18 +28,13 @@ export default function ProfilePic({ path, size, stroke, currentUser }: Props) {
 		});
 		
 		socket?.socket?.on('isInGame', (username) => {
-			// console.log('isInGame:', username);
-			// console.log('currentUser:', currentUser);
 			if (username === currentUser) 
 				setIsConnected('In Game');
 		});
 
 		socket?.socket?.on('quitInGame', (data) => {
-			// console.log('QuitGame:', data.username);
-			// console.log('currentUser:', currentUser);
 			if (data.username === currentUser)
 				setIsConnected(data.status);
-			// console.log('data status:', data.status);
 		});
 
 		if (currentUser !== user?.name) {

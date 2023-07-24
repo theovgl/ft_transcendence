@@ -1,16 +1,18 @@
 import { useUser } from '@/utils/hooks/useUser';
-import { useContext, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import { ImExit } from 'react-icons/im';
+import { Socket } from 'socket.io-client';
 import Message from '../Message/Message';
 import { MessageType } from './Chat';
 import styles from './Conversation.module.scss';
-import { SocketContext } from '@/utils/contexts/SocketContext';
 
 interface ConversationProps {
 	messages: MessageType[];
 	isAdmin: boolean;
 	room: string;
 	sendMessage: (message: MessageType) => void;
+	socket?: Socket | null;
 }
 
 interface UseFormInputs {
@@ -18,16 +20,21 @@ interface UseFormInputs {
 }
 
 export default function Conversation(props: ConversationProps) {
-	const { messages, isAdmin, room, sendMessage } = props;
+	const { messages, isAdmin, room, sendMessage, socket } = props;
 	const { user } = useUser();
 	const {
 		register,
 		handleSubmit,
 		reset
 	} = useForm<UseFormInputs>();
-	const socketContext = useContext(SocketContext);
-	const socket = socketContext?.socket;
 	const messagesEndRef = useRef<HTMLDivElement>(null);
+
+	const leaveRoom = async (room: String) => {
+		socket?.emit('leaveRoom', {
+			clientName: user!.name,
+			roomName: room
+		});
+	};
 
 	const onSubmit = (data: any) => {
 		const newMessage: MessageType = {
@@ -35,7 +42,6 @@ export default function Conversation(props: ConversationProps) {
 			author: user!.name,
 			channel: room
 		};
-		console.log('Message submit');
 		sendMessage(newMessage);
 		reset();
 	};
@@ -55,6 +61,11 @@ export default function Conversation(props: ConversationProps) {
 				<p className={styles.conversation_title}>
 					{room}
 				</p>
+				{room == 'General' ? null : 
+					<ImExit
+						className={styles.conversation_leave}
+						onClick={() => leaveRoom(room)}
+					/>}
 			</div>
 			<div className={styles.messages_container}>
 				{messages.map((message, i) => (

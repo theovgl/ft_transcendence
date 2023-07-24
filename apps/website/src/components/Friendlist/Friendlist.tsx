@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import styles from './Friendlist.module.scss';
 import { BiSad } from 'react-icons/bi';
 import FriendEntity from './FriendEntity';
+import styles from './Friendlist.module.scss';
 
 type FriendEntityType = {
 	name: string;
@@ -26,7 +26,7 @@ export default function Friendlist(props: Props) {
 
 	useEffect(() => {
 		if (!data) return;
-		console.log(data);
+
 		setFriends(data.friendship);
 		setBlocked(data.blocked);
 		setRequested(data.request);

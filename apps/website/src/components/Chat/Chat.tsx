@@ -136,6 +136,8 @@ export default function Chat() {
 					});
 				});
 				socket.on('leaveRoomClient', (roomName) => {
+					if (tablistRef.current.length > 0)
+						simulateClick(tablistRef.current[0].label);
 					setTablist(() => {
 						let newtablist = tablistRef.current.filter(
 							(tabItem) => tabItem.label !== roomName
@@ -143,7 +145,7 @@ export default function Chat() {
 						setMessages([]);
 						return newtablist;
 					});
-					
+					router.replace('/chat');
 				});
 				socket.on('loadDm', (payload) => {
 					console.log('load Dm');
@@ -168,7 +170,6 @@ export default function Chat() {
 	const socketInitializer = async () => {
 		socket?.on('msgToClient', (msg: MessageType) => {
 			setMessages((currentMsg) => {
-				console.log('receive message');
 				if (msg.channel === roomRef.current) {
 					return [
 						...currentMsg,
@@ -195,15 +196,9 @@ export default function Chat() {
 			message: messageToSend.message,
 			channel: messageToSend.channel 
 		});
-		// setMessages((currentMsg) => [
-		// 	...currentMsg,
-		// 	messageToSend
-		// ]);
-		// setMessage('');
 	};	
 
 	const changeRoom = async (newRoom: string) => {
-		console.log('newroom is : ' + newRoom);
 		setIsAdmin(false);
 		setRoom(newRoom);
 		setMessages([]);
@@ -232,11 +227,7 @@ export default function Chat() {
 			console.log('no label');
 			return false;
 		}
-		console.log('allo');
-		// console.log(tablistRef.current);
-		// // console.log(tabList);
 		const updatedTabs = tablistRef.current.map((tab) => {
-			console.log('inTablist');
 			if (tab.label === label) {
 				changeRoom(label);
 				return { ...tab, active: true };
@@ -250,7 +241,6 @@ export default function Chat() {
 	};
 
 	const CreateConversation = () => {
-		console.log('createRoom');
 		setIsCreatingRoom(true);
 	};
 
@@ -265,6 +255,7 @@ export default function Chat() {
 					isAdmin={isAdmin}
 					room={room}
 					sendMessage={sendMessage}
+					socket={socket}
 				/>
 			}
 		</div>

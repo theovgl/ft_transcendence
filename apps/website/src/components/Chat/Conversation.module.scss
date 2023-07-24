@@ -10,6 +10,7 @@
 
 .conversation_header {
 	display: flex;
+	justify-content: space-between;
 	align-items: center;
 	background-color: $black-color;
 	padding: 13px 20px;
@@ -21,6 +22,11 @@
 		font-weight: 800;
 		color: white;
 		margin: 0;
+	}
+
+	svg {
+		cursor: pointer;
+		color: white;
 	}
 }
 

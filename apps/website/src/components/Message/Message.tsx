@@ -26,8 +26,6 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 	const [isAdmin, setIsAdmin] = useState<boolean>(isUserAdmin);
 
 	function kick() {
-		console.log("KICK");
-		console.log(socket);
 		socket?.emit('kick', {kicked: username, room: room});
 	}
 
@@ -41,7 +39,6 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 
 	function sendInvite() {
 		const id = [username, user?.name].sort().join('');
-		console.log('id', id);
 		socket?.emit('challenge', {challenged: username});
 		router.push(
 			{
@@ -57,7 +54,6 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 	}
 
 	useEffect(() => {
-		console.log(content);
 		const fetchProfilePic = async () => {
 			const response = await fetch(
 				`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/${username}
