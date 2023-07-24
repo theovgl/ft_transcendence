@@ -78,6 +78,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	this.chatService.roomCreation(client, payload.roomName, payload.status, payload.password);
  }
  
+ @SubscribeMessage('setUserAdmin')
+ handleSetUserAdmin(client: Socket, payload: string){
+	this.chatService.setAdmin(client, payload);
+ }
+ 
  //Room Events
  @SubscribeMessage('CreateRoomfromServer')
  handleRoomCreation(client: Socket, payload: String): void {

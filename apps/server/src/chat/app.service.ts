@@ -362,6 +362,18 @@ export class ChatService implements OnModuleInit {
 		await this.loadRoom(client, roomName)
 	}
   
+	public async setAdmin(client: Socket, roomName: string){
+		//if user && room , addTalk admintalk
+		const	userName = this.clientList.get(client)
+		const	user = await this.findUser(userName);
+		const	room = await this.findRoom(roomName);
+
+		if (user && room) {
+			await this.addTalk(userName, roomName, this.prisma.adminTalk);
+			client.emit('setAdmin', true);
+		}
+	}
+
 	public async checkAdmin(client: Socket, roomName: string) {
 		const userName = this.clientList.get(client);
 		const adminTalk = await this.findAdminTalk(userName, roomName)
@@ -401,14 +413,10 @@ export class ChatService implements OnModuleInit {
 		const checkPass = await this.checkPassword(password, roomName);
 		const isOwner = await this.isOwner(owner, roomName);
 		if (newRoom.status === 'public' || checkPass || isOwner){
-			if (newRoom.status === "public"){
-				await this.addAllUsersToRoom(roomName);
-			}
+			await this.addUserToRoom(owner, roomName)
 			if (!checkPass && newRoom.status !== 'public' && isOwner)
 				await this.setPassword(roomName ,password);
-			// await this.loadRoom(client, roomName, password);
 			client.emit('loadDm', {name: owner, dmName: roomName});
-			// return ;
 		}
 		else
 			console.log("bad password")
