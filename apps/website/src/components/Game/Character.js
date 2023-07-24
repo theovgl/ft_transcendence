@@ -144,6 +144,7 @@ const Character = React.forwardRef((props, ref) => {
 				y: prev.y <= 35 ? prev.y : 35};
 		});
 	}, [props.height]);
+
 	//  Opponent movement online
 	useEffect(() => {
 		if (props.controlMode === ONLINEMODE) {
@@ -159,12 +160,6 @@ const Character = React.forwardRef((props, ref) => {
 		}
 	}, [props.controlMode, props.socket]);
 
-	// useEffect(() => {
-	//   if (props.controlMode === ONLINEMODE)
-	//   {
-	//     if (props.)
-	//   }
-	// })
 	//  Responsive position
 	useEffect(() => {
 		setPercentagePos({
@@ -193,7 +188,6 @@ const CharacterDiv = styled.div.attrs((props) => ({
 		width: '2%',
 		left: `${props.x}%`,
 		top: `${props.y}%`,
-		//  borderRadius: '0%',
 	},
 }))``;
 

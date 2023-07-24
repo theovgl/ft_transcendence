@@ -31,7 +31,6 @@ export default function Match({
 
 	return (
 		<div className={styles.match_card}>
-			{/* <p className={styles.match_date}>{ matchDate }</p> */}
 			<div className={styles.score_container}>
 				<Link
 					className={
@@ -51,8 +50,6 @@ export default function Match({
 						${styles.player_score}
 					`
 				}>{ player1Score }</p>
-
-				{/* maybe we can display profile pic */}
 
 				<p className={styles.score_separator}>vs</p>
 

@@ -19,7 +19,6 @@ const MultiplayerManager = (props) => {
 		leftPlayer: PLAYERMODE,
 		connected: false
 	});
-	// const UseAuth = useAuth();
 	const socketRef = useRef(null);
 
 	useEffect(() => {

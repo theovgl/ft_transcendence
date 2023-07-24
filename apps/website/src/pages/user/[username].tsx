@@ -95,7 +95,6 @@ export default function Profile() {
 	const startDm = () => {
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 
-		// socket?.emit('startDm', {clientName: `${router.query.username}`, receiverName: encodeURIComponent(jwtPayload.username)})
 		router.push({
 			pathname: '/chat',
 			query: {

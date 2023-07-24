@@ -1,14 +1,14 @@
-import 'normalize.css';
-import homepageStyle from '@/styles/homepage.module.scss';
+import Button from '@/components/Button/Button';
+import Friendlist, { FriendListType } from '@/components/Friendlist/Friendlist';
 import Leaderboard from '@/components/Leaderboard/index';
 import Navbar from '@/components/Navbar';
-import Head from 'next/head';
-import Button from '@/components/Button/Button';
-import { useRouter } from 'next/router';
-import Friendlist, { FriendListType } from '@/components/Friendlist/Friendlist';
-import { useContext, useEffect, useState } from 'react';
-import { useUser } from '@/utils/hooks/useUser';
+import homepageStyle from '@/styles/homepage.module.scss';
 import { SocketContext } from '@/utils/contexts/SocketContext';
+import { useUser } from '@/utils/hooks/useUser';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import 'normalize.css';
+import { useContext, useEffect, useState } from 'react';
 
 export default function Home(props: any) {
 	const router = useRouter();
@@ -18,7 +18,6 @@ export default function Home(props: any) {
 	const socket = socketContext?.socket;
 
 	const onButtonClick = () => {
-		// socket.emit()
 		router.push({
 			pathname: '/game',
 			query: {premade: false, premadeId: '', premadeMode: 'Normal', userId: user?.name }

@@ -60,7 +60,6 @@ export default function Chat() {
 	const [username, setUsername] = useState('');
 	const [isCreatingRoom, setIsCreatingRoom] = useState(false);
 	const [chosenUsername, setChosenUsername] = useState('');
-	// const [message, setMessage] = useState('');
 	const [messages, setMessages] = useState<Array<MessageType>>([]);
 	const [rooms, setRooms] = useState<Array<String>>([]);
 	const [room, setRoom] = useState('');

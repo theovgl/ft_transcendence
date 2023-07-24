@@ -177,20 +177,6 @@ const Ball = (props) => {
 		if (!collisionPhysic(ballRect, playerRect, props.playerRef) &&
 			!collisionPhysic(ballRect, opponentRect, props.opponentRef))
 			setIsColliding(false);
-
-		// if ((props.playerRef.current && checkCollision(ballRect, playerRect)) ||
-		//   (props.opponentRef.current && checkCollision(ballRect, opponentRect))) {
-		//   if (!isColliding) {
-		//     setIsColliding(true);
-		//     setVelocity((prevVelocity) => ({
-		//         x: -(prevVelocity.x < 0 ? (Math.max(prevVelocity.x * BOUNCE_ACCELERATION, -MAX_VELOCITY)) :
-		//             Math.min(prevVelocity.x * BOUNCE_ACCELERATION, MAX_VELOCITY)),
-		//         y: prevVelocity.y
-		//     }));
-		//   }
-		// } else {
-		//   setIsColliding(false);
-		// }
 	}, [position, props.playerRef, props.opponentRef, props.scoreLeft, props.scoreRight,
 		gamebounds.height, gamebounds.width, gamebounds.x, gamebounds.y, bounds.height, bounds.width, isColliding, props.socket]);
 

@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import Ball from './Ball.js';
-import Score from './Score.js';
 import Character from './Character.js';
-import GameManager from './GameManager.js';
 import Collectible from './Collectible.js';
+import GameManager from './GameManager.js';
+import Score from './Score.js';
 
 const BASE_HEIGHT = 10;
 
@@ -19,14 +19,6 @@ const GameBox = (props) => {
 	const [bounds, setBounds] = useState({x: 0, y: 0, width: 0, height: 0});
 	const [leftPlayer, setLeftPlayer] = useState({x: 5, y: 20, height: BASE_HEIGHT});
 	const [rightPlayer, setRightPlayer] = useState({x: 95, y: 20, height: BASE_HEIGHT});
-	// useEffect(() => {
-	//     if (props.socket !== null)
-	//     {
-	//         props.socket.on('menu', () => {
-	//             props.quitEvent();
-	//         })
-	//     }
-	// }, [managerRef.current]);
 
 	useEffect(() => {
 		if (props.socket !== null) {

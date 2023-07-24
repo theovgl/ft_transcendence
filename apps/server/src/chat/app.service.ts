@@ -11,7 +11,6 @@ export class ChatService implements OnModuleInit {
 
 	private clientList: Map<Socket, string> = new Map<Socket, string>();
 	private currentRoomName = '';
-	// private roomList: Set<string> = new Set();
 	async onModuleInit() {}
 
 	public async createRoom(room: string, owner: string, status: string, password ?: string) {
