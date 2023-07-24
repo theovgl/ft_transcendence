@@ -41,6 +41,8 @@ export class BallService {
   private percentagePos: {x: number, y: number} = {x: 0, y: 0};
   private forfeited = false;
   private winnerId: string = "";
+  private gameBegin: Date;
+  private gameEnd: Date;
 
   constructor(
 		private prisma: PrismaService,
@@ -80,6 +82,7 @@ export class BallService {
 // Clear the interval after emitting the delayed event
         clearInterval(readyIntervale);
         timer--;
+        this.gameBegin = new Date();
         server.to(room).emit("ready-timer", timer)
         this.leftPlayer.x += this.leftPlayer.width - (this.leftPlayer.width / 4);
         this.leftPlayer.width /= 4;
@@ -106,7 +109,7 @@ export class BallService {
 
   }
 
-  private async updateHistory(userid: string)
+  private async updateHistory(userid: string, duration: string)
   {
     const user = await this.prisma.user.findUnique({
       where: {
@@ -120,7 +123,8 @@ export class BallService {
         winnerId: this.winnerId,
         userIdLeft: this.pOneId,
         userIdRight: this.pTwoId,
-        userId: user.id
+        duration: duration,
+        userId: user.id,
       },
       include: {
         user: true
@@ -130,12 +134,16 @@ export class BallService {
 
   private updateGameResult()
   {
+    this.gameEnd = new Date();
+    const minutes: string = ((this.gameEnd.getMinutes() - this.gameBegin.getMinutes())).toString();
+    const seconds: string = ((this.gameEnd.getSeconds() - this.gameBegin.getSeconds()) % 60).toString();
+    const game_duration: string = minutes + ":" + seconds; 
     if (this.winnerId != "" && this.scoreLeft > this.scoreRight)
       this.winnerId = this.pOneId;
     else if (this.winnerId != "")
       this.winnerId = this.pTwoId;
-    this.updateHistory(this.pOneId);
-    this.updateHistory(this.pTwoId);
+    this.updateHistory(this.pOneId, game_duration);
+    this.updateHistory(this.pTwoId, game_duration);
   }
   //désactiver la boucle lorsque la partie est terminée
   public unsetBallLoop() {
