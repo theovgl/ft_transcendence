@@ -74,7 +74,7 @@ export class AuthController {
 		);
 		if (!isCodeValid)
 			throw new UnauthorizedException('Wrong authentication code');
-		
+
 		await this.authService.turnOffTwoFactorAuthentication(user);
 		return await this.authService.loginWith2fa(user);
 	}

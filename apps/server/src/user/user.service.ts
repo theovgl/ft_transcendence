@@ -75,7 +75,7 @@ export class UserService {
 
 			// Assign this image a unique name
 			const uniqueFilename = uuidv4();
-			const convertedImageFilename = `${uniqueFilename}.webp`; 
+			const convertedImageFilename = `${uniqueFilename}.webp`;
 
 			// Create the right directory if it doesn't exists
 			if (!fs.existsSync(`${process.env.UPLOADS_DESTINATION}/profile-pictures`))
