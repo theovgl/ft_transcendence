@@ -117,7 +117,7 @@ export default function Chat() {
 							return [...currenTablist];
 						else
 							if (tablistRef.current.length === 0) {
-								setRoom(payload);
+								setRoom('General');
 								return [...currenTablist,
 									{
 										label: payload,
