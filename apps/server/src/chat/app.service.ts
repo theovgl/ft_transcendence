@@ -3,6 +3,7 @@ import { AdminTalk, BannedTalk, FriendshipStatus, MutedTalk, Talk } from '@prism
 import { Server, Socket } from 'socket.io';
 import { PrismaService, Room, User } from '../prisma/prisma.service';
 import { Message } from './app.interface';
+import * as argon2 from 'argon2';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -21,6 +22,9 @@ export class ChatService implements OnModuleInit {
 		// {
 		// 	return ;
 		// }
+		let hash = password;
+		if (password)
+			hash = await argon2.hash(password);
 		let newRoom = await this.findRoom(room);
 		if (newRoom)
 			return newRoom;
@@ -32,7 +36,7 @@ export class ChatService implements OnModuleInit {
 				data: {
 					name: room,
 					status: status,
-					password: password,
+					password: hash,
 				},
 			})
 			if (status === "public"){
@@ -94,12 +98,15 @@ export class ChatService implements OnModuleInit {
 
 		if (room){
 			console.log('set password to: ' + password);
+			let hash = password;
+			if (password)
+				hash = await argon2.hash(password);
 			await this.prisma.room.update({
 				where: {
 					id: room.id
 				},
 				data: {
-					password: password
+					password: hash
 				}
 			})
 		}
@@ -340,7 +347,7 @@ export class ChatService implements OnModuleInit {
 	public async createDm(client: Socket, clientName: string, receiverName: string)
 	{
 		const username = this.clientList.get(client);
-		const roomName = [username, receiverName].sort().join('');
+		const roomName = [username, receiverName].sort().join(' <-> ');
 		console.log('createDm: ' + receiverName + username);
 		await this.createRoom(roomName, username, "private");
 		await this.removeOwner(username, roomName);
@@ -353,7 +360,7 @@ export class ChatService implements OnModuleInit {
 	public async createGameInvite(client: Socket, payload)
 	{
 		const username = this.clientList.get(client);
-		const roomName = [username, payload].sort().join('');
+		const roomName = [username, payload].sort().join(' <-> ');
 		await this.createRoom(roomName, username, "private");
 		await this.removeOwner(username, roomName)
 		await this.addUserToRoom(this.clientList.get(client), roomName);
@@ -403,9 +410,9 @@ export class ChatService implements OnModuleInit {
 				console.log('no password');
 				return true;
 			}
-			else {
-				console.log('password match: ' + (password === room.password));
-				return (password === room.password)
+			else if (password) {
+				console.log('password match: ' + (await argon2.verify(room.password, password)));
+				return (await argon2.verify(room.password, password))
 			}
 		}
 		return false;
