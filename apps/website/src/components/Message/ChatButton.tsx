@@ -6,7 +6,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 	icon?: React.ReactElement | null,
 }
 
-const ChatButton: React.FC<ButtonProps> = ({text, icon, tooltipText, ...props}) => {
+const ChatButton: React.FC<ButtonProps> = ({text, icon, ...props}) => {
 	return (
 		<button
 			className={styles.btn}

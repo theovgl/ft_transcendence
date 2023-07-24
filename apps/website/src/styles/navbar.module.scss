@@ -1,5 +1,16 @@
 @import './library';
 
+@media screen and (max-width: 450px) {
+	.title {
+		font-size: 16px;
+	}
+
+	.nav_container {
+		padding: 10px 25px 10px 25px;
+		margin: 5px;
+	}
+}
+
 .nav_container {
 	display: flex;
 	justify-content: space-between;
@@ -11,6 +22,11 @@
 	margin: 8px;
 	border-radius: 40px;
 	box-sizing: border-box;
+
+	@media screen and (max-width: 450px) {
+		padding: 10px 25px 10px 25px;
+		margin: 5px;
+	}
 }
 
 .title {
@@ -26,6 +42,10 @@
 
 	&:visited {
 		color: $white-font-color;
+	}
+
+	@media screen and (max-width: 450px) {
+		font-size: 14px;
 	}
 }
 

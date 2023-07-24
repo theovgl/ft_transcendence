@@ -2,11 +2,22 @@
 
 .chat_container {
 	display: flex;
-	width: 90%;
-	max-width: 900px;
+	flex-direction: column-reverse;
+	width: 95%;
 	margin: auto;
-	height: 600px;
-	border-radius: 20px;
+	height: 100%;
 	border: 4px solid $black-color;
+	border-radius: 20px;
 	overflow: hidden;
+}
+
+@media only screen and (min-width: 580px) {
+	.chat_container {
+		flex-direction: row;
+		width: 90%;
+		max-width: 900px;
+		margin: auto;
+		height: 600px;
+		overflow: hidden;
+	}
 }

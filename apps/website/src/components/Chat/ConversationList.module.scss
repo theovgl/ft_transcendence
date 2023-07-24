@@ -35,3 +35,17 @@
 	height: 50px;
 	border-top: 1px solid rgba($black-color, 0.15);
 }
+
+@media only screen and (max-width: 580px) {
+	.conversationList_container {
+		width: 100%;
+		min-height: 200px;
+		max-height: 230px;
+		border-top: 4px solid black;
+		box-sizing: border-box;
+	}
+
+	.conversationList_create {
+		min-height: 40px;
+	}
+}

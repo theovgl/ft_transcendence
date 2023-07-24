@@ -90,3 +90,9 @@
 .error_message_invisible {
 	visibility: hidden;
 }
+
+@media only screen and (max-width: 580px) {
+	.createRoom_container {
+		height: 450px;
+	}
+}
