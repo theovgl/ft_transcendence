@@ -1,13 +1,14 @@
-import Button from '@/components/Button/Button';
 import { useUser } from '@/utils/hooks/useUser';
 import { UserInfos } from 'global';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { BiLogoKickstarter, BiPlay, BiVolumeMute } from 'react-icons/bi';
+import { BiLogoKickstarter, BiVolumeMute } from 'react-icons/bi';
+import { RiSwordFill } from 'react-icons/ri';
 import { Socket } from 'socket.io-client';
 import ProfilePic from '../UserProfile/ProfilePic';
+import ChatButton from './ChatButton';
 import styles from './Message.module.scss';
 
 type MessageProps = {
@@ -72,7 +73,7 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 
 	return (
 		<div className={styles.message}>
-			<div className={styles.message_left}>
+			<div className={styles.message_profilePic_container}>
 				<Link
 					href={`/user/${username}`}
 					className={styles.message_profilePic}
@@ -84,50 +85,42 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 						currentUser={username}
 					/>
 				</Link>
-				<div className={styles.message_content}>
-					<div className={styles.message_username}>
-						<span>{username}</span>
-					</div>
-					<span className={styles.message_text}>{content}</span>
-				</div>
 			</div>
-			<div className={styles.message_right}>
-				{username !== user?.name &&
-					<Button
-						text='Play'
-						theme="light"
-						boxShadow
-						icon={<BiPlay />}
-						onClick={sendInvite}
+			<div className={styles.message_content}>
+				<div className={styles.message_username}>
+					<span>{username}</span>
+				</div>
+				<span className={styles.message_text}>{content}</span>
+				<div className={styles.message_button_container}>
+					{username !== user?.name &&
+						<ChatButton
+							text='Play'
+							icon={<RiSwordFill />}
+							onClick={sendInvite}
+						/>
+					}
+					{isAdmin && username !== user?.name &&
+					<ChatButton
+						text='Kick'
+						icon={<BiLogoKickstarter />}
+						onClick={kick}
 					/>
-				}
-				{isAdmin && username !== user?.name &&
-				<Button
-					text='Kick'
-					theme="light"
-					boxShadow
-					icon={<BiLogoKickstarter />}
-					onClick={kick}
-				/>
-				}
-				{isAdmin && username !== user?.name &&
-				<Button
-					text='Ban'
-					theme="light"
-					boxShadow
-					icon={<BiLogoKickstarter />}
-					onClick={ban}
-				/>
-				}
-				{isAdmin && username !== user?.name &&
-				<Button
-					text='mute'
-					theme="light"
-					boxShadow
-					icon={<BiVolumeMute />}
-					onClick={mute}
-				/>
-				}
+					}
+					{isAdmin && username !== user?.name &&
+					<ChatButton
+						text='Ban'
+						icon={<BiLogoKickstarter />}
+						onClick={ban}
+					/>
+					}
+					{isAdmin && username !== user?.name &&
+					<ChatButton
+						text='Mute'
+						icon={<BiVolumeMute />}
+						onClick={mute}
+					/>
+					}
+				</div>
 			</div>
 		</div>
 	);
