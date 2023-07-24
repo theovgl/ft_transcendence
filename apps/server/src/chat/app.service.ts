@@ -58,6 +58,18 @@ export class ChatService implements OnModuleInit {
 		}
 	}
 
+	async isOwner(userName: string, roomName: string){
+		const user = await this.findUser(userName);
+		const room = await this.findRoom(roomName);
+
+		if (user && room) {
+			if (room.ownerId){
+				return room.ownerId === user.id;
+			}
+		}
+		return false;
+	}
+
 	async setUserAsOwner(owner: string, roomName: string){
 		const user = await this.findUser(owner);
 	
@@ -83,6 +95,7 @@ export class ChatService implements OnModuleInit {
 		const room = await this.findRoom(roomName);
 
 		if (room){
+			console.log('set password to: ' + password);
 			await this.prisma.room.update({
 				where: {
 					id: room.id
@@ -120,10 +133,6 @@ export class ChatService implements OnModuleInit {
 
 	public async loadRoom(client: Socket, room: string, password ?: string)
 	{
-		if (password && !this.checkPassword(password, room)){
-			console.log("bad password");
-			return;
-		}
 		await this.checkAdmin(client, room);
 		if (room !== this.currentRoomName)
 		{
@@ -133,7 +142,7 @@ export class ChatService implements OnModuleInit {
 		const bannedUser = await this.findBannedTalk(this.clientList.get(client), room)
 		//emit un message pour dire au user qu'il est ban ?
 		if (bannedUser)
-			return;
+			return true;
 		await this.addUserToRoom(this.clientList.get(client), room)
 		client.leave(this.currentRoomName);
 		client.join(room);
@@ -160,15 +169,15 @@ export class ChatService implements OnModuleInit {
 					message: message.content
 				};
 				if (await this.isBlocked(this.clientList.get(client), message.author.name))
-					return ;
-				console.log('emitting message: ' + msg.message)
+					return true;
+				// console.log('emitting message: ' + msg.message)
 				client.emit('msgToClient', msg);
 			});
 		}
 	}
-
 	public async changeRoom(client: Socket, room: string)
 	{
+		console.log('changing room');
 		await this.loadRoom(client, room);
 	}
 
@@ -367,26 +376,40 @@ export class ChatService implements OnModuleInit {
 			client.emit('setAdmin', false);
 		}
 	}
-
+ 
 	public async checkPassword(password: string, roomName: string) {
 		const room = await this.findRoom(roomName);
-
 		if (room){
+			console.log('check password: ' + password + ' with: ' + room.password)
 			if (room.password === null)
+			{
+				console.log('no password');
 				return true;
+			}
 			else {
-				return password === room.password
+				console.log('password match: ' + (password === room.password));
+				return (password === room.password)
 			}
 		}
+		return false;
 	}
 
-	async roomCreation(client: Socket, roomName: string, status: string){
+	async roomCreation(client: Socket, roomName: string, status: string, password?: string){
 		const owner = this.clientList.get(client);
 		console.log('create room: ' + roomName);
 		console.log('by: ' + owner);
-		await this.createRoom(roomName, owner, status);
-		await this.loadRoom(client, roomName);
-		client.emit('loadDm', {name: owner, dmName: roomName})
+		await this.createRoom(roomName, owner, status, password);
+		const checkPass = await this.checkPassword(password, roomName);
+		const isOwner = await this.isOwner(owner, roomName);
+		if (status === 'public' || checkPass || isOwner){
+			if (!checkPass && status !== 'public' && isOwner)
+				await this.setPassword(roomName ,password);
+			// await this.loadRoom(client, roomName, password);
+			client.emit('loadDm', {name: owner, dmName: roomName});
+			// return ;
+		}
+		else
+			console.log("bad password")
 	}
 
 	public async leaveRoom(clientName: string, roomName: string){

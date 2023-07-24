@@ -182,9 +182,9 @@ export default function Chat() {
 				return currentMsg;
 			});
 		});
-		socket?.on('setAdmin', (status) => {
-			setIsAdmin(status);
-		});
+		// socket?.on('setAdmin', (status) => {
+		// 	setIsAdmin(status);
+		// });
 	};
 
 	const sendMessage = async (messageToSend: MessageType) => {
