@@ -5,6 +5,7 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { BiLogoKickstarter, BiVolumeMute } from 'react-icons/bi';
+import { MdKeyboardDoubleArrowUp } from 'react-icons/md';
 import { RiSwordFill } from 'react-icons/ri';
 import { Socket } from 'socket.io-client';
 import ProfilePic from '../UserProfile/ProfilePic';
@@ -36,6 +37,10 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 
 	function mute() {
 		socket?.emit('mute', {muted: username, room: room});
+	}
+
+	function promote() {
+		socket?.emit('setAdmin', {username: username, roomName: room});
 	}
 
 	function sendInvite() {
@@ -118,6 +123,13 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 						text='Mute'
 						icon={<BiVolumeMute />}
 						onClick={mute}
+					/>
+					}
+					{isAdmin && username !== user?.name &&
+					<ChatButton
+						text='Promote'
+						icon={<MdKeyboardDoubleArrowUp />}
+						onClick={promote}
 					/>
 					}
 				</div>
