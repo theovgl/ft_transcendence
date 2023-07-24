@@ -347,7 +347,7 @@ export class ChatService implements OnModuleInit {
 	public async createDm(client: Socket, clientName: string, receiverName: string)
 	{
 		const username = this.clientList.get(client);
-		const roomName = [username, receiverName].sort().join('');
+		const roomName = [username, receiverName].sort().join(' <-> ');
 		console.log('createDm: ' + receiverName + username);
 		await this.createRoom(roomName, username, "private");
 		await this.removeOwner(username, roomName);
@@ -360,7 +360,7 @@ export class ChatService implements OnModuleInit {
 	public async createGameInvite(client: Socket, payload)
 	{
 		const username = this.clientList.get(client);
-		const roomName = [username, payload].sort().join('');
+		const roomName = [username, payload].sort().join(' <-> ');
 		await this.createRoom(roomName, username, "private");
 		await this.removeOwner(username, roomName)
 		await this.addUserToRoom(this.clientList.get(client), roomName);
