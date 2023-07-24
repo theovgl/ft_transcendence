@@ -410,7 +410,7 @@ export class ChatService implements OnModuleInit {
 				console.log('no password');
 				return true;
 			}
-			else {
+			else if (password) {
 				console.log('password match: ' + (await argon2.verify(room.password, password)));
 				return (await argon2.verify(room.password, password))
 			}
