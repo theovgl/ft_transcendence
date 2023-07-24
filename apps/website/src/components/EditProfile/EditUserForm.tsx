@@ -35,7 +35,7 @@ export default function EditUserForm() {
 		const body = {
 			newDisplayName: lowerCaseName,
 		};
-	
+
 		try {
 			const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/edit?user=${encodeURIComponent(
 				user!.name
@@ -49,7 +49,7 @@ export default function EditUserForm() {
 			});
 			if (!response.ok)
 				throw new Error(response.statusText);
-			
+
 			saveNewDisplayName(lowerCaseName);
 		} catch (e: any) {
 			if (e.message === 'Conflict') {
@@ -154,7 +154,7 @@ export default function EditUserForm() {
 			</div>
 			<Button
 				text='Save changes'
-				type='submit' 
+				type='submit'
 				theme='light'
 				icon={<BiSave />}
 				boxShadow

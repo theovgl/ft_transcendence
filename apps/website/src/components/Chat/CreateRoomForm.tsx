@@ -79,8 +79,8 @@ export default function CreateRoomForm({ socket }: CreateRoomFormProps) {
 					<span
 						className={styles.hidePassword}
 						onClick={() => {
-							passwordInputType === 'password' ? 
-								setPasswordInputType('text') : 
+							passwordInputType === 'password' ?
+								setPasswordInputType('text') :
 								setPasswordInputType('password');
 						}}
 					>

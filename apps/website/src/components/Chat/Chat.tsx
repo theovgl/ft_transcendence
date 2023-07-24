@@ -90,7 +90,7 @@ export default function Chat() {
 	useEffect(() => {
 		roomRef.current = room;
 	}, [room]);
-	
+
 	function startDm() {
 		if (typeof router.query.requesterName !== 'undefined' && typeof router.query.addresseeName !== 'undefined'){
 			console.log('setdmRoomName');
@@ -128,7 +128,7 @@ export default function Chat() {
 							} else {
 								return [...currenTablist,
 									{
-										label: payload, 
+										label: payload,
 										active: tablistRef.current.length === 0 ? true : false,
 										onClick: () => handleTabClick(payload)
 									}
@@ -196,9 +196,9 @@ export default function Chat() {
 		socket?.emit('msgToServer', {
 			author: messageToSend.author,
 			message: messageToSend.message,
-			channel: messageToSend.channel 
+			channel: messageToSend.channel
 		});
-	};	
+	};
 
 	const changeRoom = async (newRoom: string) => {
 		setIsAdmin(false);
@@ -210,9 +210,9 @@ export default function Chat() {
 
 	const simulateClick = (label: string) => {
 		if (!label) return false;
-		
+
 		const updatedTabs = tablistRef.current.map((tab) => {
-		
+
 			if (tab.label === label) {
 				changeRoom(label);
 				return { ...tab, active: true };
@@ -249,9 +249,9 @@ export default function Chat() {
 	return (
 		<div className={styles.chat_container}>
 			<ConversationList conversations={tabList} createRoom={CreateConversation}/>
-			{isCreatingRoom ? 
+			{isCreatingRoom ?
 				<CreateRoomForm socket={socket} />
-				: 
+				:
 				<Conversation
 					messages={messages}
 					isAdmin={isAdmin}

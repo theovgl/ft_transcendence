@@ -1,6 +1,6 @@
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import styles from './Match.module.scss';
-import Link from 'next/link';
 
 interface Props {
 	matchDate: number,
@@ -40,30 +40,29 @@ export default function Match({
 						${styles.player_name}
 					`
 					}
-					
 					href={`/user/${player1Name}`}
 				>
 					{ player1Name }
 				</Link>
-				
+
 				<p className={
 					`
 						${winner === 1 ? styles.winner : null}
 						${styles.player_score}
 					`
 				}>{ player1Score }</p>
-				
+
 				{/* maybe we can display profile pic */}
-				
+
 				<p className={styles.score_separator}>vs</p>
-				
+
 				<p className={
 					`
 					${winner === 2 ? styles.winner : null}
 					${styles.player_score}
 				`
 				}>{ player2Score }</p>
-				
+
 				<Link
 					className={
 						`
@@ -71,7 +70,6 @@ export default function Match({
 						${styles.player_name}
 					`
 					}
-					
 					href={`/user/${player2Name}`}
 				>
 					{ player2Name }
