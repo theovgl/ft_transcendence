@@ -154,6 +154,7 @@ export class ChatService implements OnModuleInit {
 		if (currentRoom) {
 			currentRoom.messages.forEach(async (message) => {
 				const msg: Message = {
+					username: message.author.name,
 					author: message.author.displayName,
 					channel: message.room.name,
 					message: message.content
@@ -263,18 +264,33 @@ export class ChatService implements OnModuleInit {
 		return false;
 	}
 
+	getRoomSockets(room: string, server: Server): Socket[] {
+		const roomSockets = Array.from(server.sockets.adapter.rooms.get(room) || new Set());
+	
+		// Get socket objects from their IDs
+		const sockets = roomSockets.map(socketId => server.sockets.sockets.get(String(socketId)));
+	
+		return sockets;
+	}
+
 	async storeMessageAndSend(client: Socket, payload, server: Server){
 		const message = await this.storeMessage(payload)
 		if (message)
 		{
 			const msg: Message = {
+				username: message.author.name,
 				author: message.author.displayName,
 				channel: message.room.name,
 				message: message.content,
 			};
-			if (await this.isBlocked(this.clientList.get(client), message.author.name))
-				return ;
-			server.to(payload.channel).emit('msgToClient', msg);
+			let roomSockets = this.getRoomSockets(message.room.name, server)
+			for (const roomSocket of roomSockets){
+				console.log('check if blocked: ' + this.clientList.get(roomSocket))
+				if (await this.isBlocked(this.clientList.get(roomSocket), message.author.name))
+					continue ;
+				console.log('not blocked');
+				roomSocket.emit('msgToClient', msg);
+			}
 		}
 	}
 	
@@ -366,6 +382,8 @@ export class ChatService implements OnModuleInit {
 
 	async roomCreation(client: Socket, roomName: string, status: string){
 		const owner = this.clientList.get(client);
+		console.log('create room: ' + roomName);
+		console.log('by: ' + owner);
 		await this.createRoom(roomName, owner, status);
 		await this.loadRoom(client, roomName);
 		client.emit('loadDm', {name: owner, dmName: roomName})

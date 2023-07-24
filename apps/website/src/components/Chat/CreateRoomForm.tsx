@@ -25,9 +25,8 @@ export default function CreateRoomForm({ socket }: CreateRoomFormProps) {
 	const [passwordInputType, setPasswordInputType] = useState<string>('password');
 
 	const onSubmit = (data: UseFormInputs) => {
-		console.log(data);
 		reset();
-		// socket.emit('createRoom', data.roomName, 'public')
+		socket.emit('createRoom', { roomName: data.roomName, status: 'public' })
 		// createRoom
 	};
 

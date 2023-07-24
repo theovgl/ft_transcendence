@@ -67,7 +67,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	console.log('challenge: ' + payload.challenged )
 	this.chatService.createGameInvite(client, payload.challenged);
  }
-
+ 
  @SubscribeMessage('checkAdmin')
  handleCheckAdmin(client: Socket, payload: string): void {
 	this.chatService.checkAdmin(client, payload);
@@ -77,7 +77,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
  handleCreateRoom(client: Socket, payload: {roomName: string, status: string}): void {
 	this.chatService.roomCreation(client, payload.roomName, payload.status);
  }
-
+ 
  //Room Events
  @SubscribeMessage('CreateRoomfromServer')
  handleRoomCreation(client: Socket, payload: String): void {
