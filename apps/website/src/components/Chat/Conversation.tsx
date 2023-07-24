@@ -30,7 +30,6 @@ export default function Conversation(props: ConversationProps) {
 	const messagesEndRef = useRef<HTMLDivElement>(null);
 
 	const leaveRoom = async (room: String) => {
-		console.log('leaving room');
 		socket?.emit('leaveRoom', {
 			clientName: user!.name,
 			roomName: room
@@ -43,7 +42,6 @@ export default function Conversation(props: ConversationProps) {
 			author: user!.name,
 			channel: room
 		};
-		console.log('Message submit');
 		sendMessage(newMessage);
 		reset();
 	};
