@@ -9,6 +9,7 @@ import ConversationList from './ConversationList';
 import CreateRoomForm from './CreateRoomForm';
 
 export type MessageType = {
+	username?: string,
 	author: string;
 	message: string;
 	channel: string;
@@ -174,6 +175,7 @@ export default function Chat() {
 					return [
 						...currentMsg,
 						{
+							username: msg.username,
 							author: msg.author,
 							message: msg.message,
 							channel: roomRef.current

@@ -15,12 +15,13 @@ import styles from './Message.module.scss';
 type MessageProps = {
 	content: string;
 	username: string;
+	displayName?: string;
 	socket?: Socket | null;
 	room: string;
 	isUserAdmin: boolean
 }
 
-export default function Message({content, username, socket, room, isUserAdmin }: MessageProps) {
+export default function Message({content, username, socket, room, isUserAdmin, displayName }: MessageProps) {
 	const [profilePic, setProfilePic] = useState<string>('');
 	const [cookies] = useCookies();
 	const router = useRouter();
@@ -93,7 +94,7 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 			</div>
 			<div className={styles.message_content}>
 				<div className={styles.message_username}>
-					<span>{username}</span>
+					<span>{displayName ? displayName : username}</span>
 				</div>
 				<span className={styles.message_text}>{content}</span>
 				<div className={styles.message_button_container}>

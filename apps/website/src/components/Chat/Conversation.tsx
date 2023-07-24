@@ -38,6 +38,7 @@ export default function Conversation(props: ConversationProps) {
 
 	const onSubmit = (data: any) => {
 		const newMessage: MessageType = {
+			username: user?.displayName,
 			message: data.message,
 			author: user!.name,
 			channel: room
@@ -73,6 +74,7 @@ export default function Conversation(props: ConversationProps) {
 						key={i}
 						content={message.message}
 						username={message.author}
+						displayName={message.username}
 						room={message.channel}
 						socket={socket}
 						isUserAdmin={isAdmin}

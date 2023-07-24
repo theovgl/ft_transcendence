@@ -161,8 +161,8 @@ export class ChatService implements OnModuleInit {
 		if (currentRoom) {
 			currentRoom.messages.forEach(async (message) => {
 				const msg: Message = {
-					username: message.author.name,
-					author: message.author.displayName,
+					username: message.author.displayName,
+					author: message.author.name,
 					channel: message.room.name,
 					message: message.content
 				};
@@ -285,8 +285,8 @@ export class ChatService implements OnModuleInit {
 		if (message)
 		{
 			const msg: Message = {
-				username: message.author.name,
-				author: message.author.displayName,
+				username: message.author.displayName,
+				author: message.author.name,
 				channel: message.room.name,
 				message: message.content,
 			};
