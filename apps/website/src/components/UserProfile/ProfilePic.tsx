@@ -26,9 +26,9 @@ export default function ProfilePic({ path, size, stroke, currentUser }: Props) {
 			if (connectedRef.current !== 'In Game')
 				setIsConnected(status ? 'Online' : 'Offline');
 		});
-		
+
 		socket?.socket?.on('isInGame', (username) => {
-			if (username === currentUser) 
+			if (username === currentUser)
 				setIsConnected('In Game');
 		});
 
@@ -46,7 +46,7 @@ export default function ProfilePic({ path, size, stroke, currentUser }: Props) {
 			});
 			return () => {
 				socket?.socket?.off('mapUpdated');
-			};		
+			};
 		}
 	}, [socket, currentUser, user?.name, socket?.socket?.connected]);
 

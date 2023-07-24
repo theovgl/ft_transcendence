@@ -1,19 +1,19 @@
+import Button from '@/components/Button/Button';
 import Navbar from '@/components/Navbar';
-import { useRouter } from 'next/router';
-import styles from '@/styles/userProfile/userProfile.module.scss';
-import { useContext, useEffect, useState } from 'react';
+import Match from '@/components/UserProfile/Match';
 import Name from '@/components/UserProfile/Name';
 import ProfilePic from '@/components/UserProfile/ProfilePic';
-import Button from '@/components/Button/Button';
-import { BiBlock, BiCheck, BiMessageAltDetail, BiEdit } from 'react-icons/bi';
-import { AiOutlineUserAdd } from 'react-icons/ai';
 import Statistics from '@/components/UserProfile/Statistics';
-import Match from '@/components/UserProfile/Match';
-import { useCookies } from 'react-cookie';
+import styles from '@/styles/userProfile/userProfile.module.scss';
+import { SocketContext } from '@/utils/contexts/SocketContext';
 import type { UserInfos } from 'global';
 import jwtDecode from 'jwt-decode';
 import Head from 'next/head';
-import { SocketContext } from '@/utils/contexts/SocketContext';
+import { useRouter } from 'next/router';
+import { useContext, useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
+import { AiOutlineUserAdd } from 'react-icons/ai';
+import { BiBlock, BiCheck, BiEdit, BiMessageAltDetail } from 'react-icons/bi';
 
 type jwtType = {
 	userId: number;
@@ -44,11 +44,11 @@ export default function Profile() {
 			setButtonText('Blocked');
 		else if (response === 'RECEIVED')
 			setButtonText('Accept request');
-		else if (response === 'EDIT') 
+		else if (response === 'EDIT')
 			setButtonText('Edit profile');
-		 else 
+		else
 			setButtonText('Add friend');
-		
+
 		setStatus(response);
 	}
 
@@ -77,9 +77,9 @@ export default function Profile() {
 					}
 				);
 				const status = await statusResponse.text();
-				if (status === 'BLOCKED') 
+				if (status === 'BLOCKED')
 					setIsBlocked(true);
-				else 
+				else
 					setIsBlocked(false);
 			} catch (error) {
 				console.error(error);
@@ -95,16 +95,15 @@ export default function Profile() {
 	const startDm = () => {
 		const jwtPayload: jwtType = jwtDecode<jwtType>(cookies['jwt']);
 
-		// socket?.emit('startDm', {clientName: `${router.query.username}`, receiverName: encodeURIComponent(jwtPayload.username)})
 		router.push({
 			pathname: '/chat',
 			query: {
 				addresseeName: `${router.query.username}`,
 				requesterName: encodeURIComponent(jwtPayload.username),
 			}
-		})
-	}
-	
+		});
+	};
+
 	async function relationshipUpdate() {
 		let route = 'add';
 		if (status === 'ACCEPTED')
@@ -232,10 +231,10 @@ export default function Profile() {
 										/>
 										<Button
 											text={buttonText}
-											boxShadow={buttonText === 'Add friend' || 
+											boxShadow={buttonText === 'Add friend' ||
 													buttonText === 'Edit profile' ? true : false}
 											onClick={buttonText === 'Edit profile' ? redirectToEdit : relationshipUpdate}
-											theme={buttonText === 'Add friend' || 
+											theme={buttonText === 'Add friend' ||
 													buttonText === 'Edit profile' ? 'light' : 'dark'}
 											icon={buttonText === ('Add friend') ? <AiOutlineUserAdd /> :
 												buttonText === 'Edit profile' ? <BiEdit /> :

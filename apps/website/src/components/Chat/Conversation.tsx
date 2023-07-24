@@ -48,7 +48,7 @@ export default function Conversation(props: ConversationProps) {
 	};
 
 	const scrollToBottom = () => {
-		if (messagesEndRef.current) 
+		if (messagesEndRef.current)
 			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
 	};
 
@@ -62,7 +62,7 @@ export default function Conversation(props: ConversationProps) {
 				<p className={styles.conversation_title}>
 					{room}
 				</p>
-				{room == 'General' ? null : 
+				{room == 'General' ? null :
 					<ImExit
 						className={styles.conversation_leave}
 						onClick={() => leaveRoom(room)}

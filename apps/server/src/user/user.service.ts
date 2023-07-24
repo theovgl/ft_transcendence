@@ -1,16 +1,14 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { EditUserDto } from './dto';
+import * as fs from 'fs';
 import * as sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
-import * as fs from 'fs';
+import { PrismaService } from '../prisma/prisma.service';
+import { EditUserDto } from './dto';
 
 @Injectable()
 export class UserService {
 	constructor(private prisma: PrismaService) {}
 	async editUser(name: string, dto: EditUserDto) {
-		console.log(name);
-
 		const existingUser = await this.prisma.user.findUnique({
 			where: {
 				displayName: dto.newDisplayName
@@ -75,7 +73,7 @@ export class UserService {
 
 			// Assign this image a unique name
 			const uniqueFilename = uuidv4();
-			const convertedImageFilename = `${uniqueFilename}.webp`; 
+			const convertedImageFilename = `${uniqueFilename}.webp`;
 
 			// Create the right directory if it doesn't exists
 			if (!fs.existsSync(`${process.env.UPLOADS_DESTINATION}/profile-pictures`))

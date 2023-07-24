@@ -1,4 +1,4 @@
-import { FaPlus } from "react-icons/fa6";
+import { FaPlus } from 'react-icons/fa6';
 import { TabItem } from './Chat';
 import styles from './ConversationList.module.scss';
 

@@ -1,27 +1,26 @@
-import 'normalize.css';
-import homepageStyle from '@/styles/homepage.module.scss';
+import Button from '@/components/Button/Button';
+import Friendlist, { FriendListType } from '@/components/Friendlist/Friendlist';
 import Leaderboard from '@/components/Leaderboard/index';
 import Navbar from '@/components/Navbar';
-import Head from 'next/head';
-import Button from '@/components/Button/Button';
-import { useRouter } from 'next/router';
-import Friendlist, { FriendListType } from '@/components/Friendlist/Friendlist';
-import { useContext, useEffect, useState } from 'react';
-import { useUser } from '@/utils/hooks/useUser';
+import homepageStyle from '@/styles/homepage.module.scss';
 import { SocketContext } from '@/utils/contexts/SocketContext';
+import { useUser } from '@/utils/hooks/useUser';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import 'normalize.css';
+import { useContext, useEffect, useState } from 'react';
 
 export default function Home(props: any) {
 	const router = useRouter();
-	const {user} = useUser(); 
+	const {user} = useUser();
 	const [friendListData, setFriendListData] = useState<FriendListType | null>(null);
 	const socketContext = useContext(SocketContext);
 	const socket = socketContext?.socket;
 
 	const onButtonClick = () => {
-		// socket.emit()
 		router.push({
 			pathname: '/game',
-			query: {premade: false, premadeId: "", premadeMode: "Normal", userId: user?.name }
+			query: {premade: false, premadeId: '', premadeMode: 'Normal', userId: user?.name }
 		});
 	};
 
@@ -49,7 +48,7 @@ export default function Home(props: any) {
 				console.error('Error while fetching user friendlist: ', error);
 			}
 		};
-		
+
 		fetchRelationList();
 	}, [user]);
 
@@ -57,7 +56,7 @@ export default function Home(props: any) {
 		<>
 			<Head>
 				<title>Transcendence - Home</title>
-			</Head>		
+			</Head>
 			<Navbar />
 			<div className={homepageStyle.container}>
 				<main className={homepageStyle.content}>
@@ -81,7 +80,7 @@ export async function getServerSideProps() {
 	try {
 		const res = await fetch('http://backend:4000/leaderboard');
 		const data = await res.json();
-		
+
 		return { props: { data } };
 	} catch (error) {
 		console.error('Error fetching leaderboard data: ', error);

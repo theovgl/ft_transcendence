@@ -46,9 +46,9 @@ export default function TwoFaForm() {
 				},
 				body: JSON.stringify(body)
 			});
-			if (response.ok) 
+			if (response.ok)
 				return true;
-			else 
+			else
 				throw new Error(response.statusText);
 		} catch (e: any) {
 			if (e.message === 'Unauthorized') {
@@ -147,7 +147,7 @@ export default function TwoFaForm() {
 						id="checkbox"
 						{...register('checkbox')}
 					/>
-					{(qrCode !== null && !is2faEnable && checkboxValue) && 
+					{(qrCode !== null && !is2faEnable && checkboxValue) &&
 						<Image
 							width={200}
 							height={200}

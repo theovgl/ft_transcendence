@@ -61,7 +61,7 @@ export default function SettingsModal(props: SettingsModalProps) {
 						${isModalOpen ? '' : style.hidden}
 					`}
 				>
-					<ModalLink 
+					<ModalLink
 						title='Home'
 						href='/'
 						icon={ <BiSolidHome /> }

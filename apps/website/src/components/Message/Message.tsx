@@ -50,7 +50,7 @@ export default function Message({content, username, socket, room, isUserAdmin, d
 		router.push(
 			{
 				pathname: '/game',
-				query: { 
+				query: {
 					premade: true,
 					premadeId: id,
 					premadeMode: 'Normal',

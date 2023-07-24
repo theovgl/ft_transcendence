@@ -1,9 +1,9 @@
 import { Body, Controller, Get, HttpCode, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import jwt_decode from 'jwt-decode';
+import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from './auth.service';
 import { JwtGuard } from './guard';
 import { ftAuthGuard } from './guard/ft.guards';
-import { PrismaService } from '../prisma/prisma.service';
-import jwt_decode from 'jwt-decode';
 
 @Controller('auth')
 export class AuthController {
@@ -52,7 +52,6 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	async turnOnTwoFactorAuthentication(@Req() req, @Body() body) {
 		const user = jwt_decode(req.headers.authorization);
-		console.log('body in route', body);
 		const isCodeValid = await this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
 			user,
@@ -74,7 +73,7 @@ export class AuthController {
 		);
 		if (!isCodeValid)
 			throw new UnauthorizedException('Wrong authentication code');
-		
+
 		await this.authService.turnOffTwoFactorAuthentication(user);
 		return await this.authService.loginWith2fa(user);
 	}
@@ -84,7 +83,6 @@ export class AuthController {
 	@UseGuards(JwtGuard)
 	async authenticate(@Req() req, @Body() body) {
 		const user = jwt_decode(req.headers.authorization);
-		console.log('body in route', body);
 		const isCodeValid = await this.authService.isTwoFactorAuthenticationCodeValid(
 			body.twoFactorAuthenticationCode,
 			user,

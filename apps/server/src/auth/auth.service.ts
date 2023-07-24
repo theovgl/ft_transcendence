@@ -1,10 +1,10 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { User } from '@prisma/client';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
@@ -38,7 +38,7 @@ export class AuthService {
 			const foundWithDisplayName = await this.prisma.user.findUnique({
 				where: {
 					displayName: ft_data.login
-				}	
+				}
 			});
 
 			if (foundWithName) {
@@ -81,13 +81,13 @@ export class AuthService {
 				client_secret: process.env.FT_CLIENT_SECRET,
 				redirect_uri: process.env.FT_CALLBACK_URL,
 			};
-			
+
 			const data = new URLSearchParams(params);
 			const response = await fetch('https://api.intra.42.fr/oauth/token', {
 				method: 'POST',
 				body: data,
 			});
-			
+
 			if (!response || !response.ok)
 				throw new Error('Failed to exchange code for token');
 
@@ -98,7 +98,7 @@ export class AuthService {
 			throw error;
 		}
 	}
-	
+
 	async handleCallback(response: any): Promise<any> {
 		const user: FortyTwoUser = await this.getUserInfo(response.access_token);
 		const token = await this.signToken(user.userId, user.username, user.displayname, user.email, user.picture, user.twoFAEnabled);
@@ -147,7 +147,7 @@ export class AuthService {
 		});
 		if (user)
 			return user;
-		
+
 		const newUser = this.createUser(details);
 		return newUser;
 	}
@@ -205,7 +205,7 @@ export class AuthService {
 			console.error('Error when setting 2FA secret:', e);
 			throw (new InternalServerErrorException('Failed to set two factor authentication secret'));
 		}
-	}			
+	}
 
 	async turnOnTwoFactorAuthentication(jwtDecoded: any) {
 		await this.prisma.user.update({
@@ -224,9 +224,6 @@ export class AuthService {
 			token: twoFactorAuthenticationCode,
 			secret: user.twoFASecret,
 		});
-		console.log('isValid token', twoFactorAuthenticationCode);
-		console.log('isValid secret', user.twoFASecret);
-		console.log('isCodeValid: ', isCodeValid);
 		return isCodeValid;
 	}
 
@@ -251,7 +248,7 @@ export class AuthService {
 			twoFAEnabled: user.twoFAEnabled,
 			isTwoFactorAuthenticated: true,
 		};
-	
+
 		return {
 			email: payload.email,
 			access_token: this.jwt.sign(payload),

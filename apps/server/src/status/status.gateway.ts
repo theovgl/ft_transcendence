@@ -1,31 +1,31 @@
-import { ConnectedSocket, MessageBody,SubscribeMessage, WebSocketGateway, WebSocketServer} from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
 	cors: {
-	  origin: ['https://hoppscotch.io', `http://${process.env.IP_ADDRESS}:3000`, `http://${process.env.IP_ADDRESS}:4000`],
-	  methods: ['GET', 'POST'],
-	  credentials: true,
-	  transport: ['websocket', 'polling'],
-	  allowedHeaders: ['Authorization', 'Content-Type'],
-	  exposedHeaders: ['Authorization'],
-	  allowEIO3: true,
-	  allowEIO4: true,
+		origin: ['https://hoppscotch.io', `http://${process.env.IP_ADDRESS}:3000`, `http://${process.env.IP_ADDRESS}:4000`],
+		methods: ['GET', 'POST'],
+		credentials: true,
+		transport: ['websocket', 'polling'],
+		allowedHeaders: ['Authorization', 'Content-Type'],
+		exposedHeaders: ['Authorization'],
+		allowEIO3: true,
+		allowEIO4: true,
 	},
 })
 export class StatusGateway {
-@WebSocketServer() server: Server;
-private logger = new Logger('StatusGateway');
-private onlineUsers: Map<string, string> = new Map();
-private onlineUsersInGame: Map<string, string> = new Map();
-	
+	@WebSocketServer() server: Server;
+	private logger = new Logger('StatusGateway');
+	private onlineUsers: Map<string, string> = new Map();
+	private onlineUsersInGame: Map<string, string> = new Map();
+
 	@SubscribeMessage('addConnectedUser')
-async handleUserConnected(@MessageBody() data: string, @ConnectedSocket() client: Socket): Promise<string> {
-	await this.onlineUsers.set(client.id, data);
-	this.server.emit('mapUpdated', this.onlineUsers.get(client.id));
-	return data;
-}
+	async handleUserConnected(@MessageBody() data: string, @ConnectedSocket() client: Socket): Promise<string> {
+		await this.onlineUsers.set(client.id, data);
+		this.server.emit('mapUpdated', this.onlineUsers.get(client.id));
+		return data;
+	}
 
 	@SubscribeMessage('removeConnectedUser')
 	async handleUserDisconnected(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
@@ -37,16 +37,14 @@ async handleUserConnected(@MessageBody() data: string, @ConnectedSocket() client
 			}
 		});
 	}
-	
+
 	@SubscribeMessage('inGame')
 	async handleInGame(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log('inGame: ' + data);
 		this.server.emit('isInGame', data);
 	}
 
 	@SubscribeMessage('quitGame')
 	async handleQuitGame(@ConnectedSocket() client: Socket, @MessageBody() data: any) {
-		console.log('quitGame: ' + data);
 		this.server.emit('quitInGame', { username: data, status: 'Online'});
 	}
 

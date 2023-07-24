@@ -6,7 +6,7 @@ import { JwtGuard } from '../auth/guard';
 @Controller('friendship')
 export class FriendshipController {
 	constructor(private friendshipService: FriendshipService) {}
-	
+
 	@UseGuards(JwtGuard)
 	@Get('add')
 	async addFriend(@Query() qry, @Res() response: Response) {

@@ -22,7 +22,7 @@ export default function CallbackPage() {
 		handleSubmit,
 		formState: { errors },
 	} = useForm<IFormValues>();
-	
+
 	const saveLoginState = () => {
 		const jwt = cookies.get('jwt');
 		if (!jwt) return;
@@ -77,9 +77,9 @@ export default function CallbackPage() {
 				},
 				body: JSON.stringify(body)
 			});
-			if (response.ok) 
+			if (response.ok)
 				return true;
-			else 
+			else
 				throw new Error(response.statusText);
 		} catch (e: any) {
 			if (e.message === 'Unauthorized') {
@@ -134,9 +134,9 @@ export default function CallbackPage() {
 						router.replace(redirectPath);
 					}
 					setTwoFA(true);
-					if (auth?.isAuthenticated) {
+					if (auth?.isAuthenticated)
 						auth.isAuthenticated = false;
-					}
+
 				})
 				.catch((error) => {
 					console.error(error);
