@@ -401,6 +401,9 @@ export class ChatService implements OnModuleInit {
 		const checkPass = await this.checkPassword(password, roomName);
 		const isOwner = await this.isOwner(owner, roomName);
 		if (newRoom.status === 'public' || checkPass || isOwner){
+			if (newRoom.status === "public"){
+				await this.addAllUsersToRoom(roomName);
+			}
 			if (!checkPass && newRoom.status !== 'public' && isOwner)
 				await this.setPassword(roomName ,password);
 			// await this.loadRoom(client, roomName, password);
@@ -422,28 +425,35 @@ export class ChatService implements OnModuleInit {
 	}
 
 	async	kickUser(userName:string, roomName: string){
-		console.log("kick: " + userName + " from: " + roomName);
-		this.leaveRoom(userName, roomName);
+		const isUserOwner = await this.isOwner(userName, roomName)
+		if (!isUserOwner)
+			this.leaveRoom(userName, roomName);
 	}
 
 	async	banUser(userName: string, roomName: string){
-		this.kickUser(userName, roomName);
-		this.addTalk(userName, roomName, this.prisma.bannedTalk)
+		const isUserOwner = await this.isOwner(userName, roomName)
+		if (!isUserOwner){
+			this.kickUser(userName, roomName);
+			this.addTalk(userName, roomName, this.prisma.bannedTalk)
+		}
 	}
 
 	async 	muteUser(userName: string, roomName: string){
-		const mutedUser = await this.findMutedTalk(userName, roomName);
-		if (mutedUser)
-		{
-			console.log("already muted");
-			return;
+		const isUserOwner = await this.isOwner(userName, roomName)
+		if (!isUserOwner){
+			const mutedUser = await this.findMutedTalk(userName, roomName);
+			if (mutedUser)
+			{
+				console.log("already muted");
+				return;
+			}
+			console.log('mute user: ' + userName + "in room: " + roomName);
+			this.addTalk(userName, roomName, this.prisma.mutedTalk)
+			setTimeout(() => {
+				console.log('unmute user: ' + userName + "in room: " + roomName);
+				this.removeTalk(userName, roomName, this.prisma.mutedTalk)			
+			}, 6009 * 10 * 2);
 		}
-		console.log('mute user: ' + userName + "in room: " + roomName);
-		this.addTalk(userName, roomName, this.prisma.mutedTalk)
-		setTimeout(() => {
-			console.log('unmute user: ' + userName + "in room: " + roomName);
-			this.removeTalk(userName, roomName, this.prisma.mutedTalk)			
-		}, 600 * 10);
 	}
   
 	async	addUserToRoom(clientName: string, roomName: string) {
