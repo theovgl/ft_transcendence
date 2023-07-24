@@ -1,24 +1,27 @@
-import styles from './Message.module.scss';
-import ProfilePic from '../UserProfile/ProfilePic';
-import Link from 'next/link';
-import { use, useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
-import { UserInfos } from 'global';
-import Button from '@/components/Button/Button';
-import { BiLogoKickstarter, BiPlay, BiUserMinus, BiVolumeMute } from 'react-icons/bi';
-import { useRouter } from 'next/router';
 import { useUser } from '@/utils/hooks/useUser';
+import { UserInfos } from 'global';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
+import { BiLogoKickstarter, BiVolumeMute } from 'react-icons/bi';
+import { MdKeyboardDoubleArrowUp } from 'react-icons/md';
+import { RiSwordFill } from 'react-icons/ri';
 import { Socket } from 'socket.io-client';
+import ProfilePic from '../UserProfile/ProfilePic';
+import ChatButton from './ChatButton';
+import styles from './Message.module.scss';
 
 type MessageProps = {
 	content: string;
 	username: string;
+	displayName?: string;
 	socket?: Socket | null;
 	room: string;
 	isUserAdmin: boolean
 }
 
-export default function Message({content, username, socket, room, isUserAdmin }: MessageProps) {
+export default function Message({content, username, socket, room, isUserAdmin, displayName }: MessageProps) {
 	const [profilePic, setProfilePic] = useState<string>('');
 	const [cookies] = useCookies();
 	const router = useRouter();
@@ -37,9 +40,12 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 		socket?.emit('mute', {muted: username, room: room});
 	}
 
+	function promote() {
+		socket?.emit('setUserAdmin', {username: username, roomName: room});
+	}
+
 	function sendInvite() {
 		const id = [username, user?.name].sort().join('');
-		console.log('id', id);
 		socket?.emit('challenge', {challenged: username});
 		router.push(
 			{
@@ -54,39 +60,26 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 		);
 	}
 
-	// useEffect(() => {
-	// 	const fetchIsAdmin = async () => {
-	// 		const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/${room}/isAdmin?username=${user?.name}}`, {
-	// 			method: 'GET',
-	// 			headers: {
-	// 				Content-Type: 'application/json',
-	// 				'Authorization': 'Bearer ' + cookies['jwt'],
-	// 			}
-	// 		});
-	// 		const isAdmin = await response.json();
-	// 		setIsAdmin(isAdmin);
-	// 	};
-	// 	fetchIsAdmin();
-	// }, [room]);
-
 	useEffect(() => {
 		const fetchProfilePic = async () => {
-			const response = await fetch(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/${username}`, {
-				method: 'GET',
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': 'Bearer ' + cookies['jwt'],
-				}
-			});
+			const response = await fetch(
+				`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/${username}
+			`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': 'Bearer ' + cookies['jwt'],
+					}
+				});
 			const userInfos: UserInfos = await response.json();
 			setProfilePic(userInfos.profilePicPath);
 		};
 		fetchProfilePic();
-	});
+	}, []);
 
 	return (
 		<div className={styles.message}>
-			<div className={styles.message_left}>
+			<div className={styles.message_profilePic_container}>
 				<Link
 					href={`/user/${username}`}
 					className={styles.message_profilePic}
@@ -98,52 +91,49 @@ export default function Message({content, username, socket, room, isUserAdmin }:
 						currentUser={username}
 					/>
 				</Link>
-				<div>
-					<div className={styles.message_username}>
-						{username}
-					</div>
-					<div className={styles.message_content}>
-						{content}
-					</div>
-				</div>
 			</div>
-			<div className={styles.message_right}>
-				{username !== user?.name &&
-					<Button
-						text='Play'
-						theme="light"
-						boxShadow
-						icon={<BiPlay />}
-						onClick={sendInvite}
+			<div className={styles.message_content}>
+				<div className={styles.message_username}>
+					<span>{displayName ? displayName : username}</span>
+				</div>
+				<span className={styles.message_text}>{content}</span>
+				<div className={styles.message_button_container}>
+					{username !== user?.name &&
+						<ChatButton
+							text='Play'
+							icon={<RiSwordFill />}
+							onClick={sendInvite}
+						/>
+					}
+					{isAdmin && username !== user?.name &&
+					<ChatButton
+						text='Kick'
+						icon={<BiLogoKickstarter />}
+						onClick={kick}
 					/>
-				}
-				{isAdmin && username !== user?.name &&
-				<Button
-					text='Kick'
-					theme="light"
-					boxShadow
-					icon={<BiLogoKickstarter />}
-					onClick={kick}
-				/>
-				}
-				{isAdmin && username !== user?.name &&
-				<Button
-					text='Ban'
-					theme="light"
-					boxShadow
-					icon={<BiLogoKickstarter />}
-					onClick={ban}
-				/>
-				}
-				{isAdmin && username !== user?.name &&
-				<Button
-					text='mute'
-					theme="light"
-					boxShadow
-					icon={<BiVolumeMute />}
-					onClick={mute}
-				/>
-				}
+					}
+					{isAdmin && username !== user?.name &&
+					<ChatButton
+						text='Ban'
+						icon={<BiLogoKickstarter />}
+						onClick={ban}
+					/>
+					}
+					{isAdmin && username !== user?.name &&
+					<ChatButton
+						text='Mute'
+						icon={<BiVolumeMute />}
+						onClick={mute}
+					/>
+					}
+					{isAdmin && username !== user?.name &&
+					<ChatButton
+						text='Promote'
+						icon={<MdKeyboardDoubleArrowUp />}
+						onClick={promote}
+					/>
+					}
+				</div>
 			</div>
 		</div>
 	);

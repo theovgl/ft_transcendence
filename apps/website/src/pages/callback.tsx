@@ -1,11 +1,11 @@
+import Navbar from '@/components/Navbar';
+import { AuthContext } from '@/utils/contexts/AuthContext.tsx';
 import jwtDecode from 'jwt-decode';
 import { useRouter } from 'next/router';
-import { useContext, useEffect, useState} from 'react';
-import {AuthContext} from '@/utils/contexts/AuthContext.tsx';
-import styles from '../components/TwoFA/TwoFAForm.module.scss';
+import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Cookies from 'universal-cookie';
-import Navbar from '@/components/Navbar';
+import styles from '../components/TwoFA/TwoFAForm.module.scss';
 
 interface IFormValues {
 	'tfaCode': string;
@@ -135,7 +135,6 @@ export default function CallbackPage() {
 					}
 					setTwoFA(true);
 					if (auth?.isAuthenticated) {
-						console.log('ah');
 						auth.isAuthenticated = false;
 					}
 				})

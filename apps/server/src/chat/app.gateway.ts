@@ -1,18 +1,18 @@
 import {
- SubscribeMessage,
- WebSocketGateway,
- OnGatewayInit,
- WebSocketServer,
- OnGatewayConnection,
- OnGatewayDisconnect,
+	OnGatewayConnection,
+	OnGatewayDisconnect,
+	OnGatewayInit,
+	SubscribeMessage,
+	WebSocketGateway,
+	WebSocketServer,
 } from '@nestjs/websockets';
 
 import { ChatService } from './app.service';
 
-import {Message} from './app.interface';
+import { Message } from './app.interface';
 
 import { Logger } from '@nestjs/common';
-import { Socket, Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 
 @WebSocketGateway({
 	cors: {
@@ -34,10 +34,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
  //Message Events
  @SubscribeMessage('msgToServer')
  async handleMessage(client: Socket, payload: Message) {
-	await this.chatService.storeMessageAndSend(client, payload);
-//   if (await this.chatService.storeMessage(payload) === true)
-// 	  this.server.to(payload.channel).emit('msgToClient', payload);
-  // server.to(payload.channel).emit('msgToClient', payload.message);
+	await this.chatService.storeMessageAndSend(client, payload, this.server);
  }
 
  @SubscribeMessage('leaveRoom')
@@ -70,12 +67,22 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	console.log('challenge: ' + payload.challenged )
 	this.chatService.createGameInvite(client, payload.challenged);
  }
-
+ 
  @SubscribeMessage('checkAdmin')
  handleCheckAdmin(client: Socket, payload: string): void {
 	this.chatService.checkAdmin(client, payload);
  }
 
+ @SubscribeMessage('createRoom')
+ handleCreateRoom(client: Socket, payload: {roomName: string, status: string, password ?: string}): void {
+	this.chatService.roomCreation(client, payload.roomName, payload.status, payload.password);
+ }
+ 
+ @SubscribeMessage('setUserAdmin')
+ handleSetUserAdmin(client: Socket, payload: {username: string, roomName: string}){
+	this.chatService.setAdmin(payload.username, payload.roomName);
+ }
+ 
  //Room Events
  @SubscribeMessage('CreateRoomfromServer')
  handleRoomCreation(client: Socket, payload: String): void {
@@ -85,28 +92,21 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
  @SubscribeMessage('ChangeRoomFromClient')
  handleRoomChange(client: Socket, payload: string): void {
 	this.chatService.changeRoom(client, payload);
-	// this.server.emit('ChangeRoomFromServer', payload)
  }
  
  private clientList: Map<Socket, string> = new Map();
  @SubscribeMessage('UserConnection')
  async handleUserConnection(client: Socket, payload: {username: string, dmReceiverName?: string}){
-	// setTimeout(async () => {
 	if (this.clientList.get(client))
 	{
 		this.chatService.userReconnection(client, payload.username, payload.dmReceiverName)
-		// this.chatService.loadRoomlist(client);
 		console.log("already registered in chat");
 		return ;
 	}
 	console.log("registering in chat: " + client)
 	this.clientList.set(client, payload.username)
 	await this.chatService.userConnection(client, "General", payload.username, payload?.dmReceiverName);
-	// }, 150);
-	// client.emit('userConnected')
-	// Put user in General chat
-	// Get messages from General
-	// Emit the messages
+
  }
 
  //WebSocket Log events

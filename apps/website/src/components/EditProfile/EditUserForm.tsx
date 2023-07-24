@@ -1,11 +1,10 @@
-import styles from './EditUserForm.module.scss';
-import React from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import Button from '../Button/Button';
-import { BiPencil, BiSave } from 'react-icons/bi';
-import FormLabel from './FormLabel';
 import { useUser } from '@/utils/hooks/useUser';
 import { useCookies } from 'react-cookie';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { BiPencil, BiSave } from 'react-icons/bi';
+import Button from '../Button/Button';
+import styles from './EditUserForm.module.scss';
+import FormLabel from './FormLabel';
 
 interface IFormValues {
 	'Nickname': string;

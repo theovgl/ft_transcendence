@@ -1,5 +1,6 @@
 export interface Message
 {
+	username:string;
 	author: string;
 	message: string;
 	channel: string;
@@ -25,6 +26,7 @@ export interface ClientToServerEvents {
 	checkAdmin: (roomName: string) => void;
 	leaveRoom: (payload: {clientName: string, roomName: string}) => void;
 	sendDm: (payload: string) => void;
+	createRoom: (payload:  {roomName: string, status: string}) => void;
 }
 
 export interface InterServerEvents {
