@@ -45,6 +45,7 @@ export class MatchmakingService {
 	//first premade user connect
 	//create a room and add player to it
 	public addPremadePlayer(player: Socket, mode: string, id: string, roomId: string, server: Server) {
+		player.emit('statusinGame');
 		if (this.premadePlayers.has(roomId)) {
 			//set the players
 			const playerOne = {
