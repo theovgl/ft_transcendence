@@ -1,7 +1,6 @@
 import Link from 'next/link';
-import styles from './FriendEntity.module.scss';
 import ProfilePic from '../UserProfile/ProfilePic';
-import { useEffect } from 'react';
+import styles from './FriendEntity.module.scss';
 
 type Props = {
 	name: string;
@@ -9,9 +8,6 @@ type Props = {
 }
 
 export default function FriendEntity({name, profilePicPath}: Props) {
-	useEffect(() => {
-		console.log('FriendEntity: ', name, profilePicPath);
-	});
 	return (
 		<div className={styles.friendEntity}>
 			<Link

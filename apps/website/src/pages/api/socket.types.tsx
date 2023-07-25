@@ -14,18 +14,3 @@ export interface ServerToClientEvents {
 	greeting:()=>void;
 	message: (msg: Message) => void;
 }
-
-//export interface InterServerEvents {
-//  ping: () => void;
-//}
-//
-//export interface SocketData {
-//  name: string;
-//  age: number;
-//}
-//
-////Client side
-//export interface ClientToServerEvents {
-//  hello: () => void;
-//	createdMessage: (msg: Message) => void;
-//}

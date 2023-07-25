@@ -28,6 +28,7 @@ export class ftStrategy extends PassportStrategy(Strategy) {
 				firstName: profile.name.givenName,
 				lastName: profile.name.familyName,
 				picture: profile._json.image.link,
+				twoFAEnabled: profile.twoFAEnabled,
 				accessToken,
 				refreshToken,
 			};

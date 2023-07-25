@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useLocalStorage } from './useLocalStorage';
+import { useAtom } from 'jotai';
+import { atomWithStorage, RESET } from 'jotai/utils';
 
 export interface User {
 	id: string;
@@ -8,31 +8,21 @@ export interface User {
 	email: string;
 	profilePic: string;
 	authToken: string;
+	twoFAEnabled: boolean;
 }
+
+export const userAtom = atomWithStorage<User | null>('user', null);
 
 // This hook will store the user in our context and localStorage.
 export const useUser = () => {
-	const [ user, setUser ] = useState<User | null>(null);
-	const { setItem, getItem, removeItem } = useLocalStorage();
-
-	useEffect(() => {
-		const userItem: string | null = getItem('user');
-
-		if (userItem) {
-			const user: User | null = JSON.parse(userItem);
-			if (user)
-				setUser(user);
-		}
-	}, [getItem('user')]);
+	const [user, setUser] = useAtom(userAtom);
 
 	const addUser = (user: User) => {
 		setUser(user);
-		setItem('user', JSON.stringify(user));
 	};
 
 	const removeUser = () => {
-		setUser(null);
-		removeItem('user');
+		setUser(RESET);
 	};
 
 	const editUser = (updatedUser: Partial<User>) => {
@@ -40,7 +30,6 @@ export const useUser = () => {
 
 		const newUser = { ...user, ...updatedUser };
 		setUser(newUser);
-		setItem('user', JSON.stringify(newUser));
 	};
 
 	return { user, addUser, removeUser, editUser };

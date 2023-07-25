@@ -1,9 +1,9 @@
 import { Body, Controller, Get, HttpCode, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import jwt_decode from 'jwt-decode';
+import { PrismaService } from '../prisma/prisma.service';
 import { AuthService } from './auth.service';
 import { JwtGuard } from './guard';
 import { ftAuthGuard } from './guard/ft.guards';
-import { PrismaService } from '../prisma/prisma.service';
-import jwt_decode from 'jwt-decode';
 
 @Controller('auth')
 export class AuthController {
@@ -33,7 +33,7 @@ export class AuthController {
 			res.status(200).send();
 		} catch (error) {
 			console.error(error);
-			res.status(500).send('Internal server error');
+			res.status(403).send('Failed to fetch user info');
 		}
 	}
 
@@ -73,7 +73,7 @@ export class AuthController {
 		);
 		if (!isCodeValid)
 			throw new UnauthorizedException('Wrong authentication code');
-		
+
 		await this.authService.turnOffTwoFactorAuthentication(user);
 		return await this.authService.loginWith2fa(user);
 	}

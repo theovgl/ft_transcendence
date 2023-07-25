@@ -21,6 +21,7 @@ type MatchInfos = {
 	userIdRight: string
 	scorePlayerTwo: number
 	duration: string
+	winnerId: string
 }
 
 

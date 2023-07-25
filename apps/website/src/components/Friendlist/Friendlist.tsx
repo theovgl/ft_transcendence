@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import styles from './Friendlist.module.scss';
 import { BiSad } from 'react-icons/bi';
 import FriendEntity from './FriendEntity';
+import styles from './Friendlist.module.scss';
 
 type FriendEntityType = {
 	name: string;
@@ -26,7 +26,7 @@ export default function Friendlist(props: Props) {
 
 	useEffect(() => {
 		if (!data) return;
-		console.log(data);
+
 		setFriends(data.friendship);
 		setBlocked(data.blocked);
 		setRequested(data.request);
@@ -60,7 +60,7 @@ export default function Friendlist(props: Props) {
 						</>
 					) : (
 						<>
-							{requested && requested.length != 0 ? 
+							{requested && requested.length != 0 ?
 								<div className={styles.section_container}>
 									<p className={styles.section_title}>Friend request</p>
 									{requested.map((request: FriendEntityType) => (
@@ -73,7 +73,7 @@ export default function Friendlist(props: Props) {
 								</div>
 								: ''}
 
-							{friends && friends.length != 0 ? 
+							{friends && friends.length != 0 ?
 								<div className={styles.section_container}>
 									<p className={styles.section_title}>Friends</p>
 									{friends.map((friend: FriendEntityType) => (
@@ -86,7 +86,7 @@ export default function Friendlist(props: Props) {
 								</div>
 								: ''}
 
-							{blocked && blocked.length != 0 ? 
+							{blocked && blocked.length != 0 ?
 								<div className={styles.section_container}>
 									<p className={styles.section_title}>Blocked users</p>
 									{blocked.map((blocked: FriendEntityType) => (

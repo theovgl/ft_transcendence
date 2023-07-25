@@ -1,11 +1,11 @@
-import { Test } from '@nestjs/testing';
-import { AppModule } from '../src/app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { PrismaService } from '../src/prisma/prisma.service';
+import { Test } from '@nestjs/testing';
 import * as pactum from 'pactum';
 import { AuthDto } from 'src/auth/dto';
-import { EditUserDto } from 'src/user/dto';
 import { CreateBookmarkDto, EditBookmarkDto } from 'src/bookmark/dto';
+import { EditUserDto } from 'src/user/dto';
+import { AppModule } from '../src/app.module';
+import { PrismaService } from '../src/prisma/prisma.service';
 
 describe('App e2e', () => {
 	let app: INestApplication;
@@ -32,7 +32,7 @@ describe('App e2e', () => {
 	afterAll(() => {
 		app.close();
 	});
-    
+
 	const dto: AuthDto = {
 		email: 'test@gmail.com',
 		password: '123',

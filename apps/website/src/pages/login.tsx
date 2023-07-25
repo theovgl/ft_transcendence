@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 
 export default function LoginPage() {
 	const router = useRouter();
-	
+
 	function onSubmit() {
 		router.push(`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/auth/42/login`);
 	}

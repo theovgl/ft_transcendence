@@ -12,7 +12,7 @@ export class FriendshipService {
 	constructor(
 		private prisma: PrismaService,
 	) {}
-	
+
 	async getRequesterAddressee(requesterName: string, addresseeName: string) {
 		const requester = await this.prisma.user.findUnique({
 			where: {
@@ -28,6 +28,8 @@ export class FriendshipService {
 	}
 
 	async getFriendship(requester: any, addressee: any) {
+		if (!requester || !addressee)
+			return null;
 		const friendship = await this.prisma.friendship.findUnique({
 			where: {
 				requesterId_addresseeId: {
@@ -38,7 +40,7 @@ export class FriendshipService {
 		});
 		return friendship;
 	}
-	
+
 	async handleAddFriend(requesterName: string, addresseeName: string) {
 		const { requester, addressee } = await this.getRequesterAddressee(requesterName, addresseeName);
 		if (!requester || !addressee)
@@ -113,7 +115,7 @@ export class FriendshipService {
 			return null;
 		const { requester, addressee } = await this.getRequesterAddressee(requesterName, addresseeName);
 		const friendship = await this.getFriendship(addressee, requester);
-		if (friendship 
+		if (friendship
 			&& friendship.status === 'PENDING') {
 			return this.prisma.friendship.update({
 				where: {

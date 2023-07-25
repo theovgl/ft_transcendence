@@ -1,13 +1,15 @@
-import Head from 'next/head'
-import Navigation from "@/components/Navigation.tsx"
-import Button from "@/components/Button.tsx"
-import Chat from '@/components/Chat.tsx'
+import Chat from '@/components/Chat/Chat';
+import Navbar from '@/components/Navbar';
+import Head from 'next/head';
 
 export default function ChatPage() {
-return (
+	return (
 		<>
-				<Navigation current_page="Chat"/>
-				<Chat/>
+			<Head>
+				<title>Transcendence - Chat</title>
+			</Head>
+			<Navbar />
+			<Chat/>
 		</>
-)
+	);
 }

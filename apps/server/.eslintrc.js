@@ -28,6 +28,6 @@ module.exports = {
 		'curly': ['error', 'multi-or-nest'],
 		'no-multiple-empty-lines': ['error', { max: 1 }],
 		"keyword-spacing": ["error", { "after": true, "before": true }],
-
+		"no-trailing-spaces": ["error"]
 	},
 };

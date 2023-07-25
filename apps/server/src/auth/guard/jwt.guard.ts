@@ -12,8 +12,8 @@ export class JwtGuard extends AuthGuard('jwt') {
 		return super.canActivate(context);
 	}
 
-	handleRequest(err, user)  {
-		if (err || !user) { 
+	handleRequest(err, user) {
+		if (err || !user) {
 			// Handle authentication failure
 			throw err || new UnauthorizedException();
 		}
@@ -25,7 +25,7 @@ export class JwtGuard extends AuthGuard('jwt') {
 				if (!prismaUser)
 					throw new UnauthorizedException('Invalid user');
 			} catch (error) {
-				console.log('JwtGuard handleRequest error', error);
+				console.error('JwtGuard handleRequest error', error);
 				throw error;
 			}
 		})();
