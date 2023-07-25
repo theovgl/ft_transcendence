@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import * as fs from 'fs';
 import * as sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
@@ -94,7 +94,11 @@ export class UserService {
 
 			return convertedImageFilename;
 		} catch (error) {
-			console.error('An error occurred during file handling or database operation:', error);
+			if (error.message === 'Input image exceeds pixel limit') {
+				console.error('Error: ', error);
+				throw new UnprocessableEntityException(error);
+			} else
+				console.error('An error occurred during file handling or database operation:', error);
 			throw error;
 		}
 	}
