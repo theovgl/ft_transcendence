@@ -337,6 +337,8 @@ export class ChatService implements OnModuleInit {
 				channel: message.room.name,
 				message: message.content,
 			};
+			if (await this.isBlocked(payload, message.author.name))
+				return ;
 			for (const [client, userId] of this.clientList) {
 				if (userId === payload)
 					client.emit('msgToClient', msg);
