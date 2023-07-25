@@ -57,7 +57,7 @@ export default function Profile() {
 	useEffect(() => {
 		if (!router.isReady) return;
 
-			const user_matches = async () => {
+		const user_matches = async () => {
 			try {
 				const statusResponse = await fetch(
 					`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/${router.query.username}/matches`,
@@ -80,13 +80,8 @@ export default function Profile() {
 							return response.json();
 					})
 					.then((response: MatchInfos[]) => {
-						console.log(response)
+						console.log(response);
 						setMatches(response);
-						
-						matches.map((match, i) => (
-							//console.log(new Date(match.createdAt).getFullYear())
-							//matchDuration = {(new Date(match.createdAt).getMinutes()- new Date(match.updatedAt).getMinutes()).toString()}
-						))
 									
 					});
 			} catch (error) {
@@ -139,7 +134,7 @@ export default function Profile() {
 				addresseeName: `${router.query.username}`,
 				requesterName: encodeURIComponent(jwtPayload.username),
 			}
-		})
+		});
 	}
 	
 	async function relationshipUpdate() {
@@ -294,24 +289,15 @@ export default function Profile() {
 									</section>
 									<section className={styles.content_section}>
 										<h2 className={styles.title2}>Match history</h2>
-										<Match
-											matchDate={Date.now()}
-											player1Name='tvogel'
-											player1Score={8}
-											player2Name='ppiques'
-											player2Score={4}
-											matchDuration='18:20'
-										/>
 										{
 											matches.map((match, i) => (
 												<Match
-												key={i}
-												player1Name = {match.userIdLeft}
-												player2Name =  {match.userIdRight}
-//												matchDate = {new Date(match.createdAt).getDate()}
-												player1Score = {match.scorePlayerOne}
-												player2Score = {match.scorePlayerTwo}
-												matchDuration = {match.duration}
+													key={i}
+													player1Name = {match.userIdLeft}
+													player2Name =  {match.userIdRight}
+													player1Score = {match.scorePlayerOne}
+													player2Score = {match.scorePlayerTwo}
+													matchDuration = {match.duration}
 												/>
 											))
 										}
