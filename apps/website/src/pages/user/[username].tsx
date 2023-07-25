@@ -83,7 +83,6 @@ export default function Profile() {
 							return response.json();
 					})
 					.then((response: MatchInfos[]) => {
-						console.log(response);
 						setMatches(response);
 					});
 			} catch (error) {

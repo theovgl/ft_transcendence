@@ -150,7 +150,6 @@ export default function Chat() {
 						simulateClick(payload.dmName);
 				});
 				socket.on('setAdmin', (isUserAdmin) => {
-					console.log(isUserAdmin);
 					setIsAdmin(isUserAdmin);
 				});
 			}
