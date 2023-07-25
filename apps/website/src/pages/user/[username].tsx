@@ -251,7 +251,8 @@ export default function Profile() {
 											level={userInfo.level}
 											wins={userInfo.wins}
 											losses={userInfo.losses}
-											winRate={(5 / 80) * 100}
+											winRate={userInfo.wins && userInfo.losses ?
+												userInfo.wins / userInfo.losses: 'N/A'}
 										/>
 									</section>
 									<section className={styles.content_section}>
