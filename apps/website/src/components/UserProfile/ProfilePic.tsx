@@ -52,29 +52,22 @@ export default function ProfilePic({ path, size, stroke, currentUser }: Props) {
 	}, [socket, currentUser, user?.name, socket?.socket?.connected]);
 
 	return (
-		<>
-			{/* <Head>
-				<link rel="preload" as="image" href={path ? path : '/default_profil_picture.jpg'} />
-			</Head> */}
-			<Image
-				className={
-					`${stroke === true ? styles.profilePic_stroke : styles.profilePic} ${
-						isConnected === 'Online'
-							? styles.onlineBorder
-							: isConnected === 'Offline'
-								? styles.offlineBorder
-								: isConnected === 'In Game'
-									? styles.inGameBorder
-									: ''
-					}`
-				}
-				alt='Profile picture of the user'
-				src={path ? path : '/default_profil_picture.jpg'}
-				width={size}
-				height={size}
-				// loading="lazy"
-				priority
-			/>
-		</>
+		<Image
+			className={
+				`${stroke === true ? styles.profilePic_stroke : styles.profilePic} ${
+					isConnected === 'Online'
+						? styles.onlineBorder
+						: isConnected === 'Offline'
+							? styles.offlineBorder
+							: isConnected === 'In Game'
+								? styles.inGameBorder
+								: ''
+				}`
+			}
+			alt='Profile picture of the user'
+			src={path ? path : '/default_profil_picture.jpg'}
+			width={size}
+			height={size}
+		/>
 	);
 }

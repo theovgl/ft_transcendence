@@ -145,16 +145,12 @@ export class BallService {
 	}
 
 	private updateGameResult() {
-		this.gameEnd = new Date();
-		const minutes: string = ((this.gameEnd.getMinutes() - this.gameBegin.getMinutes())).toString();
-		const seconds: string = ((this.gameEnd.getSeconds() - this.gameBegin.getSeconds()) % 60).toString();
-		const game_duration: string = minutes + ":" + seconds; 
 		if (this.winnerId === '' && this.scoreLeft > this.scoreRight)
 			this.winnerId = this.pOneId;
 		else if (this.winnerId === '')
 			this.winnerId = this.pTwoId;
-		this.updateHistory(this.pOneId, game_duration);
-		this.updateHistory(this.pTwoId, game_duration);
+		this.updateHistory(this.pOneId, '');
+		this.updateHistory(this.pTwoId, '');
 	}
 
 	//désactiver la boucle lorsque la partie est terminée

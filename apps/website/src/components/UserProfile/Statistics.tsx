@@ -4,12 +4,12 @@ interface Props {
 	level: number,
 	wins: number,
 	losses: number,
-	winRate: number,
+	winRate: string | number,
 }
 
 interface IStatisticsElement {
 	title: string,
-	value: number
+	value: string | number
 }
 
 function StatisticsElement(options: IStatisticsElement) {

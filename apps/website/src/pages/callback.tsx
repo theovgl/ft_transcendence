@@ -1,3 +1,4 @@
+import FormLabel from '@/components/EditProfile/FormLabel';
 import Navbar from '@/components/Navbar';
 import { AuthContext } from '@/utils/contexts/AuthContext.tsx';
 import jwtDecode from 'jwt-decode';
@@ -5,7 +6,7 @@ import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Cookies from 'universal-cookie';
-import styles from '../components/TwoFA/TwoFAForm.module.scss';
+import styles from '../styles/callback.module.scss';
 
 interface IFormValues {
 	'tfaCode': string;
@@ -151,6 +152,7 @@ export default function CallbackPage() {
 			{twoFA
 				? <form id='2faForm' className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
 					<div className={styles.labeledInput_container}>
+						<FormLabel content='Enter your 2FA code'/>
 						<input
 							className={`
 						${styles.input}
