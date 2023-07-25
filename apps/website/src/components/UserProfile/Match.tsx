@@ -3,27 +3,29 @@ import { useEffect, useState } from 'react';
 import styles from './Match.module.scss';
 
 interface Props {
-	matchDate: number,
+	//matchDate: number,
 	player1Score: number;
 	player1Name: string;
 	player2Score: number;
 	player2Name: string;
 	matchDuration: string;
+	winnerId: string;
 }
 
 export default function Match({
-	matchDate,
+	//matchDate,
 	player1Score,
 	player1Name,
 	player2Score,
 	player2Name,
 	matchDuration,
+	winnerId
 }: Props) {
 
 	const [winner, setWinner] = useState(1);
 
 	useEffect(() => {
-		if (player1Score > player2Score)
+		if (winnerId === player1Name)
 			setWinner(1);
 		else
 			setWinner(2);

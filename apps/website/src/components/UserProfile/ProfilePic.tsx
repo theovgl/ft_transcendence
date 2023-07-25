@@ -3,6 +3,7 @@ import { SocketContext } from '@/utils/contexts/SocketContext';
 import Image from 'next/image';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useUser } from '../../utils/hooks/useUser';
+import Head from 'next/head';
 
 interface Props {
 	path?: string;

@@ -23,6 +23,11 @@ export class UserController {
 		return this.userService.findOneByUsername(username);
 	}
 
+	@Get(':username/matches')
+	findMatchesByUsername(@Param('username') username: string) {
+		return this.userService.findMatchesByUsername(username);
+	}
+
 	@Patch('edit')
 	async edit(
 		@Query() query,

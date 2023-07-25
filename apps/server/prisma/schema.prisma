@@ -113,6 +113,7 @@ model Game {
   winnerId           String
   userIdLeft         String
   userIdRight        String
+  duration           String
   userId             Int
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

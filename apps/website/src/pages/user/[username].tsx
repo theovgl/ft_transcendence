@@ -1,17 +1,17 @@
 import Button from '@/components/Button/Button';
 import Navbar from '@/components/Navbar';
-import Match from '@/components/UserProfile/Match';
 import Name from '@/components/UserProfile/Name';
 import ProfilePic from '@/components/UserProfile/ProfilePic';
 import Statistics from '@/components/UserProfile/Statistics';
+import Match from '@/components/UserProfile/Match';
+import { useCookies } from 'react-cookie';
+import type { UserInfos, MatchInfos } from 'global';
 import styles from '@/styles/userProfile/userProfile.module.scss';
 import { SocketContext } from '@/utils/contexts/SocketContext';
-import type { UserInfos } from 'global';
 import jwtDecode from 'jwt-decode';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useContext, useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 import { BiBlock, BiCheck, BiEdit, BiMessageAltDetail } from 'react-icons/bi';
 
@@ -28,6 +28,7 @@ export default function Profile() {
 	const router = useRouter();
 	const [userInfo, setUserInfo] = useState<UserInfos | undefined>(undefined);
 	const [cookies] = useCookies();
+	const [matches, setMatches] = useState<Array<MatchInfos>>([]);
 	const [buttonText, setButtonText] = useState<string>('');
 	const [status, setStatus] = useState<string>('');
 	const [isBlocked, setIsBlocked] = useState(false);
@@ -56,7 +57,41 @@ export default function Profile() {
 		setIsBlocked(!isBlocked);
 		updateButtonState(status);
 	}
+	useEffect(() => {
+		if (!router.isReady) return;
 
+		const user_matches = async () => {
+			try {
+				const statusResponse = await fetch(
+					`http://${process.env.NEXT_PUBLIC_IP_ADDRESS}:4000/users/${router.query.username}/matches`,
+					{
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: 'Bearer ' + cookies['jwt'],
+						},
+					}
+				)
+					.then((response) => {
+						if (!response.ok) {
+							if (response.status === 404) {
+								router.push('/404');
+								return null;
+							}
+							throw new Error('Failed to fetch match info');
+						} else
+							return response.json();
+					})
+					.then((response: MatchInfos[]) => {
+						console.log(response);
+						setMatches(response);
+					});
+			} catch (error) {
+				console.error(error);
+			}
+		};
+		user_matches();
+	}, []);
 	// This useEffect is used to update the button text when the user changes as blocked or unblocked
 	useEffect(() => {
 		if (!router.isReady) return;
@@ -257,22 +292,19 @@ export default function Profile() {
 									</section>
 									<section className={styles.content_section}>
 										<h2 className={styles.title2}>Match history</h2>
-										<Match
-											matchDate={Date.now()}
-											player1Name='tvogel'
-											player1Score={8}
-											player2Name='ppiques'
-											player2Score={4}
-											matchDuration='18:20'
-										/>
-										<Match
-											matchDate={Date.now()}
-											player1Name='tvogel'
-											player1Score={8}
-											player2Name='ppiques'
-											player2Score={4}
-											matchDuration='18:20'
-										/>
+										{
+											matches.map((match, i) => (
+												<Match
+													key={i}
+													player1Name = {match.userIdLeft}
+													player2Name =  {match.userIdRight}
+													player1Score = {match.scorePlayerOne}
+													player2Score = {match.scorePlayerTwo}
+													matchDuration = {match.duration}
+													winnerId= {match.winnerId}
+												/>
+											))
+										}
 									</section>
 								</div>
 							</>
