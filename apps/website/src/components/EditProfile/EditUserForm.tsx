@@ -25,14 +25,20 @@ export default function EditUserForm() {
 
 	const saveNewDisplayName = (newDisplayName: string) => {
 		editUser({ displayName: newDisplayName});
-		reset();
 	};
 
 	const saveNewProfilPic = (newPath: string) => {
 		editUser({ profilePic: `/images/profile-pictures/${newPath}` });
 	};
 
-	const submitDisplayName = async (newDisplayName: string) => {
+	const saveAll = (imageID: string, newDisplayName: string) => {
+		editUser({
+			profilePic:  `/images/profile-pictures/${imageID}`,
+			displayName: newDisplayName
+		});
+	};
+
+	const submitDisplayName = async (newDisplayName: string): Promise<string | null> => {
 		const lowerCaseName = newDisplayName.toLowerCase();
 		const body = {
 			newDisplayName: lowerCaseName,
@@ -52,7 +58,7 @@ export default function EditUserForm() {
 			if (!response.ok)
 				throw new Error(response.statusText);
 
-			saveNewDisplayName(lowerCaseName);
+			return lowerCaseName;
 		} catch (e: any) {
 			if (e.message === 'Conflict') {
 				setError('Nickname', {
@@ -65,10 +71,11 @@ export default function EditUserForm() {
 					message: 'Something went wrong while setting the displayname',
 				});
 			}
+			return null;
 		}
 	};
 
-	const submitProfilePic = async (data: any) => {
+	const submitProfilePic = async (data: any): Promise<string | null> => {
 		const formData = new FormData();
 		formData.append('profile-picture', data[0]);
 
@@ -84,21 +91,46 @@ export default function EditUserForm() {
 			});
 			if (response.ok) {
 				const responseJSON = await response.json();
-				saveNewProfilPic(responseJSON.imageID);
+				return responseJSON.imageID;
 			}
 		} catch (error) {
 			console.error(error);
+			return null;
 		}
-
+		return null;
 	};
 
 	const onSubmit: SubmitHandler<IFormValues> = async (data: any) => {
 		if (!data) return;
 
-		if (data.ProfilePic.length === 1)
-			await submitProfilePic(data.ProfilePic);
-		if (data.Nickname)
-			await submitDisplayName(data.Nickname);
+		if (data.ProfilePic.length === 1 && data.Nickname) {
+			const [imageID, newDisplayName] = await Promise.all([
+				await submitProfilePic(data.ProfilePic),
+				await submitDisplayName(data.Nickname),
+			]);
+			if (imageID && newDisplayName) {
+				saveAll(imageID, newDisplayName);
+				reset();
+			} else {
+				setError('Nickname', {
+					type: 'server',
+					message: 'Something went wrong',
+				});
+				reset();
+			}
+		} else if (data.ProfilePic.length === 1) {
+			const imageID: string | null = await submitProfilePic(data.ProfilePic);
+			if (imageID) {
+				saveNewProfilPic(imageID);
+				reset();
+			}
+		} else if (data.Nickname) {
+			const newDisplayname: string | null = await submitDisplayName(data.Nickname);
+			if (newDisplayname) {
+				saveNewDisplayName(newDisplayname);
+				reset();
+			}
+		}
 	};
 
 	return (
