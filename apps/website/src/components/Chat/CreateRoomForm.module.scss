@@ -1,0 +1,98 @@
+@import '../../styles/library';
+
+.createRoom_container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	font-family: $font-family;
+	height: 100%;
+	width: 100%;
+}
+
+.createRoom_title {
+	font-weight: 700;
+	font-size: 20px;
+}
+
+.createRoom_form {
+	display: flex;
+	flex-direction: column;
+	max-width: 100%;
+	gap: 10px;
+}
+
+.input_label_container {
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+}
+
+.input {
+	box-sizing: border-box;
+	padding: 8px 10px;
+	width: 100%;
+	margin: 0;
+	margin-top: 5px;
+	border: solid rgb(222, 222, 222) 3px;
+	border-radius: 15px;
+	transition: border ease-out 0.10s;
+
+	&:focus-visible {
+		border: solid rgb(0, 0, 0) 3px;
+		outline: none;
+		transition: border ease-out 0.15s;
+	}
+}
+
+.hidePassword {
+	font-size: 12px;
+	padding: 5px 2px;
+	cursor: pointer;
+	color: rgb(94, 94, 94);
+
+	&:hover {
+		text-decoration: underline;
+		color: rgb(15, 15, 15);
+	}
+}
+
+.privateField_container {
+	display: flex;
+	align-items: center;
+	gap: 5px
+}
+
+.input_error {
+	@extend .input;
+	border: solid rgb(245, 82, 82) 3px;
+	animation: shake 0.3s 1 linear;
+	border-radius: 15px 15px 0px 0px;
+	border-bottom: none;
+
+	&:focus-visible {
+		border: solid rgb(245, 82, 82) 3px;
+		border-bottom: none;
+	}
+}
+
+.error_message {
+	font-family: $font-family;
+	font-weight: 700;
+	color: $off-white-color;
+	background-color: rgb(245, 82, 82);
+	padding: 8px 15px;
+	font-size: 13px;
+	border-radius: 0px 0px 15px 15px;
+	animation: shake 0.3s 1 linear;
+}
+
+.error_message_invisible {
+	visibility: hidden;
+}
+
+@media only screen and (max-width: 580px) {
+	.createRoom_container {
+		height: 450px;
+	}
+}

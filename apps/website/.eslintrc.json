@@ -1,3 +1,18 @@
 {
-  "extends": "next/core-web-vitals"
+	"extends": [
+		"next/core-web-vitals",
+		"eslint:recommended"
+	],
+	"rules": {
+		"indent": ["error", "tab"],
+		"semi": ["error", "always"],
+		"brace-style": ["error", "1tbs"],
+		"quotes": [ "error", "single" ],
+		"linebreak-style": [ "error", "unix" ],
+		"curly": ["error", "multi-or-nest"],
+		"no-multiple-empty-lines": ["error", { "max": 1 }],
+		"max-len": ["warn", { "code": 90}],
+		"keyword-spacing": ["error", { "after": true, "before": true }],
+		"no-trailing-spaces": ["error"]
+	}
 }

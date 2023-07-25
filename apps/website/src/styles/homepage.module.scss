@@ -1,0 +1,34 @@
+@import './library';
+
+.container {
+	display: flex;
+	background-color: $off-white-color;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+}
+
+.content {
+	display: flex;
+	gap: 2em;
+	box-sizing: border-box;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+}
+
+.info_container {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	gap: 40px;
+	padding: 0px 20px;
+	box-sizing: border-box;
+	flex-wrap: wrap;
+}
+
+@media only screen and (max-width: 475px) {
+	.info_container {
+		padding: 0px 0px;
+	}
+}

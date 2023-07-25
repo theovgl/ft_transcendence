@@ -1,0 +1,39 @@
+@import '../../styles/library';
+
+.message {
+	display: flex;
+	align-items: flex-start;
+	width: 100%;
+	font-family: $font-family;
+	padding: 10px 20px;
+	box-sizing: border-box;
+	gap: 10px;
+}
+
+.message_profilePic {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.message_username {
+	font-weight: 600;
+}
+
+.message_content {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	gap: 5px;
+}
+
+.message_text {
+	color: $black-color;
+	word-break: break-word;
+}
+
+.message_button_container {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
