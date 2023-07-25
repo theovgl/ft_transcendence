@@ -88,6 +88,7 @@ export default function Conversation(props: ConversationProps) {
 			>
 				<input
 					placeholder='Type your message...'
+					autoComplete='off'
 					className={styles.message_input}
 					{...register('message', { required: true })}
 				/>
