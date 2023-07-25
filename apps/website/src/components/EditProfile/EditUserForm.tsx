@@ -18,12 +18,14 @@ export default function EditUserForm() {
 	const {
 		register,
 		setError,
+		reset,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<IFormValues>();
 
 	const saveNewDisplayName = (newDisplayName: string) => {
 		editUser({ displayName: newDisplayName});
+		reset();
 	};
 
 	const saveNewProfilPic = (newPath: string) => {
