@@ -4,6 +4,7 @@ import * as argon2 from 'argon2';
 import { Server, Socket } from 'socket.io';
 import { PrismaService, Room, User } from '../prisma/prisma.service';
 import { Message } from './app.interface';
+import { MessageDto } from './dto';
 
 @Injectable()
 export class ChatService implements OnModuleInit {
@@ -265,7 +266,7 @@ export class ChatService implements OnModuleInit {
 		return sockets;
 	}
 
-	async storeMessageAndSend(client: Socket, payload, server: Server){
+	async storeMessageAndSend(client: Socket, payload: MessageDto, server: Server){
 		const message = await this.storeMessage(payload);
 		if (message) {
 			const msg: Message = {
