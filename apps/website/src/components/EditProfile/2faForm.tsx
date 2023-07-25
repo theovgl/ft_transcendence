@@ -1,10 +1,10 @@
+import { useUser } from '@/utils/hooks/useUser';
 import Image from 'next/image';
-import { useForm } from 'react-hook-form';
-import FormLabel from './FormLabel';
-import styles from './EditUserForm.module.scss';
 import { useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { useUser } from '@/utils/hooks/useUser';
+import { useForm } from 'react-hook-form';
+import styles from './EditUserForm.module.scss';
+import FormLabel from './FormLabel';
 
 interface IFormValues {
 	'checkbox': Boolean;
@@ -141,27 +141,32 @@ export default function TwoFaForm() {
 			onSubmit={handleSubmit(onSubmit)}
 		>
 			<div className={styles.formSection}>
-				<div className={styles.formSection}>
+				<div className={styles.labeledInput_container}>
 					<FormLabel content='Two factor authentication' />
-					<input type="checkbox"
-						id="checkbox"
-						{...register('checkbox')}
-					/>
-					{(qrCode !== null && !is2faEnable && checkboxValue) &&
-						<Image
-							width={200}
-							height={200}
-							src={qrCode}
-							alt='2fa qrcode'
-						/>}
-				</div>
-				{isPromptDisplayed &&
-					<div className={styles.labeledInput_container}>
+					<div className={styles.tfa_container}>
+						<div className={styles.tfa_checkbox_container}>
+							<p className={styles.tfa_checkbox_label}>Enable ?</p>
+							<input type="checkbox"
+								id="checkbox"
+								{...register('checkbox')}
+							/>
+						</div>
+						{(qrCode !== null && !is2faEnable && checkboxValue) &&
+							<Image
+								width={200}
+								height={200}
+								src={qrCode}
+								alt='2fa qrcode'
+							/>}
+					</div>
+					{isPromptDisplayed &&
+					<>
 						<input
+							autoComplete='off'
 							className={`
-							${styles.input}
-							${errors.tfaCode ? styles.input_error : ''}
-						`}
+								${styles.input}
+								${errors.tfaCode ? styles.input_error : ''}
+							`}
 							type='text'
 							placeholder='2FA Code'
 							{...register('tfaCode', {
@@ -180,8 +185,9 @@ export default function TwoFaForm() {
 								styles.error_message : styles.error_message_invisible
 						}
 						>{errors.tfaCode && errors.tfaCode.message}</span>
-					</div>
-				}
+					</>
+					}
+				</div>
 			</div>
 		</form>
 	);
