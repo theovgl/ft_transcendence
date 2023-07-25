@@ -393,7 +393,7 @@ export class ChatService implements OnModuleInit {
 		const isOwner = await this.isOwner(owner, roomName);
 		if (newRoom.status === 'public' || checkPass || isOwner){
 			await this.addUserToRoom(owner, roomName);
-			if (!checkPass && newRoom.status !== 'public' && isOwner)
+			if (newRoom.status !== 'public' && isOwner)
 				await this.setPassword(roomName ,password);
 			client.emit('loadDm', {name: owner, dmName: roomName});
 		}
