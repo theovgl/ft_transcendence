@@ -109,10 +109,10 @@ export default function Chat() {
 					setTablist((currenTablist: TabItem[]) => {
 						const isLabelAlreadyExists = tablistRef.current.some(
 							(tab: any) => tab.label === payload
-						);
-						if (isLabelAlreadyExists)
+							);
+							if (isLabelAlreadyExists)
 							return [...currenTablist];
-						else
+							else
 							if (tablistRef.current.length === 0) {
 								setRoom('General');
 								return [...currenTablist,

@@ -54,10 +54,15 @@ export class ChatService implements OnModuleInit {
 		const user = await this.findUser(userName);
 		const room = await this.findRoom(roomName);
 
+		if (room.name === 'General')
+			return false;
 		if (user && room) {
 			if (room.ownerId)
 				return room.ownerId === user.id;
-
+			else {
+				this.setUserAsOwner(userName, roomName);
+				return true;
+			}
 		}
 		return false;
 	}
@@ -323,8 +328,20 @@ export class ChatService implements OnModuleInit {
 		await this.removeOwner(username, roomName);
 		await this.addUserToRoom(this.clientList.get(client), roomName);
 		await this.addUserToRoom(payload, roomName);
-		await this.storeMessage({author: username, channel: roomName, message: 'Clique sur play pour jouer avec moi !'});
+		const message = await this.storeMessage({author: username, channel: roomName, message: 'Clique sur play pour jouer avec moi !'});
 		await this.loadRoom(client, roomName);
+		if (message) {
+			const msg: Message = {
+				username: message.author.displayName,
+				author: message.author.name,
+				channel: message.room.name,
+				message: message.content,
+			};
+			for (const [client, userId] of this.clientList) {
+				if (userId === payload)
+					client.emit('msgToClient', msg);
+			}
+		}
 	}
 
 	public async setAdmin(userName: string, roomName: string){
@@ -358,7 +375,7 @@ export class ChatService implements OnModuleInit {
 	public async checkPassword(password: string, roomName: string) {
 		const room = await this.findRoom(roomName);
 		if (room){
-			if (room.password === null)
+			if (room.password === null || !room.password)
 				return true;
 			 else if (password)
 				return (await argon2.verify(room.password, password));
@@ -382,10 +399,30 @@ export class ChatService implements OnModuleInit {
 
 	public async leaveRoom(clientName: string, roomName: string){
 		await this.removeTalk(clientName, roomName, this.prisma.talk);
+		if (await this.isOwner(clientName, roomName)) {
+			await this.removeOwner(clientName, roomName);
+			const room = await this.findRoom(roomName);
+			if (room){
+				const talk = await this.prisma.talk.findFirst({
+					where: {
+						roomId: room.id
+					},
+					include: {
+						user: true,
+					},
+				});
+				if (talk){
+					await this.setUserAsOwner(talk.user.name, roomName);
+					for (const [client, userId] of this.clientList) {
+						if (userId === talk.user.name)
+							client.emit('setAdmin', true);
+					}
+				}
+			}
+		}
 		for (const [client, userId] of this.clientList) {
 			if (userId === clientName)
 				client.emit('leaveRoomClient', roomName);
-
 		}
 	}
 

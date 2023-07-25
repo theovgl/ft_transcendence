@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useUser } from '@/utils/hooks/useUser';
 import ProfilePic from './UserProfile/ProfilePic';
 import { useAuth } from '@/utils/hooks/useAuth';
+import Head from 'next/head';
 
 export default function Navbar() {
 	const { isAuthenticated } = useAuth();
