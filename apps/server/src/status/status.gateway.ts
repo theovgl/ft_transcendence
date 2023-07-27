@@ -23,7 +23,6 @@ export class StatusGateway {
 
 	@SubscribeMessage('addConnectedUser')
 	async handleUserConnected(@MessageBody() data: string, @ConnectedSocket() client: Socket): Promise<string> {
-		console.log('test');
 		// this.server.emit('dbCheck');
 		await this.onlineUsers.set(client.id, data);
 		this.server.emit('mapUpdated', this.onlineUsers.get(client.id));

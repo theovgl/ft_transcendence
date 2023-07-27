@@ -11,6 +11,7 @@ import { Server, Socket } from 'socket.io';
 import { Message } from './app.interface';
 import { ChatService } from './app.service';
 import { roomCreationDto } from './dto/roomCreation.dto';
+import { MessageDto } from './dto';
 
 @WebSocketGateway({
 	cors: {
@@ -31,7 +32,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
 	//Message Events
 	@SubscribeMessage('msgToServer')
-	async handleMessage(client: Socket, payload: Message) {
+	async handleMessage(client: Socket, payload: MessageDto) {
 		await this.chatService.storeMessageAndSend(client, payload, this.server);
 	}
 
@@ -87,7 +88,6 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 	@SubscribeMessage('dbCheck')
 	async handleDbCheck(client: Socket, data: string){
-		console.log("check DB...");
 		if (!await this.chatService.findUser(data)){
 			console.log('client not in DB');
 			client.emit('logout');
