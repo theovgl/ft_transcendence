@@ -90,7 +90,8 @@ export default function Profile() {
 			}
 		};
 		user_matches();
-	}, []);
+	}, [router]);
+
 	// This useEffect is used to update the button text when the user changes as blocked or unblocked
 	useEffect(() => {
 		if (!router.isReady) return;

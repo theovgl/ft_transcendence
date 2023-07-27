@@ -10,6 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Message } from './app.interface';
 import { ChatService } from './app.service';
+import { roomCreationDto } from './dto/roomCreation.dto';
 
 @WebSocketGateway({
 	cors: {
@@ -70,7 +71,7 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	}
 
 	@SubscribeMessage('createRoom')
-	handleCreateRoom(client: Socket, payload: {roomName: string, status: string, password ?: string}): void {
+	handleCreateRoom(client: Socket, payload: roomCreationDto): void {
 		this.chatService.roomCreation(client, payload.roomName, payload.status, payload.password);
 	}
 

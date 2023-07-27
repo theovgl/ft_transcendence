@@ -143,12 +143,21 @@ export class MatchmakingService {
 			value.emit('statusinGame');
 
 	}
+
+	private pingStatusInvite(waitingPlayers: Map<string, [string, Socket]>): void {
+		const values = waitingPlayers.values();
+
+		for (const value of values)
+			value[1].emit('statusinGame');
+	}
+
 	public startMatchmaking(server): void {
 		setInterval(() => {
+			this.pingStatusInvite(this.premadePlayers);
 			this.pingStatus(this.waitingPlayerSpecial);
 			this.pingStatus(this.waitingPlayers);
 			this.matchPlayers(server, this.waitingPlayers, 'Normal');
 			this.matchPlayers(server, this.waitingPlayerSpecial, 'Special');
-		}, 5000);
+		}, 3000);
 	}
 }
