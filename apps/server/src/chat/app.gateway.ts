@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Logger, OnModuleDestroy } from '@nestjs/common';
 import {
 	OnGatewayConnection,
 	OnGatewayDisconnect,
@@ -23,7 +23,7 @@ import { ChatService } from './app.service';
 		allowEIO4: true,
 	},
 })
-export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnModuleDestroy {
 	constructor(private readonly chatService: ChatService) {}
 	@WebSocketServer() server: Server;
 	private logger: Logger = new Logger('ChatGateway');
@@ -84,7 +84,15 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 	handleRoomCreation(client: Socket, payload: string): void {
 		this.server.emit('CreateRoomFromClient', payload);
 	}
-
+	@SubscribeMessage('dbCheck')
+	async handleDbCheck(client: Socket, data: string){
+		console.log("check DB...");
+		if (!await this.chatService.findUser(data)){
+			console.log('client not in DB');
+			client.emit('logout');
+		}
+	}
+	
 	@SubscribeMessage('ChangeRoomFromClient')
 	handleRoomChange(client: Socket, payload: string): void {
 		this.chatService.changeRoom(client, payload);
@@ -112,5 +120,11 @@ export class ChatGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 		this.chatService.userDisconnection(client);
 	}
 
-	handleConnection(client: Socket, ...args: any[]) {}
+	onModuleDestroy() {
+		this.server.emit('logout');
+	}
+
+	handleConnection(client: Socket, ...args: any[]) {
+		// if (!this.chatService.findUser())
+	}
 }

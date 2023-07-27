@@ -9,7 +9,7 @@ type SocketContextType = {
 export const SocketContext = React.createContext<SocketContextType | null>(null!);
 
 export const SocketProvider = (props: React.PropsWithChildren) => {
-	const { isAuthenticated, user } = useAuth();
+	const { isAuthenticated, user, logout } = useAuth();
 	const [isSocketConnected, setIsSocketConnected] = useState(false);
 	const { children } = props;
 
@@ -21,9 +21,14 @@ export const SocketProvider = (props: React.PropsWithChildren) => {
 			socket.current.on('connect', () => {
 				console.info('Socket connected');
 				socket.current?.emit('addConnectedUser', user?.name);
+				socket.current?.emit('dbCheck', user?.name);
 				setIsSocketConnected(true);
 			});
 
+			socket.current?.on('logout', () => {
+				logout();
+			})
+			
 			socket.current?.on('disconnect', () => {
 				console.info('Socket disconnected');
 				socket.current?.emit('removeConnectedUser', user?.name);

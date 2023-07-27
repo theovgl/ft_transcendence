@@ -1,6 +1,7 @@
 import { Logger } from '@nestjs/common';
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { ChatService } from '../chat/app.service';
 
 @WebSocketGateway({
 	cors: {
@@ -22,6 +23,8 @@ export class StatusGateway {
 
 	@SubscribeMessage('addConnectedUser')
 	async handleUserConnected(@MessageBody() data: string, @ConnectedSocket() client: Socket): Promise<string> {
+		console.log('test');
+		// this.server.emit('dbCheck');
 		await this.onlineUsers.set(client.id, data);
 		this.server.emit('mapUpdated', this.onlineUsers.get(client.id));
 		return data;
