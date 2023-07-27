@@ -1,0 +1,17 @@
+@import '../../styles/library';
+
+.btn {
+	display: flex;
+	align-items: center;
+	border: 2px solid ;
+	padding: 4px 8px;
+	border-radius: 10px;
+	cursor: pointer;
+	background-color: $off-white-color;
+	filter: brightness(100%);
+	transition: filter 0.15 ease-out;
+
+	&:hover {
+		filter: brightness(90%);
+	}
+}

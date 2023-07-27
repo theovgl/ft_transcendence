@@ -1,0 +1,54 @@
+@import '../../styles/library';
+
+.match_card {
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	padding: 20px 35px;
+	border: 5px solid $black-color;
+	border-radius: 20px;
+	width: 100%;
+
+	@media only screen and (max-width: 900px) {
+		justify-content: flex-start;
+		flex-wrap: wrap;
+		max-width: 100%;
+		padding: 10px 20px;
+	}
+}
+
+.score_container {
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+.player_name {
+	font-family: $font-family;
+
+	&.winner {
+		text-decoration: underline;
+	}
+}
+
+.player_score {
+	font-family: $font-family;
+	font-weight: 900;
+	font-size: 24px;
+	color: #b1b1b1;
+
+	&.winner {
+		color: $black-color;
+	}
+}
+
+.score_separator {
+	font-family: $font-family;
+	font-weight: 300;
+}
+
+.match_duration {
+	font-family: $font-family;
+	text-align: center;
+	color: #666;
+}
